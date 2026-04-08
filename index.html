@@ -1756,3 +1756,589 @@
     if (!raw || typeof raw !== 'object') return null;
     let hist = raw.historical || raw.history || raw.past;
     let proj = raw.projected || raw.projection || raw.forecast;
+    if (Array.isArray(raw.series)) {
+      hist = raw.series.filter(function (p) {
+        return !p.projected;
+      });
+      proj = raw.series.filter(function (p) {
+        return p.projected;
+      });
+    }
+    if (!Array.isArray(hist)) hist = [];
+    if (!Array.isArray(proj)) proj = [];
+    const events = Array.isArray(raw.events) ? raw.events : raw.annotations || [];
+    const threshold =
+      num(raw.poverty_threshold_price) ||
+      num(raw.threshold_price) ||
+      2.14;
+    const projMeta = raw.projections || raw.projection_summary || {};
+    return {
+      historical: hist,
+      projected: proj,
+      events: events,
+      threshold: threshold,
+      july: projMeta.july || projMeta.july_2026,
+      oct: projMeta.october || projMeta.oct_2026
+    };
+  }
+
+  function parseHistoryDate(s) {
+    const d = new Date(s);
+    return Number.isFinite(d.getTime()) ? d : null;
+  }
+
+  function buildSyntheticHistory() {
+    const hist = [];
+    const proj = [];
+    const d = new Date('2022-01-01');
+    let price = 1.42;
+    let i = 0;
+    while (d <= new Date('2026-04-01')) {
+      const ds = d.toISOString().slice(0, 10);
+      price += Math.sin(i / 5) * 0.04 + 0.018;
+      price = Math.min(2.42, Math.max(1.25, price));
+      hist.push({ date: ds, price: Number(price.toFixed(2)) });
+      d.setMonth(d.getMonth() + 1);
+      i++;
+    }
+    const d2 = new Date('2026-05-01');
+    while (d2 <= new Date('2026-10-01')) {
+      const ds = d2.toISOString().slice(0, 10);
+      price += 0.045;
+      proj.push({ date: ds, price: Number(price.toFixed(2)) });
+      d2.setMonth(d2.getMonth() + 1);
+    }
+    return {
+      historical: hist,
+      projected: proj,
+      events: [
+        { date: '2022-02-24', label: 'Russia invades Ukraine' },
+        { date: '2025-06-01', label: 'Iran conflict' },
+        { date: '2026-04-08', label: 'Today' }
+      ],
+      threshold: 2.14,
+      july: { counties_in_poverty: 14 },
+      oct: { counties_in_poverty: 16 }
+    };
+  }
+
+  function renderHistoryChart(data) {
+    const canvas = document.getElementById('chart-history');
+    const un = document.getElementById('history-unavail');
+    if (!canvas || typeof Chart === 'undefined') return;
+    const h = data.historical || [];
+    const p = data.projected || [];
+    if (h.length === 0 && p.length === 0) {
+      if (un) {
+        un.style.display = 'block';
+        un.textContent = 'Forecast API unavailable.';
+      }
+      return;
+    }
+    if (un) un.style.display = 'none';
+
+    const labels = [];
+    const histData = [];
+    const projData = [];
+    const histSet = new Set();
+    h.forEach(function (pt) {
+      const ds = pt.date || pt.t;
+      labels.push(ds);
+      histSet.add(ds);
+      histData.push(num(pt.price != null ? pt.price : pt.value));
+      projData.push(null);
+    });
+    p.forEach(function (pt) {
+      const ds = pt.date || pt.t;
+      if (labels.indexOf(ds) === -1) labels.push(ds);
+    });
+    labels.sort();
+
+    const hMap = {};
+    h.forEach(function (pt) {
+      hMap[pt.date || pt.t] = num(pt.price != null ? pt.price : pt.value);
+    });
+    const pMap = {};
+    p.forEach(function (pt) {
+      pMap[pt.date || pt.t] = num(pt.price != null ? pt.price : pt.value);
+    });
+
+    const hArr = [];
+    const pArr = [];
+    let maxY = 0;
+    labels.forEach(function (lb) {
+      const hv = hMap[lb];
+      const pv = pMap[lb];
+      if (hv != null && !Number.isNaN(hv)) {
+        hArr.push(hv);
+        pArr.push(null);
+        maxY = Math.max(maxY, hv);
+      } else if (pv != null && !Number.isNaN(pv)) {
+        hArr.push(null);
+        pArr.push(pv);
+        maxY = Math.max(maxY, pv);
+      } else {
+        hArr.push(null);
+        pArr.push(null);
+      }
+    });
+    maxY = Math.max(maxY, data.threshold + 0.5, 4);
+
+    const ann = {
+      redStress: {
+        type: 'box',
+        yMin: data.threshold,
+        yMax: maxY,
+        backgroundColor: 'rgba(239, 68, 68, 0.12)',
+        borderWidth: 0
+      }
+    };
+    (data.events || []).forEach(function (ev, idx) {
+      const ds = ev.date || ev.x;
+      if (!ds) return;
+      ann['ev' + idx] = {
+        type: 'line',
+        xMin: ds,
+        xMax: ds,
+        borderColor: 'rgba(250, 250, 250, 0.25)',
+        borderWidth: 1,
+        borderDash: [4, 4],
+        label: {
+          display: true,
+          content: ev.label || '',
+          color: '#94a3b8',
+          position: 'start',
+          font: { size: 9 }
+        }
+      };
+    });
+    ann.thresholdLine = {
+      type: 'line',
+      yMin: data.threshold,
+      yMax: data.threshold,
+      borderColor: '#ef4444',
+      borderWidth: 1,
+      borderDash: [4, 4],
+      label: {
+        display: true,
+        content: 'Poverty threshold €' + data.threshold,
+        color: '#f87171',
+        position: 'end',
+        font: { size: 9 }
+      }
+    };
+
+    if (historyChartInstance) {
+      historyChartInstance.destroy();
+      historyChartInstance = null;
+    }
+
+    historyChartInstance = new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Historical',
+            data: hArr,
+            borderColor: '#f97316',
+            backgroundColor: 'rgba(249,115,22,0.06)',
+            tension: 0.25,
+            spanGaps: false,
+            fill: false,
+            pointRadius: 0
+          },
+          {
+            label: 'Projected',
+            data: pArr,
+            borderColor: '#f97316',
+            borderDash: [6, 4],
+            tension: 0.25,
+            spanGaps: false,
+            fill: false,
+            pointRadius: 0
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            labels: { color: '#e2e8f0' }
+          },
+          annotation: {
+            annotations: ann
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: '#94a3b8', maxRotation: 45, font: { size: 9 } }
+          },
+          y: {
+            min: 0,
+            max: maxY,
+            grid: { color: 'rgba(148,163,184,0.12)' },
+            ticks: { color: '#94a3b8' }
+          }
+        }
+      }
+    });
+  }
+
+  function sliderPct(val) {
+    const v = parseFloat(val);
+    return (((v - 1.5) / 2.5) * 100).toFixed(2);
+  }
+
+  function setSliderVisual(val) {
+    document.getElementById('price-slider').style.setProperty('--pct', sliderPct(val) + '%');
+  }
+
+  function setSliderVisualA(val) {
+    const el = document.getElementById('price-slider-a');
+    if (el) el.style.setProperty('--pct', sliderPctA(val) + '%');
+  }
+
+  function setSliderVisualB(val) {
+    const el = document.getElementById('price-slider-b');
+    if (el) el.style.setProperty('--pct', sliderPctB(val) + '%');
+  }
+
+  function normalizeCountyPayload(data) {
+    if (!data || typeof data !== 'object') return data;
+    const o = Object.assign({}, data);
+    if (o.poverty_pct_at_price == null && typeof o.energy_poverty_pct === 'number') {
+      o.poverty_pct_at_price = o.energy_poverty_pct;
+    }
+    if (o.estimated_annual_income == null && o.estimated_annual_income_eur != null) {
+      o.estimated_annual_income = o.estimated_annual_income_eur;
+    }
+    if (o.cliff_price_eur == null && o.cliff_price_eur_l != null) {
+      o.cliff_price_eur = o.cliff_price_eur_l;
+    }
+    if (o.retrofit_roi_saving_10yr == null && o.retrofit_roi_saving_10yr_eur != null) {
+      o.retrofit_roi_saving_10yr = o.retrofit_roi_saving_10yr_eur;
+    }
+    return o;
+  }
+
+  async function fetchCounty(county, price) {
+    const url = `${API}/county/${encodeURIComponent(county)}?fuel_price=${price}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      const err = new Error(res.statusText || 'HTTP ' + res.status);
+      err.status = res.status;
+      throw err;
+    }
+    const raw = await res.json();
+    const data = normalizeCountyPayload(raw);
+    if (!data || typeof data.county !== 'string') {
+      const err = new Error('Invalid response');
+      err.status = res.status;
+      throw err;
+    }
+    return data;
+  }
+
+  async function loadAllCounties(price) {
+    const results = await Promise.all(
+      COUNTIES.map((c) =>
+        fetchCounty(c, price).then(
+          (d) => ({ ok: true, county: c, data: d }),
+          (err) => ({ ok: false, county: c, data: null, err: err })
+        )
+      )
+    );
+    countyData = {};
+    results.forEach((r) => {
+      countyData[r.county] = r.ok ? r.data : null;
+    });
+    return results;
+  }
+
+  function describeLoadFailure(sampleErr) {
+    var proto = location.protocol;
+    var host = location.hostname;
+    if (proto === 'file:') {
+      return (
+        'This page was opened as a local file (file://). Run `node dev-server.mjs` in the fuel-fault-lines-app folder, ' +
+        'then open http://127.0.0.1:5500/ in your browser.'
+      );
+    }
+    var st = sampleErr && sampleErr.status;
+    if (st === 503 || st === 502) {
+      return (
+        'The Zerve model hub is temporarily unavailable (HTTP ' +
+        st +
+        '). Your local proxy is not the problem if you are using one — try again later.'
+      );
+    }
+    if (typeof st === 'number' && st >= 400) {
+      if (st === 404) {
+        return (
+          'The model API returned HTTP 404. The app expects https://fuel.hub.zerve.cloud ' +
+          '(the old fuel-fault-lines.hub.zerve.cloud host returns 404). Do not put /api on the hub URL — ' +
+          'routes are /county/..., /scenario, … at the root. Hard-refresh this page, ' +
+          'or set window.__FFL_API_BASE__ to your hub origin before the script runs. ' +
+          'If you use node dev-server.mjs, open the app at http://127.0.0.1:5500/ so requests go through /api.'
+        );
+      }
+      return 'The model API returned HTTP ' + st + '. Check the hub URL or your connection.';
+    }
+    var msg = sampleErr && sampleErr.message ? String(sampleErr.message) : '';
+    var isNet =
+      (sampleErr && sampleErr.name === 'TypeError') || /Failed to fetch/i.test(msg);
+    if (isNet) {
+      var local =
+        host === 'localhost' ||
+        host === '127.0.0.1' ||
+        host === '[::1]' ||
+        host === '0.0.0.0';
+      if (local) {
+        return (
+          'Cannot reach the API from this page. Start the proxy with `node dev-server.mjs` in fuel-fault-lines-app, ' +
+          'then open http://127.0.0.1:5500/ (not a raw file or a different port without /api).'
+        );
+      }
+      return (
+        'Cannot reach the API (network or browser CORS). Serve this app from http://127.0.0.1:5500 with dev-server.mjs, ' +
+        'or open the deployed site.'
+      );
+    }
+    return 'API unreachable.';
+  }
+
+  function getTierClass(d) {
+    if (d.risk_tier === 'Critical') return 'critical';
+    if (d.risk_tier === 'High') return 'high';
+    if (d.risk_tier === 'Medium') return 'medium';
+    return 'low';
+  }
+
+  function povertyPct(d) {
+    const p = d.poverty_pct_at_price;
+    if (typeof p === 'number' && !Number.isNaN(p)) return p;
+    if (typeof d.energy_poverty_pct === 'number') return d.energy_poverty_pct;
+    return 0;
+  }
+
+  function tierColor(d) {
+    return COLORS[getTierClass(d)] || COLORS.low;
+  }
+
+  function destroyRadar() {
+    if (radarChartInstance) {
+      radarChartInstance.destroy();
+      radarChartInstance = null;
+    }
+  }
+
+  function updateNationalChart() {
+    const sorted = [...COUNTIES]
+      .filter((c) => countyData[c])
+      .sort((a, b) => countyData[b].vulnerability_score - countyData[a].vulnerability_score);
+    const ctx = document.getElementById('chart-national');
+    if (!ctx || typeof Chart === 'undefined') return;
+
+    if (sorted.length === 0) {
+      if (nationalChartInstance) {
+        nationalChartInstance.destroy();
+        nationalChartInstance = null;
+      }
+      return;
+    }
+
+    const labels = sorted;
+    const data = sorted.map((c) => countyData[c].vulnerability_score);
+    const colors = sorted.map((c) => tierColor(countyData[c]));
+
+    const commonOptions = {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#12110f',
+          titleColor: '#f5f3ef',
+          bodyColor: '#e3dfd6',
+          borderColor: '#3d3a35',
+          borderWidth: 1,
+          titleFont: { family: CHART_FONT, size: 11, weight: '600' },
+          bodyFont: { family: CHART_FONT, size: 11 },
+          padding: 10,
+          callbacks: {
+            label: function (ctx) {
+              const c = sorted[ctx.dataIndex];
+              const d = countyData[c];
+              if (!d) return '';
+              return [
+                'Index ' + formatNum(d.vulnerability_score),
+                'Fuel share ' + povertyPct(d).toFixed(1) + '% of income',
+                d.in_energy_poverty ? 'Above 10% line' : 'Below 10% line'
+              ];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0,
+          max: 100,
+          grid: { color: 'rgba(26,25,22,0.08)' },
+          ticks: { color: '#6b665e', font: { family: CHART_FONT, size: 9 } },
+          border: { color: 'rgba(26,25,22,0.2)' }
+        },
+        y: {
+          grid: { display: false },
+          ticks: {
+            color: '#3d3a35',
+            font: { family: CHART_FONT, size: 9 },
+            autoSkipPadding: 4
+          },
+          border: { display: false }
+        }
+      }
+    };
+
+    if (nationalChartInstance) {
+      nationalChartInstance.data.labels = labels;
+      nationalChartInstance.data.datasets[0].data = data;
+      nationalChartInstance.data.datasets[0].backgroundColor = colors;
+      nationalChartInstance.update('none');
+    } else {
+      nationalChartInstance = new Chart(ctx.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Index',
+            data,
+            backgroundColor: colors,
+            borderWidth: 0,
+            borderRadius: 0,
+            barThickness: 7
+          }]
+        },
+        options: commonOptions
+      });
+    }
+  }
+
+  function updateStats() {
+    const vals = COUNTIES.map((c) => countyData[c]).filter(Boolean);
+    const critical = vals.filter((d) => d.risk_tier === 'Critical').length;
+    const inPoverty = vals.filter((d) => d.in_energy_poverty).length;
+
+    const elC = document.getElementById('stat-critical');
+    const elP = document.getElementById('stat-poverty');
+    elC.textContent = critical;
+    elP.textContent = inPoverty;
+    elC.classList.remove('muted');
+    elP.classList.remove('muted');
+
+    const alert = document.getElementById('crisis-alert');
+    const households = vals
+      .filter((d) => d.in_energy_poverty)
+      .reduce((s, d) => s + (Number(d.est_vulnerable_households) || 0), 0);
+
+    if (inPoverty > 0) {
+      alert.classList.add('show');
+      document.getElementById('crisis-count').textContent = String(inPoverty);
+      document.getElementById('crisis-households').textContent = households.toLocaleString();
+    } else {
+      alert.classList.remove('show');
+    }
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('county-grid');
+    const reg = document.getElementById('county-register');
+    if (reg) {
+      reg.classList.toggle('compare-active', compareMode && scenarioCompared);
+    }
+    updateCompareHeads();
+
+    const sorted = [...COUNTIES].sort((a, b) => {
+      const da = countyData[a];
+      const db = countyData[b];
+      const sa = da ? da.vulnerability_score : -1;
+      const sb = db ? db.vulnerability_score : -1;
+      return sb - sa;
+    });
+
+    const cmp = compareMode && scenarioCompared && scenarioByCounty;
+
+    grid.innerHTML = sorted
+      .map(function (county) {
+        const d = countyData[county];
+        if (d === null) {
+          const errCls = cmp ? ' county-row compare error' : ' county-row error';
+          return (
+            '<button type="button" class="' +
+            errCls.trim() +
+            '" title="Retry"' +
+            ' onclick="window.__fflRetryCounty(\'' +
+            county.replace(/'/g, "\\'") +
+            '\')">' +
+            '<span class="cr-name">' +
+            escapeHtml(county) +
+            '</span>' +
+            '<span class="cr-err">Request failed — click to retry</span>' +
+            '</button>'
+          );
+        }
+        const tier = getTierClass(d);
+        const sel = county === selectedCounty ? ' selected' : '';
+        const microW = Math.min(100, Math.max(0, d.vulnerability_score || 0)).toFixed(0);
+        const rowCls = 'county-row ' + tier + sel + (cmp ? ' compare' : '');
+
+        if (cmp) {
+          const sc = scenarioByCounty[county];
+          const pa =
+            sc && sc.poverty_pct_a != null
+              ? sc.poverty_pct_a
+              : povertyPct(d);
+          const pb = sc && sc.poverty_pct_b != null ? sc.poverty_pct_b : null;
+          const inB =
+            sc && sc.in_poverty_b != null ? !!sc.in_poverty_b : false;
+          const inA =
+            sc && sc.in_poverty_a != null ? !!sc.in_poverty_a : !!d.in_energy_poverty;
+          const newRisk =
+            sc && (sc.newly_at_risk || (!inA && inB));
+          const pbStr = pb != null && !Number.isNaN(pb) ? pb.toFixed(1) : '—';
+          const clsA = inA ? ' cr-pct--bad' : '';
+          const clsB = inB ? ' cr-pct--bad' : '';
+          const badge = newRisk ? '<span class="badge-new">NEWLY AT RISK</span>' : '';
+          return (
+            '<button type="button" class="' +
+            rowCls +
+            '" onclick="window.__fflSelectCounty(\'' +
+            county.replace(/'/g, "\\'") +
+            '\')">' +
+            '<span class="cr-name">' +
+            escapeHtml(county) +
+            badge +
+            '</span>' +
+            '<span class="cr-score">' +
+            formatNum(d.vulnerability_score) +
+            '</span>' +
+            '<span class="cr-pct' +
+            clsA +
+            '">' +
+            pa.toFixed(1) +
+            '</span>' +
+            '<span class="cr-pct' +
+            clsB +
+            '">' +
+            pbStr +
+            '</span>' +
+            '<span class="cr-tier">' +
+            escapeHtml(String(d.risk_tier)) +
+            '</span>' +
+            '<span class="cr-bar"><span style="width:' +
+            microW +
+            '%"></span></span>' +
