@@ -2342,3 +2342,588 @@
             '<span class="cr-bar"><span style="width:' +
             microW +
             '%"></span></span>' +
+            '</button>'
+          );
+        }
+
+        const pov = povertyPct(d);
+        const pctClass = d.in_energy_poverty ? ' cr-pct--bad' : '';
+        return (
+          '<button type="button" class="' +
+          rowCls +
+          '" onclick="window.__fflSelectCounty(\'' +
+          county.replace(/'/g, "\\'") +
+          '\')">' +
+          '<span class="cr-name">' +
+          escapeHtml(county) +
+          '</span>' +
+          '<span class="cr-score">' +
+          formatNum(d.vulnerability_score) +
+          '</span>' +
+          '<span class="cr-pct' +
+          pctClass +
+          '">' +
+          pov.toFixed(1) +
+          '</span>' +
+          '<span class="cr-tier">' +
+          escapeHtml(String(d.risk_tier)) +
+          '</span>' +
+          '<span class="cr-bar"><span style="width:' +
+          microW +
+          '%"></span></span>' +
+          '</button>'
+        );
+      })
+      .join('');
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function formatNum(n) {
+    if (typeof n !== 'number' || Number.isNaN(n)) return '—';
+    return Number.isInteger(n) ? String(n) : n.toFixed(1);
+  }
+
+  function renderDetailError(county, message) {
+    destroyRadar();
+    document.getElementById('detail-panel').innerHTML =
+      '<div class="note-panel">' +
+      '<h2>' + escapeHtml(county) + '</h2>' +
+      '<p style="color:#7f1d1d;font-size:0.82rem;margin-top:0.65rem;line-height:1.5">' +
+      escapeHtml(message) + '</p>' +
+      '<p class="panel-refresh-hint">Change the price or retry.</p>' +
+      '</div>';
+  }
+
+  function buildRadar(d, scoreColor) {
+    destroyRadar();
+    const host = document.getElementById('radar-canvas-host');
+    if (!host || typeof Chart === 'undefined') return;
+
+    const vals = [
+      Number(d.fuel_dependency_score) || 0,
+      Number(d.building_inefficiency_score) || 0,
+      Number(d.social_deprivation_score) || 0,
+      Number(d.energy_intensity_score) || 0
+    ];
+    const ctx = host.getContext('2d');
+    radarChartInstance = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: ['Fuel dep.', 'Building', 'Social dep.', 'Energy int.'],
+        datasets: [{
+          label: 'Drivers',
+          data: vals,
+          fill: true,
+          backgroundColor: hexToRgba(scoreColor, 0.12),
+          borderColor: scoreColor,
+          borderWidth: 1.5,
+          pointBackgroundColor: scoreColor,
+          pointBorderColor: '#fdfcfa',
+          pointRadius: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          r: {
+            min: 0,
+            max: 100,
+            angleLines: { color: 'rgba(26,25,22,0.1)' },
+            grid: { color: 'rgba(26,25,22,0.08)' },
+            pointLabels: {
+              color: '#3d3a35',
+              font: { family: CHART_FONT, size: 9 }
+            },
+            ticks: { display: false, stepSize: 25 }
+          }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
+
+  function hexToRgba(hex, a) {
+    const m = hex.replace('#', '');
+    const n = parseInt(m.length === 3 ? m.split('').map((c) => c + c).join('') : m, 16);
+    const r = (n >> 16) & 255;
+    const g = (n >> 8) & 255;
+    const b = n & 255;
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+  }
+
+  function renderDetail(d) {
+    destroyRadar();
+    const tier = getTierClass(d);
+    const scoreColor = COLORS[tier];
+
+    document.getElementById('detail-panel').innerHTML =
+      '<div class="detail-stack">' +
+      '<div class="note-panel">' +
+      '<h2>' + escapeHtml(d.county) + '</h2>' +
+      '<p class="sub">' +
+      escapeHtml(d.province) +
+      ' · €' +
+      getActivePrice().toFixed(2) +
+      '/L scenario</p>' +
+      '<div class="score-block">' +
+      '<div class="num" style="color:' + scoreColor + '">' + formatNum(d.vulnerability_score) + '</div>' +
+      '<div class="meta">Composite index<br><strong style="color:' + scoreColor + '">' +
+      escapeHtml(String(d.risk_tier)) + '</strong></div></div>' +
+      '<p class="drivers-label">Component scores (0–100)</p>' +
+      '<div class="chart-radar-wrap"><canvas id="radar-canvas-host"></canvas></div>' +
+      buildCountyMetricsHtml(d, getActivePrice().toFixed(2)) +
+      '</div></div>';
+
+    requestAnimationFrame(function () {
+      buildRadar(d, scoreColor);
+    });
+  }
+
+  window.__fflRetryCounty = async function (county) {
+    try {
+      const d = await fetchCounty(county, getActivePrice());
+      countyData[county] = d;
+      var failed = COUNTIES.filter(function (c) {
+        return countyData[c] === null;
+      }).length;
+      if (failed === 0) hideGlobalError();
+      else showGlobalError('Partial data (' + failed + ' failed). Click row to retry.');
+      updateStats();
+      renderGrid();
+      updateNationalChart();
+      if (selectedCounty === county) renderDetail(d);
+    } catch (e) {
+      countyData[county] = null;
+      renderGrid();
+      updateNationalChart();
+    }
+  };
+
+  window.__fflSelectCounty = async function (county) {
+    selectedCounty = county;
+    renderGrid();
+    openCountyModal();
+    const mb = document.getElementById('modal-body');
+    mb.innerHTML =
+      '<div class="loading-inline"><div class="spinner"></div> Loading deep dive…</div>';
+
+    document.getElementById('detail-panel').innerHTML =
+      '<div class="loading-inline"><div class="spinner"></div> Fetching county…</div>';
+
+    const price = getActivePrice();
+    let d = null;
+    let deep = null;
+    try {
+      const pair = await Promise.all([
+        fetchCounty(county, price).catch(function () {
+          return null;
+        }),
+        fetchDeepDive(county, price)
+      ]);
+      d = pair[0];
+      deep = pair[1];
+    } catch (err) {
+      d = null;
+      deep = null;
+    }
+    if (d) countyData[county] = d;
+    const base = d || countyData[county];
+    if (!base) {
+      mb.innerHTML =
+        '<p style="color:#7f1d1d;font-size:0.82rem">Could not load county data.</p>';
+      renderDetailError(county, 'Could not load county.');
+      return;
+    }
+    const merged = Object.assign({}, base, deep || {});
+    try {
+      await fillCountyModal(county, merged);
+      renderDetail(merged);
+      updateStats();
+      renderGrid();
+      updateNationalChart();
+    } catch (err) {
+      mb.innerHTML =
+        '<p style="color:#7f1d1d;font-size:0.82rem">' +
+        escapeHtml(err.message || 'Could not render county.') +
+        '</p>';
+      renderDetailError(county, err.message || 'Could not render county.');
+    }
+  };
+
+  function showGlobalError(msg) {
+    const ge = document.getElementById('global-error');
+    ge.textContent = msg;
+    ge.classList.add('show');
+  }
+
+  function hideGlobalError() {
+    document.getElementById('global-error').classList.remove('show');
+  }
+
+  /* Compare mode: national chart and grid vulnerability scores stay tied to scenario A (priceA). */
+  async function runLoad(isInitial) {
+    const loadPrice = compareMode ? priceA : currentPrice;
+    try {
+      const results = await loadAllCounties(loadPrice);
+      const okCount = results.filter((r) => r.ok).length;
+      if (okCount === 0) {
+        var failed = results.find(function (r) {
+          return !r.ok && r.err;
+        });
+        showGlobalError(describeLoadFailure(failed ? failed.err : null));
+      } else {
+        hideGlobalError();
+        if (okCount < COUNTIES.length) {
+          showGlobalError(
+            'Incomplete load — ' +
+              (COUNTIES.length - okCount) +
+              ' counties missing. Click row to retry.'
+          );
+        }
+      }
+      updateStats();
+      renderGrid();
+      updateNationalChart();
+      if (selectedCounty && countyData[selectedCounty]) {
+        renderDetail(countyData[selectedCounty]);
+      } else if (selectedCounty && countyData[selectedCounty] === null) {
+        renderDetailError(selectedCounty, 'No row data at this price.');
+      }
+    } finally {
+      if (isInitial) {
+        document.getElementById('load-overlay').classList.add('hidden');
+      }
+    }
+  }
+
+  window.__fflSetCompareMode = function (on) {
+    compareMode = !!on;
+    scenarioCompared = false;
+    scenarioByCounty = null;
+    var errEl = document.getElementById('scenario-err');
+    if (errEl) {
+      errEl.classList.remove('show');
+      errEl.textContent = '';
+    }
+    var sumEl = document.getElementById('scenario-summary');
+    if (sumEl) {
+      sumEl.classList.remove('show');
+      sumEl.textContent = '';
+    }
+
+    document.getElementById('btn-single-mode').classList.toggle('active', !compareMode);
+    document.getElementById('btn-compare-mode').classList.toggle('active', compareMode);
+    document.getElementById('single-price-ui').classList.toggle('hidden', compareMode);
+    document.getElementById('compare-price-ui').classList.toggle('show', compareMode);
+
+    var cap = document.getElementById('fig1-caption');
+    if (compareMode) {
+      var sa = document.getElementById('price-slider-a');
+      var sb = document.getElementById('price-slider-b');
+      if (sa) priceA = parseFloat(sa.value);
+      if (sb) priceB = parseFloat(sb.value);
+      document.getElementById('stat-price').textContent = '€' + priceA.toFixed(2);
+      setSliderVisualA(String(priceA));
+      setSliderVisualB(String(priceB));
+      if (cap) {
+        cap.innerHTML =
+          '<strong>Fig. 1</strong> — Index at scenario A (€' + priceA.toFixed(2) + '/L)';
+      }
+    } else {
+      document.getElementById('stat-price').textContent = '€' + currentPrice.toFixed(2);
+      if (cap) {
+        cap.innerHTML =
+          '<strong>Fig. 1</strong> — County vulnerability index (0–100) at current price';
+      }
+    }
+    updateCompareHeads();
+    renderGrid();
+    runLoad(false);
+  };
+
+  window.__fflOnCompareA = function (val) {
+    priceA = parseFloat(val);
+    setSliderVisualA(val);
+    var ra = document.getElementById('price-val-a');
+    if (ra) ra.textContent = '€' + priceA.toFixed(2);
+    if (compareMode) document.getElementById('stat-price').textContent = '€' + priceA.toFixed(2);
+    if (compareMode && scenarioCompared) {
+      scenarioCompared = false;
+      scenarioByCounty = null;
+      var s = document.getElementById('scenario-summary');
+      if (s) {
+        s.classList.remove('show');
+        s.textContent = '';
+      }
+      var er = document.getElementById('scenario-err');
+      if (er) er.classList.remove('show');
+    }
+    updateCompareHeads();
+    renderGrid();
+    clearTimeout(sliderDebounce);
+    sliderDebounce = setTimeout(function () {
+      runLoad(false);
+    }, 400);
+  };
+
+  window.__fflOnCompareB = function (val) {
+    priceB = parseFloat(val);
+    setSliderVisualB(val);
+    var rb = document.getElementById('price-val-b');
+    if (rb) rb.textContent = '€' + priceB.toFixed(2);
+    if (compareMode && scenarioCompared) {
+      scenarioCompared = false;
+      scenarioByCounty = null;
+      var s = document.getElementById('scenario-summary');
+      if (s) {
+        s.classList.remove('show');
+        s.textContent = '';
+      }
+      var er = document.getElementById('scenario-err');
+      if (er) er.classList.remove('show');
+    }
+    updateCompareHeads();
+    renderGrid();
+  };
+
+  window.__fflRunScenarioCompare = async function () {
+    var el = document.getElementById('scenario-err');
+    if (el) {
+      el.classList.remove('show');
+      el.textContent = '';
+    }
+    priceA = parseFloat(document.getElementById('price-slider-a').value);
+    priceB = parseFloat(document.getElementById('price-slider-b').value);
+    var by = await fetchScenarioApi(priceA, priceB);
+    if (!by || Object.keys(by).length === 0) {
+      try {
+        by = await loadScenarioViaDualFetch(priceA, priceB);
+      } catch (e1) {
+        by = null;
+      }
+    }
+    if (!by || Object.keys(by).length === 0) {
+      if (el) {
+        el.textContent =
+          'Scenario comparison unavailable — could not load A/B pricing data.';
+        el.classList.add('show');
+      }
+      scenarioCompared = false;
+      scenarioByCounty = null;
+      updateCompareHeads();
+      renderGrid();
+      return;
+    }
+    scenarioByCounty = by;
+    scenarioCompared = true;
+    await runLoad(false);
+    updateScenarioSummary(priceA, priceB, by);
+    updateCompareHeads();
+    renderGrid();
+  };
+
+  window.__fflToggleHistory = async function () {
+    var panel = document.getElementById('history-panel');
+    var btn = document.getElementById('history-toggle');
+    if (!panel || !btn) return;
+    var opening = !panel.classList.contains('open');
+    panel.classList.toggle('open', opening);
+    btn.classList.toggle('expanded', opening);
+    btn.setAttribute('aria-expanded', opening ? 'true' : 'false');
+    if (!opening) return;
+    if (historyFetchDone) return;
+    historyFetchDone = true;
+    var data = null;
+    try {
+      var res = await fetch(API + '/history');
+      if (res.ok) {
+        var j = await res.json();
+        data = normalizeHistoryPayload(j);
+      }
+    } catch (e2) {}
+    if (
+      !data ||
+      ((!data.historical || !data.historical.length) &&
+        (!data.projected || !data.projected.length))
+    ) {
+      data = buildSyntheticHistory();
+    }
+    historyCache = data;
+    document.getElementById('hc-today').textContent = '11 counties in energy poverty';
+    document.getElementById('hc-july').textContent =
+      data.july && data.july.counties_in_poverty != null
+        ? String(data.july.counties_in_poverty) + ' counties projected'
+        : '—';
+    document.getElementById('hc-oct').textContent =
+      data.oct && data.oct.counties_in_poverty != null
+        ? String(data.oct.counties_in_poverty) + ' counties projected'
+        : '—';
+    renderHistoryChart(data);
+  };
+
+  function appendAiMsg(cls, text) {
+    var th = document.getElementById('ai-thread');
+    if (!th) return null;
+    var d = document.createElement('div');
+    d.className = 'ai-msg ' + cls;
+    d.textContent = text;
+    th.appendChild(d);
+    th.scrollTop = th.scrollHeight;
+    return d;
+  }
+
+  window.__fflOpenAiDrawer = function () {
+    var dr = document.getElementById('ai-drawer');
+    var bd = document.getElementById('ai-backdrop');
+    if (dr) dr.classList.add('open');
+    if (bd) bd.classList.add('open');
+  };
+
+  window.__fflCloseAiDrawer = function () {
+    var dr = document.getElementById('ai-drawer');
+    var bd = document.getElementById('ai-backdrop');
+    if (dr) dr.classList.remove('open');
+    if (bd) bd.classList.remove('open');
+  };
+
+  window.__fflSaveAiKey = function () {
+    var inp = document.getElementById('ai-api-key');
+    if (inp && inp.value.trim()) localStorage.setItem(LS_AI_KEY, inp.value.trim());
+  };
+
+  function geminiContentsFromChat(msgs) {
+    return msgs.map(function (m) {
+      var role = m.role === 'assistant' ? 'model' : 'user';
+      return { role: role, parts: [{ text: m.content }] };
+    });
+  }
+
+  window.__fflAiSend = async function () {
+    var input = document.getElementById('ai-input');
+    var keyEl = document.getElementById('ai-api-key');
+    var key = (keyEl && keyEl.value.trim()) || localStorage.getItem(LS_AI_KEY) || '';
+    var text = (input && input.value.trim()) || '';
+    if (!text) return;
+    if (!key) {
+      appendAiMsg('bot', 'Add your Gemini API key above and click Save to send messages.');
+      return;
+    }
+    appendAiMsg('user', text);
+    if (input) input.value = '';
+    var typing = appendAiMsg('bot typing', '...');
+    await new Promise(function (r) {
+      setTimeout(r, 500);
+    });
+    if (typing) typing.remove();
+
+    var nextMsgs = aiChatMessages.concat([{ role: 'user', content: text }]);
+    var url =
+      'https://generativelanguage.googleapis.com/v1beta/models/' +
+      GEMINI_MODEL +
+      ':generateContent?key=' +
+      encodeURIComponent(key);
+    try {
+      var res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: AI_SYSTEM }] },
+          contents: geminiContentsFromChat(nextMsgs),
+          generationConfig: { maxOutputTokens: 1000 }
+        })
+      });
+      var j = await res.json().catch(function () {
+        return {};
+      });
+      if (!res.ok) {
+        var errObj = j.error || {};
+        var errTxt =
+          errObj.message || errObj.status || res.statusText || 'Request failed';
+        appendAiMsg('bot', String(errTxt));
+        if (/not found|NOT_FOUND|model|invalid/i.test(String(errTxt))) {
+          appendAiMsg(
+            'bot',
+            'If the model was rejected, change GEMINI_MODEL in the page script to a model your key supports (e.g. gemini-2.5-flash).'
+          );
+        }
+        return;
+      }
+      var cand = j.candidates && j.candidates[0];
+      var parts = cand && cand.content && cand.content.parts;
+      var txt = '';
+      if (parts && parts[0] && parts[0].text) txt = parts[0].text;
+      if (!txt && j.promptFeedback && j.promptFeedback.blockReason) {
+        txt = 'Response blocked: ' + String(j.promptFeedback.blockReason);
+      }
+      if (!txt && cand && cand.finishReason && cand.finishReason !== 'STOP') {
+        txt = 'No text returned (finish: ' + String(cand.finishReason) + ').';
+      }
+      aiChatMessages = nextMsgs.concat([{ role: 'assistant', content: txt }]);
+      appendAiMsg('bot', txt || '(empty response)');
+    } catch (e3) {
+      var msg = e3 && e3.message ? String(e3.message) : 'Failed to fetch';
+      if (msg.indexOf('Failed to fetch') !== -1 || e3 instanceof TypeError) {
+        appendAiMsg(
+          'bot',
+          'Browser blocked the request (CORS). Use a CORS-safe environment or add a small POST proxy on your dev server.'
+        );
+      } else {
+        appendAiMsg('bot', msg);
+      }
+    }
+  };
+
+  window.onSliderInput = function (val) {
+    if (compareMode) return;
+    currentPrice = parseFloat(val);
+    setSliderVisual(val);
+    document.getElementById('price-val').textContent = '€' + currentPrice.toFixed(2);
+    document.getElementById('stat-price').textContent = '€' + currentPrice.toFixed(2);
+
+    clearTimeout(sliderDebounce);
+    sliderDebounce = setTimeout(function () {
+      runLoad(false);
+    }, 400);
+  };
+
+  document.getElementById('county-modal').addEventListener('click', function (ev) {
+    if (ev.target.id === 'county-modal') closeCountyModal();
+  });
+  document.getElementById('modal-close-btn').addEventListener('click', closeCountyModal);
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key !== 'Escape') return;
+    closeCountyModal();
+    window.__fflCloseAiDrawer();
+  });
+
+  var chipsHost = document.getElementById('ai-chips');
+  if (chipsHost) {
+    chipsHost.addEventListener('click', function (ev) {
+      var t = ev.target.closest('.ai-chip');
+      if (!t) return;
+      var q = t.getAttribute('data-q');
+      var inp = document.getElementById('ai-input');
+      if (q && inp) inp.value = q;
+    });
+  }
+
+  var savedKey = localStorage.getItem(LS_AI_KEY);
+  var keyInput = document.getElementById('ai-api-key');
+  if (savedKey && keyInput) keyInput.value = savedKey;
+
+  setSliderVisual('2.14');
+  setSliderVisualA('2.14');
+  setSliderVisualB('3');
+  runLoad(true);
+})();
+</script>
+</body>
+</html>
