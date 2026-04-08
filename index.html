@@ -1265,12 +1265,61 @@
   var useLocalProxy = __fflIsLocalDevHost(h);
   var API = useLocalProxy ? location.origin.replace(/\/+$/, '') + '/api' : API_PUBLIC;
 
-  const COUNTIES = [
+  const FALLBACK_COUNTIES = [
     'Longford', 'Donegal', 'Leitrim', 'Roscommon', 'Mayo', 'Monaghan',
     'Offaly', 'Sligo', 'Cavan', 'Kerry', 'Westmeath', 'Laois', 'Tipperary',
     'Clare', 'Carlow', 'Wexford', 'Galway', 'Limerick', 'Kilkenny',
     'Waterford', 'Louth', 'Cork', 'Wicklow', 'Kildare', 'Meath', 'Dublin'
   ];
+  let COUNTIES = FALLBACK_COUNTIES.slice();
+
+  function normalizeCountiesPayload(raw) {
+    function pickName(x) {
+      if (typeof x === 'string') {
+        const s = x.trim();
+        return s || '';
+      }
+      if (x && typeof x === 'object') {
+        const n = x.county || x.name || x.county_name || x.label || x.title;
+        if (typeof n === 'string') return n.trim();
+      }
+      return '';
+    }
+    let arr = null;
+    if (Array.isArray(raw)) {
+      arr = raw;
+    } else if (raw && typeof raw === 'object') {
+      arr = raw.counties || raw.items || raw.results || raw.data;
+      if (arr && typeof arr === 'object' && !Array.isArray(arr)) {
+        arr = arr.counties || Object.keys(arr);
+      }
+    }
+    if (!Array.isArray(arr)) return null;
+    const names = [];
+    const seen = Object.create(null);
+    for (let i = 0; i < arr.length; i++) {
+      const n = pickName(arr[i]);
+      if (n && !seen[n]) {
+        seen[n] = true;
+        names.push(n);
+      }
+    }
+    return names.length ? names : null;
+  }
+
+  async function fetchCountiesList() {
+    try {
+      const res = await fetch(API + '/counties');
+      if (!res.ok) return false;
+      const j = await res.json();
+      const list = normalizeCountiesPayload(j);
+      if (list && list.length) {
+        COUNTIES = list;
+        return true;
+      }
+    } catch (eC) {}
+    return false;
+  }
 
   const COLORS = {
     critical: '#7f1d1d',
@@ -1374,13 +1423,85 @@
     return Object.keys(byCounty).length ? byCounty : null;
   }
 
+  /** Live hub: counties_in_poverty_a/b (partial lists) + newly_in_poverty. */
+  function normalizeScenarioFromHub(raw, countyList) {
+    if (!raw || typeof raw !== 'object' || !Array.isArray(countyList) || !countyList.length) {
+      return null;
+    }
+    const a = raw.counties_in_poverty_a;
+    const b = raw.counties_in_poverty_b;
+    if (!Array.isArray(a) || !Array.isArray(b)) return null;
+    const mapA = {};
+    a.forEach(function (row) {
+      const name = row.county || row.name || row.county_name;
+      if (!name) return;
+      const p = num(
+        row.poverty_pct != null
+          ? row.poverty_pct
+          : row.poverty_pct_at_price != null
+            ? row.poverty_pct_at_price
+            : row.poverty_pct_at_price_a
+      );
+      if (Number.isFinite(p)) mapA[name] = p;
+    });
+    const mapB = {};
+    b.forEach(function (row) {
+      const name = row.county || row.name || row.county_name;
+      if (!name) return;
+      const p = num(
+        row.poverty_pct != null
+          ? row.poverty_pct
+          : row.poverty_pct_at_price_b != null
+            ? row.poverty_pct_at_price_b
+            : row.poverty_pct_at_price
+      );
+      if (Number.isFinite(p)) mapB[name] = p;
+    });
+    const newly = Object.create(null);
+    if (Array.isArray(raw.newly_in_poverty)) {
+      raw.newly_in_poverty.forEach(function (row) {
+        if (typeof row === 'string') {
+          newly[row] = { est_vulnerable_households: 0 };
+        } else if (row && row.county) {
+          newly[row.county] = {
+            est_vulnerable_households: Number(row.est_vulnerable_households) || 0,
+            poverty_pct_a: num(row.poverty_pct_at_price_a),
+            poverty_pct_b: num(row.poverty_pct_at_price_b)
+          };
+        }
+      });
+    }
+    const byCounty = {};
+    for (let i = 0; i < countyList.length; i++) {
+      const name = countyList[i];
+      const hasA = Object.prototype.hasOwnProperty.call(mapA, name);
+      const hasB = Object.prototype.hasOwnProperty.call(mapB, name);
+      const nu = newly[name];
+      byCounty[name] = {
+        poverty_pct_a: hasA ? mapA[name] : null,
+        poverty_pct_b: hasB ? mapB[name] : null,
+        in_poverty_a: hasA ? true : null,
+        in_poverty_b: hasB,
+        newly_at_risk: !!nu || (!hasA && hasB),
+        households_b: nu ? Number(nu.est_vulnerable_households) || 0 : undefined
+      };
+    }
+    return Object.keys(byCounty).length ? byCounty : null;
+  }
+
   async function fetchScenarioApi(pa, pb) {
     const url =
       API + '/scenario?price_a=' + encodeURIComponent(pa) + '&price_b=' + encodeURIComponent(pb);
     const res = await fetch(url);
     if (!res.ok) return null;
     const j = await res.json();
-    return normalizeScenario(j) || normalizeScenario(j.data) || null;
+    return (
+      normalizeScenario(j) ||
+      normalizeScenario(j.data) ||
+      normalizeScenarioFromHub(j, COUNTIES) ||
+      normalizeScenarioFromHub(j.data, COUNTIES) ||
+      null
+    );
   }
 
   async function loadScenarioViaDualFetch(pa, pb) {
@@ -1430,7 +1551,9 @@
     COUNTIES.forEach(function (c) {
       const r = by[c];
       if (!r) return;
-      const aPov = !!r.in_poverty_a;
+      const rowD = countyData[c];
+      const aPov =
+        r.in_poverty_a != null ? !!r.in_poverty_a : rowD ? !!rowD.in_energy_poverty : false;
       const bPov = !!r.in_poverty_b;
       const newly = r.newly_at_risk || (!aPov && bPov);
       if (newly) {
@@ -1754,6 +1877,51 @@
 
   function normalizeHistoryPayload(raw) {
     if (!raw || typeof raw !== 'object') return null;
+    if (Array.isArray(raw.price_history)) {
+      const hist = [];
+      const proj = [];
+      let julyMeta = null;
+      let octMeta = null;
+      raw.price_history.forEach(function (pt) {
+        if (!pt || typeof pt !== 'object') return;
+        const ds = pt.date || pt.t;
+        const priceVal = num(
+          pt.price_eur_per_l != null ? pt.price_eur_per_l : pt.price != null ? pt.price : pt.value
+        );
+        const isProj =
+          pt.is_projection === true ||
+          pt.is_projection === 'true' ||
+          pt.projected === true ||
+          pt.projection === true;
+        const row = {
+          date: ds,
+          price: priceVal,
+          counties_in_poverty:
+            pt.counties_in_poverty != null ? pt.counties_in_poverty : pt.counties_in_energy_poverty
+        };
+        if (isProj) {
+          proj.push(row);
+          if (ds && String(ds).indexOf('-07-') !== -1) {
+            julyMeta = { counties_in_poverty: row.counties_in_poverty };
+          }
+          if (ds && String(ds).indexOf('-10-') !== -1) {
+            octMeta = { counties_in_poverty: row.counties_in_poverty };
+          }
+        } else {
+          hist.push(row);
+        }
+      });
+      const threshold =
+        num(raw.poverty_threshold_price) || num(raw.threshold_price) || num(raw.stress_threshold_eur_l) || 2.14;
+      return {
+        historical: hist,
+        projected: proj,
+        events: Array.isArray(raw.events) ? raw.events : [],
+        threshold: threshold,
+        july: julyMeta || raw.july,
+        oct: octMeta || raw.october || raw.oct
+      };
+    }
     let hist = raw.historical || raw.history || raw.past;
     let proj = raw.projected || raw.projection || raw.forecast;
     if (Array.isArray(raw.series)) {
@@ -2079,9 +2247,9 @@
     if (typeof st === 'number' && st >= 400) {
       if (st === 404) {
         return (
-          'The model API returned HTTP 404. The app expects https://fuel.hub.zerve.cloud ' +
-          '(the old fuel-fault-lines.hub.zerve.cloud host returns 404). Do not put /api on the hub URL — ' +
-          'routes are /county/..., /scenario, … at the root. Hard-refresh this page, ' +
+          'The model API returned HTTP 404. The app expects https://fuel.hub.zerve.cloud. ' +
+          'Do not put /api on the hub URL — ' +
+          'routes are /counties, /county/..., /scenario, /history, /deep-dive/… at the root. Hard-refresh this page, ' +
           'or set window.__FFL_API_BASE__ to your hub origin before the script runs. ' +
           'If you use node dev-server.mjs, open the app at http://127.0.0.1:5500/ so requests go through /api.'
         );
@@ -2275,7 +2443,7 @@
     grid.innerHTML = sorted
       .map(function (county) {
         const d = countyData[county];
-        if (d === null) {
+        if (d == null) {
           const errCls = cmp ? ' county-row compare error' : ' county-row error';
           return (
             '<button type="button" class="' +
@@ -2757,7 +2925,14 @@
       data = buildSyntheticHistory();
     }
     historyCache = data;
-    document.getElementById('hc-today').textContent = '11 counties in energy poverty';
+    var lastHistPt =
+      data.historical && data.historical.length
+        ? data.historical[data.historical.length - 1]
+        : null;
+    document.getElementById('hc-today').textContent =
+      lastHistPt && lastHistPt.counties_in_poverty != null
+        ? String(lastHistPt.counties_in_poverty) + ' counties in energy poverty (latest history point)'
+        : '11 counties in energy poverty';
     document.getElementById('hc-july').textContent =
       data.july && data.july.counties_in_poverty != null
         ? String(data.july.counties_in_poverty) + ' counties projected'
@@ -2922,7 +3097,10 @@
   setSliderVisual('2.14');
   setSliderVisualA('2.14');
   setSliderVisualB('3');
-  runLoad(true);
+  (async function boot() {
+    await fetchCountiesList();
+    runLoad(true);
+  })();
 })();
 </script>
 </body>
