@@ -1170,3 +1170,589 @@
     </div>
   </div>
 
+  <aside class="notes-col">
+    <p class="caption"><strong>Notes</strong> — selection</p>
+    <div id="detail-panel">
+      <div class="empty-state">
+        Choose a row in Table 1. The panel shows driver scores, the fuel share of income, and grant-scheme cashflows.
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <span>Sources: SEAI · CSO 2022 · AA Ireland</span>
+  <span>Model API: Zerve · built for ZerveHack 2026</span>
+</footer>
+
+<div class="modal-backdrop" id="county-modal" role="dialog" aria-modal="true" aria-labelledby="modal-county-title">
+  <div class="modal-dialog" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="modal-title-block">
+        <h2 id="modal-county-title">County</h2>
+        <div class="modal-tier" id="modal-tier-badge"></div>
+        <p class="sub" id="modal-province" style="margin-top:0.35rem;font-family:var(--mono);font-size:0.62rem;color:var(--ink3);text-transform:uppercase;letter-spacing:0.06em"></p>
+      </div>
+      <button type="button" class="modal-close" id="modal-close-btn" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<button type="button" class="ai-fab" id="ai-fab" onclick="window.__fflOpenAiDrawer()">🤖 Ask AI Analyst</button>
+<div class="ai-backdrop" id="ai-backdrop" onclick="window.__fflCloseAiDrawer()"></div>
+<aside class="ai-drawer" id="ai-drawer" aria-label="AI policy analyst">
+  <div class="ai-drawer-head">
+    <h3>AI Policy Analyst</h3>
+    <p class="sub">Powered by Google Gemini · Zerve AI data</p>
+    <p class="ai-key-notice">Enter your Gemini API key (Google AI Studio) to activate. Stored in this browser only (localStorage).</p>
+    <div class="ai-key-row">
+      <input type="password" id="ai-api-key" placeholder="Gemini API key…" autocomplete="off" aria-label="Google Gemini API key"
+             onblur="window.__fflSaveAiKey()">
+      <button type="button" onclick="window.__fflSaveAiKey()">Save</button>
+    </div>
+  </div>
+  <div class="ai-chips" id="ai-chips">
+    <button type="button" class="ai-chip" data-q="Which county needs help most urgently?">Which county needs help most urgently?</button>
+    <button type="button" class="ai-chip" data-q="What would retrofitting Donegal cost the state?">What would retrofitting Donegal cost the state?</button>
+    <button type="button" class="ai-chip" data-q="Write a briefing note for the Minister">Write a briefing note for the Minister</button>
+    <button type="button" class="ai-chip" data-q="What happens at €3 diesel?">What happens at €3 diesel?</button>
+  </div>
+  <div class="ai-thread" id="ai-thread"></div>
+  <div class="ai-input-row">
+    <input type="text" id="ai-input" placeholder="Message…" maxlength="2000" aria-label="Message to analyst">
+    <button type="button" id="ai-send" onclick="window.__fflAiSend()">Send</button>
+  </div>
+</aside>
+
+<script>
+(function () {
+  'use strict';
+
+  document.getElementById('doc-date').textContent = new Date().toLocaleDateString('en-IE', {
+    weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+  });
+
+  try {
+    if (typeof Chart !== 'undefined' && window['chartjs-plugin-annotation']) {
+      Chart.register(window['chartjs-plugin-annotation']);
+    }
+  } catch (regErr) {}
+
+  var API_PUBLIC = (
+    typeof window.__FFL_API_BASE__ === 'string' && window.__FFL_API_BASE__.trim()
+      ? window.__FFL_API_BASE__.trim()
+      : 'https://fuel.hub.zerve.cloud'
+  )
+    .replace(/\/+$/, '')
+    .replace(/\/api$/i, '')
+    .replace(/\/+$/, '');
+  var h = location.hostname;
+  function __fflIsLocalDevHost(hostname) {
+    if (
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname === '[::1]' ||
+      hostname === '0.0.0.0'
+    ) {
+      return true;
+    }
+    if (/^192\.168\.\d{1,3}\.\d{1,3}$/.test(hostname)) return true;
+    if (/^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostname)) return true;
+    if (/^172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}$/.test(hostname)) return true;
+    return false;
+  }
+  var useLocalProxy = __fflIsLocalDevHost(h);
+  var API = useLocalProxy ? location.origin.replace(/\/+$/, '') + '/api' : API_PUBLIC;
+
+  const COUNTIES = [
+    'Longford', 'Donegal', 'Leitrim', 'Roscommon', 'Mayo', 'Monaghan',
+    'Offaly', 'Sligo', 'Cavan', 'Kerry', 'Westmeath', 'Laois', 'Tipperary',
+    'Clare', 'Carlow', 'Wexford', 'Galway', 'Limerick', 'Kilkenny',
+    'Waterford', 'Louth', 'Cork', 'Wicklow', 'Kildare', 'Meath', 'Dublin'
+  ];
+
+  const COLORS = {
+    critical: '#7f1d1d',
+    high: '#9a3412',
+    medium: '#854d0e',
+    low: '#14532d'
+  };
+
+  const CHART_FONT = "'Inter', system-ui, sans-serif";
+
+  let currentPrice = 2.14;
+  let countyData = {};
+  let selectedCounty = null;
+  let sliderDebounce = null;
+  let nationalChartInstance = null;
+  let radarChartInstance = null;
+
+  let compareMode = false;
+  let priceA = 2.14;
+  let priceB = 3.0;
+  /** @type {Record<string, object>|null} */
+  let scenarioByCounty = null;
+  let scenarioCompared = false;
+  let historyCache = null;
+  let historyChartInstance = null;
+  let historyFetchDone = false;
+  let radarModalInstance = null;
+  const LS_AI_KEY = 'ffl_gemini_key';
+  const GEMINI_MODEL = 'gemini-2.5-flash';
+  /** @type {{role:string, content:string}[]} */
+  let aiChatMessages = [];
+
+  const AI_SYSTEM =
+    'You are an expert Irish energy policy analyst. You have access to the Fuel Fault Lines dataset — a real-time energy vulnerability model covering all 26 Irish counties built on Zerve AI.\n\nKey facts from the model:\n- 6 counties are Critical risk: Longford (89.8), Donegal (75.5), Leitrim (75.2), Roscommon (73.5), Mayo (72.5), Monaghan (72.2)\n- 11 counties are already in energy poverty at €2.14/litre diesel\n- 490,130 vulnerable households across Ireland\n- €807,636,960 wasted over 10 years paying fuel allowance instead of retrofitting critical county homes\n- Average breakeven for Warmer Homes retrofit: 14.6 years\n- Donegal: 16,070 vulnerable households, cliff price €2.14\n- Longford: highest vulnerability score 89.8, cliff price €2.14\n- Dublin: lowest vulnerability score, cliff price >€3.50\n- Current diesel price: €2.14/litre (April 2026)\n- The Tánaiste called this the worst energy crisis ever (April 5 2026)\n- Data sources: SEAI, CSO Census 2022, AA Ireland, Warmer Homes Scheme\n\nAnswer questions concisely and with specific data. Be direct. Use Irish county names, real numbers from the dataset. When asked to write documents, write them properly formatted. You are advising Irish policymakers.';
+
+  function getActivePrice() {
+    return compareMode ? priceA : currentPrice;
+  }
+
+  function sliderPctA(val) {
+    const v = parseFloat(val);
+    return (((v - 1.5) / 2.5) * 100).toFixed(2);
+  }
+
+  function sliderPctB(val) {
+    return sliderPctA(val);
+  }
+
+  function updateCompareHeads() {
+    const hs = document.getElementById('county-head-single');
+    const hc = document.getElementById('county-head-compare');
+    if (!hs || !hc) return;
+    if (compareMode && scenarioCompared) {
+      hs.style.display = 'none';
+      hc.style.display = 'grid';
+    } else {
+      hs.style.display = 'grid';
+      hc.style.display = 'none';
+    }
+  }
+
+  function num(x) {
+    const n = typeof x === 'number' ? x : parseFloat(x);
+    return Number.isFinite(n) ? n : NaN;
+  }
+
+  function normalizeScenario(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    const byCounty = {};
+    let list = raw.counties || raw.results || raw.data || raw.items;
+    if (!Array.isArray(list) && raw.by_county) {
+      list = Object.keys(raw.by_county).map(function (k) {
+        return Object.assign({ county: k }, raw.by_county[k]);
+      });
+    }
+    if (!Array.isArray(list)) return null;
+    for (let i = 0; i < list.length; i++) {
+      const row = list[i];
+      const name = row.county || row.name || row.county_name;
+      if (!name) continue;
+      const pa = num(row.poverty_pct_a != null ? row.poverty_pct_a : row.poverty_a);
+      const pb = num(row.poverty_pct_b != null ? row.poverty_pct_b : row.poverty_b);
+      byCounty[name] = {
+        poverty_pct_a: Number.isFinite(pa) ? pa : null,
+        poverty_pct_b: Number.isFinite(pb) ? pb : null,
+        in_poverty_a:
+          row.in_poverty_a != null
+            ? !!row.in_poverty_a
+            : row.in_energy_poverty_a != null
+              ? !!row.in_energy_poverty_a
+              : null,
+        in_poverty_b:
+          row.in_poverty_b != null
+            ? !!row.in_poverty_b
+            : row.in_energy_poverty_b != null
+              ? !!row.in_energy_poverty_b
+              : null,
+        newly_at_risk: !!row.newly_at_risk
+      };
+    }
+    return Object.keys(byCounty).length ? byCounty : null;
+  }
+
+  async function fetchScenarioApi(pa, pb) {
+    const url =
+      API + '/scenario?price_a=' + encodeURIComponent(pa) + '&price_b=' + encodeURIComponent(pb);
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const j = await res.json();
+    return normalizeScenario(j) || normalizeScenario(j.data) || null;
+  }
+
+  async function loadScenarioViaDualFetch(pa, pb) {
+    const ra = await Promise.all(
+      COUNTIES.map(function (c) {
+        return fetchCounty(c, pa).catch(function () {
+          return null;
+        });
+      })
+    );
+    const rb = await Promise.all(
+      COUNTIES.map(function (c) {
+        return fetchCounty(c, pb).catch(function () {
+          return null;
+        });
+      })
+    );
+    const byCounty = {};
+    for (let i = 0; i < COUNTIES.length; i++) {
+      const da = ra[i];
+      const db = rb[i];
+      if (!da || !db) continue;
+      const c = COUNTIES[i];
+      byCounty[c] = {
+        poverty_pct_a: povertyPct(da),
+        poverty_pct_b: povertyPct(db),
+        in_poverty_a: !!da.in_energy_poverty,
+        in_poverty_b: !!db.in_energy_poverty,
+        newly_at_risk: !da.in_energy_poverty && !!db.in_energy_poverty,
+        households_b: Number(db.est_vulnerable_households) || 0,
+        households_a: Number(da.est_vulnerable_households) || 0
+      };
+    }
+    return byCounty;
+  }
+
+  function updateScenarioSummary(pa, pb, by) {
+    const el = document.getElementById('scenario-summary');
+    if (!el) return;
+    if (!compareMode || !scenarioCompared || !by) {
+      el.classList.remove('show');
+      el.textContent = '';
+      return;
+    }
+    let nNew = 0;
+    let hh = 0;
+    COUNTIES.forEach(function (c) {
+      const r = by[c];
+      if (!r) return;
+      const aPov = !!r.in_poverty_a;
+      const bPov = !!r.in_poverty_b;
+      const newly = r.newly_at_risk || (!aPov && bPov);
+      if (newly) {
+        nNew += 1;
+        hh +=
+          Number(r.households_b) ||
+          (countyData[c] ? Number(countyData[c].est_vulnerable_households) || 0 : 0);
+      }
+    });
+    el.textContent =
+      'Going from €' +
+      pa.toFixed(2) +
+      ' to €' +
+      pb.toFixed(2) +
+      ' puts an additional ' +
+      nNew +
+      ' counties into energy poverty, affecting ' +
+      hh.toLocaleString() +
+      ' households.';
+    el.classList.add('show');
+  }
+
+  async function fetchDeepDive(county, price) {
+    const url =
+      API +
+      '/deep-dive/' +
+      encodeURIComponent(county) +
+      '?fuel_price=' +
+      encodeURIComponent(price);
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const j = await res.json();
+    return j && typeof j === 'object' ? j : null;
+  }
+
+  function pickDeep(d, keyVariants) {
+    for (let i = 0; i < keyVariants.length; i++) {
+      const k = keyVariants[i];
+      if (d[k] != null) return d[k];
+    }
+    return null;
+  }
+
+  function buildCountyMetricsHtml(d, priceLabel) {
+    const pov = povertyPct(d);
+    const barCap = 25;
+    const barW = Math.min(100, Math.max(0, (pov / barCap) * 100)).toFixed(1);
+    const cliff = d.cliff_price_eur;
+    const cliffNum = typeof cliff === 'number' ? cliff : parseFloat(cliff);
+    const cliffOk = typeof cliffNum === 'number' && !Number.isNaN(cliffNum);
+    const cliffWarn = cliffOk && cliffNum <= 2.2;
+    const cliffStr = cliffOk ? formatNum(cliffNum) : '—';
+    const roi = d.retrofit_roi_saving_10yr;
+    const roiGood = typeof roi === 'number' && roi > 0;
+    const pl = priceLabel != null ? priceLabel : getActivePrice().toFixed(2);
+    return (
+      '<div class="poverty-bar">' +
+      '<div class="row"><span>Fuel as % of income</span>' +
+      '<span style="color:' +
+      (d.in_energy_poverty ? COLORS.critical : COLORS.low) +
+      ';font-weight:600">' +
+      pov.toFixed(1) +
+      '%</span></div>' +
+      '<div class="bar-track">' +
+      '<div class="bar-fill" style="width:' +
+      barW +
+      '%"></div>' +
+      '<div class="bar-threshold" style="left:' +
+      ((10 / barCap) * 100) +
+      '%"></div></div>' +
+      '<p class="bar-note">Scale 0–' +
+      barCap +
+      '% · vertical = 10% · scenario €' +
+      pl +
+      '/L</p></div>' +
+      '<div class="metric-row"><span class="k">Cliff price</span>' +
+      '<span class="v ' +
+      (cliffWarn ? 'bad' : 'warn') +
+      '">€' +
+      cliffStr +
+      '/L</span></div>' +
+      '<div class="metric-row"><span class="k">Est. annual income</span>' +
+      '<span class="v">€' +
+      Math.round(Number(d.estimated_annual_income) || 0).toLocaleString() +
+      '</span></div>' +
+      '<div class="metric-row"><span class="k">Annual heating bill</span>' +
+      '<span class="v warn">€' +
+      Math.round(Number(d.annual_oil_bill_eur) || 0).toLocaleString() +
+      '</span></div>' +
+      '<div class="metric-row"><span class="k">Vulnerable households</span>' +
+      '<span class="v">' +
+      (Number(d.est_vulnerable_households) || 0).toLocaleString() +
+      '</span></div>' +
+      '<div class="metric-row"><span class="k">Energy poverty flag</span>' +
+      '<span class="v ' +
+      (d.in_energy_poverty ? 'bad' : 'good') +
+      '">' +
+      (d.in_energy_poverty ? 'Yes' : 'No') +
+      '</span></div>' +
+      '<div class="note-panel retrofit-panel" style="margin-top:1rem">' +
+      '<h3>Warmer Homes (illustrative)</h3>' +
+      '<div class="metric-row"><span class="k">Annual saving post-retrofit</span>' +
+      '<span class="v good">€' +
+      Math.round(Number(d.annual_saving_post_retrofit) || 0).toLocaleString() +
+      '</span></div>' +
+      '<div class="metric-row"><span class="k">Breakeven</span>' +
+      '<span class="v warn">' +
+      (d.breakeven_years != null ? String(d.breakeven_years) : '—') +
+      ' yr</span></div>' +
+      '<div class="metric-row"><span class="k">10yr position vs allowance</span>' +
+      '<span class="v ' +
+      (roiGood ? 'good' : 'warn') +
+      '">€' +
+      Math.round(Math.abs(Number(roi) || 0)).toLocaleString() +
+      '</span></div></div>'
+    );
+  }
+
+  function destroyModalRadar() {
+    if (radarModalInstance) {
+      radarModalInstance.destroy();
+      radarModalInstance = null;
+    }
+  }
+
+  function closeCountyModal() {
+    destroyModalRadar();
+    const m = document.getElementById('county-modal');
+    if (m) {
+      m.classList.remove('open');
+      m.setAttribute('aria-hidden', 'true');
+    }
+    document.body.style.overflow = '';
+  }
+
+  function openCountyModal() {
+    const m = document.getElementById('county-modal');
+    if (m) {
+      m.classList.add('open');
+      m.setAttribute('aria-hidden', 'false');
+    }
+    document.body.style.overflow = 'hidden';
+  }
+
+  function animateCountUp(el, target, duration) {
+    if (!el) return;
+    const end = Number(target) || 0;
+    const start = 0;
+    const t0 = performance.now();
+    function frame(t) {
+      const p = Math.min(1, (t - t0) / duration);
+      const eased = 1 - (1 - p) * (1 - p);
+      el.textContent = formatNum(start + (end - start) * eased);
+      if (p < 1) requestAnimationFrame(frame);
+      else el.textContent = formatNum(end);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  async function fillCountyModal(county, merged) {
+    const tier = getTierClass(merged);
+    const scoreColor = COLORS[tier];
+    const prov = merged.province || '';
+    document.getElementById('modal-county-title').textContent = merged.county || county;
+    document.getElementById('modal-tier-badge').textContent = merged.risk_tier || '';
+    document.getElementById('modal-province').textContent = prov + ' · €' + getActivePrice().toFixed(2) + '/L';
+
+    const vuln = Number(merged.vulnerability_score) || 0;
+    const hh = Number(pickDeep(merged, ['est_vulnerable_households', 'vulnerable_households'])) || 0;
+    const ch = pickDeep(merged, ['children_at_risk', 'children_at_risk_count', 'est_children_at_risk']);
+    const eld = pickDeep(merged, ['elderly_at_risk', 'elderly_at_risk_count', 'est_elderly_at_risk']);
+    const tdName = pickDeep(merged, ['td_name', 'TD_name', 'tdName']) || '';
+    const tdParty = pickDeep(merged, ['td_party', 'party']) || '';
+    const tdEmail = pickDeep(merged, ['td_email', 'email']) || '';
+    const tmpl = pickDeep(merged, ['minister_email_template', 'email_template', 'email_body']) || '';
+    const tweetText = pickDeep(merged, ['tweet_text', 'tweet']) || '';
+
+    let dHigh = null;
+    try {
+      dHigh = await fetchCounty(county, 3.0);
+    } catch (e) {
+      dHigh = null;
+    }
+    const billNow = Math.round(Number(merged.annual_oil_bill_eur) || 0);
+    const pctNow = povertyPct(merged);
+    const billHigh = dHigh ? Math.round(Number(dHigh.annual_oil_bill_eur) || 0) : null;
+    const pctHigh = dHigh ? povertyPct(dHigh) : null;
+
+    let nar =
+      '<p>At €' +
+      getActivePrice().toFixed(2) +
+      '/litre, a typical ' +
+      escapeHtml(merged.county || county) +
+      ' household spends <strong>€' +
+      billNow.toLocaleString() +
+      '</strong> on heating and commuting annually — <strong>' +
+      pctNow.toFixed(1) +
+      '%</strong> of their income.</p>';
+    if (billHigh != null && pctHigh != null) {
+      nar +=
+        '<p>If prices reach €3.00, this rises to <strong>€' +
+        billHigh.toLocaleString() +
+        '</strong> — <strong>' +
+        pctHigh.toFixed(1) +
+        '%</strong> of income.</p>';
+    }
+
+    const mailSubj = 'Energy Crisis in ' + (merged.county || county);
+    const mailBody = tmpl || '';
+    const mailHref =
+      tdEmail && String(tdEmail).indexOf('@') !== -1
+        ? 'mailto:' +
+          String(tdEmail).replace(/[?&]/g, '') +
+          '?subject=' +
+          encodeURIComponent(mailSubj) +
+          '&body=' +
+          encodeURIComponent(mailBody)
+        : '#';
+
+    const tw =
+      'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweetText || mailSubj);
+
+    const body = document.getElementById('modal-body');
+    body.innerHTML =
+      '<div class="modal-score-big" id="modal-score-num" style="color:' +
+      scoreColor +
+      '">0</div>' +
+      '<div class="modal-stat-row">' +
+      '<div class="modal-stat"><div class="lbl">Vulnerable households</div><div class="val">' +
+      hh.toLocaleString() +
+      '</div></div>' +
+      '<div class="modal-stat"><div class="lbl">Children at risk</div><div class="val">' +
+      (ch != null ? Number(ch).toLocaleString() : '—') +
+      '</div></div>' +
+      '<div class="modal-stat"><div class="lbl">Elderly at risk</div><div class="val">' +
+      (eld != null ? Number(eld).toLocaleString() : '—') +
+      '</div></div></div>' +
+      '<p class="drivers-label">Component scores (0–100)</p>' +
+      '<div class="chart-radar-wrap"><canvas id="radar-canvas-host-modal"></canvas></div>' +
+      buildCountyMetricsHtml(merged, getActivePrice().toFixed(2)) +
+      '<div class="narrative-box"><h4>What this means</h4>' +
+      nar +
+      '</div>' +
+      '<div class="td-box"><h4>Your TD</h4>' +
+      (tdName
+        ? '<p style="font-size:0.85rem">' +
+          escapeHtml(String(tdName)) +
+          (tdParty ? ' · ' + escapeHtml(String(tdParty)) : '') +
+          '</p>'
+        : '<p style="font-size:0.78rem;color:var(--ink3)">TD contact not available for this county in the API response.</p>') +
+      (tdEmail
+        ? '<p style="font-family:var(--mono);font-size:0.68rem;margin-top:0.35rem"><a href="mailto:' +
+          escapeHtml(tdEmail) +
+          '">' +
+          escapeHtml(tdEmail) +
+          '</a></p>'
+        : '') +
+      '<div class="td-actions">' +
+      '<a class="primary" href="' +
+      escapeHtml(mailHref) +
+      '"' +
+      (mailHref === '#' ? ' onclick="return false" style="opacity:0.5;pointer-events:none"' : '') +
+      '>Email your TD</a>' +
+      '<a href="' +
+      escapeHtml(tw) +
+      '" target="_blank" rel="noopener noreferrer">Share on X</a>' +
+      '</div></div>';
+
+    destroyModalRadar();
+    const host = document.getElementById('radar-canvas-host-modal');
+    if (host && typeof Chart !== 'undefined') {
+      const vals = [
+        Number(merged.fuel_dependency_score) || 0,
+        Number(merged.building_inefficiency_score) || 0,
+        Number(merged.social_deprivation_score) || 0,
+        Number(merged.energy_intensity_score) || 0
+      ];
+      radarModalInstance = new Chart(host.getContext('2d'), {
+        type: 'radar',
+        data: {
+          labels: ['Fuel dep.', 'Building', 'Social dep.', 'Energy int.'],
+          datasets: [
+            {
+              label: 'Drivers',
+              data: vals,
+              fill: true,
+              backgroundColor: hexToRgba(scoreColor, 0.12),
+              borderColor: scoreColor,
+              borderWidth: 1.5,
+              pointBackgroundColor: scoreColor,
+              pointBorderColor: '#fdfcfa',
+              pointRadius: 3
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              min: 0,
+              max: 100,
+              angleLines: { color: 'rgba(26,25,22,0.1)' },
+              grid: { color: 'rgba(26,25,22,0.08)' },
+              pointLabels: {
+                color: '#3d3a35',
+                font: { family: CHART_FONT, size: 9 }
+              },
+              ticks: { display: false, stepSize: 25 }
+            }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    const prefersReduce =
+      typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    animateCountUp(document.getElementById('modal-score-num'), vuln, prefersReduce ? 0 : 750);
+  }
+
+  function normalizeHistoryPayload(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    let hist = raw.historical || raw.history || raw.past;
+    let proj = raw.projected || raw.projection || raw.forecast;
