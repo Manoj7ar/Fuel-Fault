@@ -584,3 +584,589 @@
       font-family: var(--mono);
       font-size: 0.72rem;
       max-width: 16rem;
+      text-align: center;
+      color: var(--ink2);
+    }
+
+    .site-footer {
+      flex-shrink: 0;
+      border-top: 2px solid var(--rule);
+      padding: 0.65rem clamp(1rem, 4vw, 2.5rem);
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      color: var(--ink3);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.35rem 1rem;
+    }
+
+    .panel-refresh-hint {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--ink3);
+      margin-top: 0.5rem;
+    }
+
+    /* —— Compare mode —— */
+    .price-mode-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 0.75rem;
+      margin-bottom: 0.65rem;
+    }
+    .btn-mode {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.35rem 0.65rem;
+      border: 1px solid var(--rule);
+      background: #fdfcfa;
+      cursor: pointer;
+    }
+    .btn-mode:hover { background: var(--paper2); }
+    .btn-mode.active { background: var(--ink); color: #fdfcfa; }
+    .btn-compare-run {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      padding: 0.4rem 0.85rem;
+      background: #f97316;
+      color: #0d0d14;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-compare-run:hover { filter: brightness(1.05); }
+    .compare-sliders { display: none; }
+    .compare-sliders.show { display: block; }
+    .compare-row { margin-bottom: 0.75rem; }
+    .compare-row label { font-family: var(--mono); font-size: 0.58rem; color: var(--ink3); display: block; margin-bottom: 0.25rem; }
+    .single-slider-wrap.hidden { display: none; }
+    .scenario-summary {
+      display: none;
+      font-size: 0.78rem;
+      padding: 0.65rem 0.75rem;
+      border: 1px solid #b45309;
+      background: #fffbeb;
+      margin-bottom: 1rem;
+      line-height: 1.45;
+    }
+    .scenario-summary.show { display: block; }
+    .scenario-err {
+      display: none;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--critical);
+      margin-bottom: 0.75rem;
+    }
+    .scenario-err.show { display: block; }
+
+    .county-head.compare {
+      grid-template-columns: minmax(4.5rem, 1.1fr) 2.6rem 2.5rem 2.5rem 3.8rem 1fr;
+    }
+    @media (max-width: 620px) {
+      .county-head.compare { display: none; }
+    }
+    .county-row.compare {
+      grid-template-columns: minmax(4.5rem, 1.1fr) 2.6rem 2.5rem 2.5rem 3.8rem 1fr;
+    }
+    @media (max-width: 620px) {
+      .county-row.compare {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+      }
+      .county-row.compare .cr-name { grid-column: 1; }
+      .county-row.compare .cr-meta { grid-column: 1; display: flex; flex-wrap: wrap; gap: 0.35rem; font-size: 0.7rem; }
+    }
+    .badge-new {
+      font-family: var(--mono);
+      font-size: 0.5rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #f59e0b;
+      padding: 0.12rem 0.35rem;
+      margin-left: 0.35rem;
+      vertical-align: middle;
+    }
+
+    /* —— Modal —— */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-dialog {
+      background: #fdfcfa;
+      border: 2px solid var(--rule);
+      max-width: min(720px, 100% - 2rem);
+      max-height: 90dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem 1.1rem;
+      border-bottom: 1px solid var(--rule-light);
+    }
+    .modal-title-block h2 {
+      font-family: var(--serif);
+      font-size: 1.65rem;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+    .modal-tier {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 0.35rem;
+      padding: 0.2rem 0.45rem;
+      border: 1px solid var(--rule);
+    }
+    .modal-close {
+      font-size: 1.5rem;
+      line-height: 1;
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: var(--ink3);
+      padding: 0.15rem;
+    }
+    .modal-close:hover { color: var(--ink); }
+    .modal-body {
+      overflow-y: auto;
+      padding: 1rem 1.1rem 1.5rem;
+    }
+    .modal-stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+    @media (max-width: 520px) {
+      .modal-stat-row { grid-template-columns: 1fr; }
+    }
+    .modal-stat {
+      border: 1px solid var(--rule-light);
+      padding: 0.65rem 0.75rem;
+      text-align: center;
+    }
+    .modal-stat .lbl {
+      font-family: var(--mono);
+      font-size: 0.52rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink3);
+    }
+    .modal-stat .val {
+      font-size: 1.15rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      margin-top: 0.2rem;
+    }
+    .modal-score-big {
+      font-family: var(--serif);
+      font-size: 3.5rem;
+      font-weight: 700;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      margin: 0.5rem 0 1rem;
+    }
+    .td-box, .narrative-box {
+      border: 1px solid var(--rule);
+      padding: 0.85rem 1rem;
+      margin-top: 1rem;
+      background: #f7f5f0;
+    }
+    .td-box h4, .narrative-box h4 {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+      color: var(--ink2);
+    }
+    .td-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.65rem; }
+    .td-actions a, .td-actions button {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      padding: 0.45rem 0.75rem;
+      border: 1px solid var(--rule);
+      background: #fdfcfa;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--ink);
+    }
+    .td-actions a.primary, .td-actions button.primary {
+      background: var(--ink);
+      color: #fdfcfa;
+    }
+    .narrative-box p {
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: var(--ink2);
+    }
+    .narrative-box p + p { margin-top: 0.65rem; }
+
+    /* —— History collapsible —— */
+    .history-block { margin-top: 1.5rem; border-top: 2px solid var(--rule-light); padding-top: 1rem; }
+    .history-toggle {
+      width: 100%;
+      text-align: left;
+      font-family: var(--serif);
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.65rem 0.5rem;
+      border: 1px solid var(--rule);
+      background: #f7f5f0;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .history-toggle::after { content: "+"; font-family: var(--mono); }
+    .history-toggle.expanded::after { content: "−"; }
+    .history-panel {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .history-panel.open { display: block; }
+    .history-chart-shell {
+      background: #0d0d14;
+      border: 1px solid #1e1e2e;
+      padding: 0.75rem;
+      border-radius: 2px;
+    }
+    .history-chart-wrap { height: 280px; position: relative; }
+    .history-callouts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+    @media (max-width: 700px) {
+      .history-callouts { grid-template-columns: 1fr; }
+    }
+    .history-callout {
+      background: #1a1a24;
+      color: #e8e8e8;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      padding: 0.65rem 0.75rem;
+      border: 1px solid #2a2a38;
+    }
+    .history-callout strong { color: #f97316; display: block; margin-bottom: 0.25rem; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .history-unavail { font-family: var(--mono); font-size: 0.72rem; color: #94a3b8; padding: 1rem; }
+
+    /* —— AI drawer —— */
+    .ai-fab {
+      position: fixed;
+      bottom: 1.25rem;
+      right: 1.25rem;
+      z-index: 2600;
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.65rem 1.1rem;
+      border-radius: 999px;
+      border: none;
+      background: #f97316;
+      color: #0d0d14;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+    .ai-fab:hover { filter: brightness(1.06); }
+    .ai-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 2550;
+      background: rgba(0,0,0,0.4);
+    }
+    .ai-backdrop.open { display: block; }
+    .ai-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(380px, 100%);
+      height: 100dvh;
+      background: #0d0d14;
+      color: #e8e8e8;
+      z-index: 2570;
+      transform: translateX(100%);
+      transition: transform 0.28s ease;
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid #2a2a38;
+    }
+    .ai-drawer.open { transform: translateX(0); }
+    .ai-drawer-head {
+      padding: 1rem 1rem 0.75rem;
+      border-bottom: 1px solid #2a2a38;
+    }
+    .ai-drawer-head h3 { font-size: 1rem; font-weight: 700; }
+    .ai-drawer-head .sub { font-size: 0.68rem; color: #94a3b8; margin-top: 0.25rem; }
+    .ai-key-notice {
+      font-size: 0.62rem;
+      color: #f97316;
+      margin: 0.5rem 0 0.35rem;
+      line-height: 1.4;
+    }
+    .ai-key-row { display: flex; gap: 0.35rem; margin-bottom: 0.5rem; }
+    .ai-key-row input {
+      flex: 1;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      padding: 0.4rem 0.5rem;
+      border: 1px solid #3d3d4a;
+      background: #14141c;
+      color: #e8e8e8;
+    }
+    .ai-key-row button {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      padding: 0.35rem 0.5rem;
+      background: #2a2a38;
+      color: #e8e8e8;
+      border: 1px solid #3d3d4a;
+      cursor: pointer;
+    }
+    .ai-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; padding: 0.5rem 1rem; }
+    .ai-chip {
+      font-size: 0.62rem;
+      padding: 0.35rem 0.55rem;
+      background: #1a1a24;
+      border: 1px solid #3d3d4a;
+      color: #cbd5e1;
+      cursor: pointer;
+      border-radius: 4px;
+      text-align: left;
+    }
+    .ai-chip:hover { border-color: #f97316; }
+    .ai-thread {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.75rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+    .ai-msg {
+      max-width: 92%;
+      padding: 0.55rem 0.7rem;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+    .ai-msg.user {
+      align-self: flex-end;
+      background: rgba(249, 115, 22, 0.25);
+      border: 1px solid #f97316;
+      color: #fff7ed;
+    }
+    .ai-msg.bot {
+      align-self: flex-start;
+      background: #1a1a24;
+      border: 1px solid #2a2a38;
+      color: #e2e8f0;
+    }
+    .ai-msg.typing { color: #94a3b8; font-style: italic; }
+    .ai-input-row {
+      display: flex;
+      gap: 0.35rem;
+      padding: 0.75rem 1rem 1rem;
+      border-top: 1px solid #2a2a38;
+    }
+    .ai-input-row input {
+      flex: 1;
+      font-size: 0.8rem;
+      padding: 0.5rem 0.65rem;
+      border: 1px solid #3d3d4a;
+      background: #14141c;
+      color: #e8e8e8;
+    }
+    .ai-input-row button {
+      padding: 0.5rem 0.85rem;
+      background: #f97316;
+      color: #0d0d14;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .ai-input-row button:disabled { opacity: 0.45; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+<div class="load-overlay" id="load-overlay" aria-live="polite">
+  <div class="spinner" aria-hidden="true"></div>
+  <p>Loading county responses from the model.</p>
+</div>
+
+<header class="masthead">
+  <div>
+    <h1 class="masthead-title">
+      <span>Working index</span>
+      Fuel fault lines
+    </h1>
+  </div>
+  <div class="masthead-aside">
+    Heating-oil and income stress by county. Figures refresh from the deployed API.
+    <div class="live-line" title="Connected endpoint">
+      <i aria-hidden="true"></i> Zerve · live
+    </div>
+  </div>
+</header>
+
+<div class="doc-band">
+  <span>ZerveHack 2026</span>
+  <span>Republic of Ireland · 26 counties</span>
+  <span id="doc-date"></span>
+</div>
+
+<dl class="kpi-row">
+  <div class="kpi-cell">
+    <dt>Critical tier</dt>
+    <dd class="muted" id="stat-critical">—</dd>
+  </div>
+  <div class="kpi-cell">
+    <dt>Over 10% threshold</dt>
+    <dd class="muted" id="stat-poverty">—</dd>
+  </div>
+  <div class="kpi-cell">
+    <dt>Vulnerable h’holds</dt>
+    <dd>490,130</dd>
+  </div>
+  <div class="kpi-cell">
+    <dt>10yr overspend</dt>
+    <dd>€808M</dd>
+  </div>
+  <div class="kpi-cell">
+    <dt>Price assumption</dt>
+    <dd id="stat-price">€2.14</dd>
+  </div>
+</dl>
+
+<div class="sheet">
+  <div class="main-col">
+    <section class="figure-block">
+      <p class="caption" id="fig1-caption"><strong>Fig. 1</strong> — County vulnerability index (0–100) at current price</p>
+      <div class="chart-box">
+        <canvas id="chart-national" aria-label="County vulnerability bars"></canvas>
+      </div>
+    </section>
+
+    <div class="body-block">
+      <div class="assumption">
+        <div class="price-mode-bar">
+          <button type="button" class="btn-mode active" id="btn-single-mode" onclick="window.__fflSetCompareMode(false)">Single price</button>
+          <button type="button" class="btn-mode" id="btn-compare-mode" onclick="window.__fflSetCompareMode(true)">Compare scenarios</button>
+        </div>
+        <div class="single-slider-wrap" id="single-price-ui">
+          <div class="assumption-top">
+            <label for="price-slider">Retail diesel, € per litre</label>
+            <div class="price-readout"><span id="price-val">€2.14</span> <small>/L</small></div>
+          </div>
+          <input type="range" id="price-slider"
+                 min="1.50" max="4.00" step="0.01" value="2.14"
+                 aria-label="Fuel price per litre"
+                 oninput="onSliderInput(this.value)">
+          <div class="ticks">
+            <span>1.50</span><span>2.00</span><span>2.50</span><span>3.00</span><span>4.00</span>
+          </div>
+        </div>
+        <div class="compare-sliders" id="compare-price-ui">
+          <div class="compare-row">
+            <label for="price-slider-a">Scenario A — €/L</label>
+            <div class="assumption-top" style="margin-bottom:0.35rem">
+              <span></span>
+              <div class="price-readout" style="font-size:1.35rem"><span id="price-val-a">€2.14</span> <small>/L</small></div>
+            </div>
+            <input type="range" id="price-slider-a" min="1.50" max="4.00" step="0.01" value="2.14"
+                   aria-label="Scenario A price" oninput="window.__fflOnCompareA(this.value)">
+            <div class="ticks"><span>1.50</span><span>4.00</span></div>
+          </div>
+          <div class="compare-row">
+            <label for="price-slider-b">Scenario B — €/L</label>
+            <div class="assumption-top" style="margin-bottom:0.35rem">
+              <span></span>
+              <div class="price-readout" style="font-size:1.35rem"><span id="price-val-b">€3.00</span> <small>/L</small></div>
+            </div>
+            <input type="range" id="price-slider-b" min="1.50" max="4.00" step="0.01" value="3.00"
+                   aria-label="Scenario B price" oninput="window.__fflOnCompareB(this.value)">
+            <div class="ticks"><span>1.50</span><span>4.00</span></div>
+          </div>
+          <button type="button" class="btn-compare-run" onclick="window.__fflRunScenarioCompare()">Compare</button>
+        </div>
+      </div>
+
+      <p class="scenario-err" id="scenario-err" role="status"></p>
+      <div class="scenario-summary" id="scenario-summary"></div>
+
+      <div class="global-error" id="global-error" role="alert"></div>
+
+      <div class="crisis-alert" id="crisis-alert">
+        <strong id="crisis-count">0</strong> counties above the 10% income share line.
+        Households in those counties: <strong id="crisis-households">0</strong>.
+      </div>
+
+      <p class="table-label"><strong>Table 1</strong> — County register (highest index first)</p>
+      <div class="county-register" id="county-register">
+        <div class="county-head" id="county-head-single">
+          <span>County</span>
+          <span>Idx</span>
+          <span>% inc.</span>
+          <span>Tier</span>
+          <span></span>
+        </div>
+        <div class="county-head compare" id="county-head-compare" style="display:none">
+          <span>County</span>
+          <span>Idx</span>
+          <span>A %</span>
+          <span>B %</span>
+          <span>Tier</span>
+          <span></span>
+        </div>
+        <div class="county-body" id="county-grid"></div>
+      </div>
+
+      <div class="history-block">
+        <button type="button" class="history-toggle" id="history-toggle" aria-expanded="false"
+                onclick="window.__fflToggleHistory()">📈 Price history and forecast</button>
+        <div class="history-panel" id="history-panel">
+          <div class="history-chart-shell">
+            <div class="history-chart-wrap">
+              <canvas id="chart-history" aria-label="Diesel price history"></canvas>
+            </div>
+            <div class="history-unavail" id="history-unavail" style="display:none"></div>
+          </div>
+          <div class="history-callouts" id="history-callouts">
+            <div class="history-callout"><strong>Today</strong><span id="hc-today">11 counties in energy poverty</span></div>
+            <div class="history-callout"><strong>By July 2026</strong><span id="hc-july">—</span></div>
+            <div class="history-callout"><strong>By Oct 2026</strong><span id="hc-oct">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
