@@ -27,7 +27,10 @@ Open `http://127.0.0.1:5500/`. The dev server proxies `/api/*` to the deployed h
 | `GET /counties` | County name list (for bootstrapping the UI) |
 | `GET /county/{county}` | County snapshot at `fuel_price` |
 | `GET /national/snapshot` | Headline national stats at `price_eur_l` |
+| `GET /insights/narrative` | Auto bullets + elevator pitch for video / Devpost |
 | `GET /insights/regional` | Province roll-ups at `fuel_price` |
+| `GET /model/scenario-curve` | Counties over threshold vs €/L (`price_min`, `price_max`, `steps`) |
+| `GET /model/ranking-stability` | Top‑k overlap when tilting composite weights |
 | `GET /compare/counties` | Side-by-side two counties + narrative delta |
 | `GET /export/county/{county}` | Markdown brief (journalists / briefings) |
 | `GET /export/briefing` | **National** one-page markdown (claims summary + validation + lineage) |
@@ -38,6 +41,7 @@ Open `http://127.0.0.1:5500/`. The dev server proxies `/api/*` to the deployed h
 | `GET /model/sensitivity` | Stress tests (litres, weights, HDD) |
 | `GET /model/policy` | Illustrative universal vs targeted grant outlay |
 | `POST /model/params` | Session-local assumption tuning (rebuilds model unless `USE_ZERVE_VARIABLE`) |
+| `GET /docs` | **OpenAPI** (tagged: core, county, scenario, model, insights, export) |
 | `GET /scenario`, `/history`, `/deep-dive/{county}` | Existing dashboard routes |
 
 ## Zerve workflow

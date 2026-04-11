@@ -1027,6 +1027,160 @@ def national_snapshot_payload(df: pd.DataFrame, params: ModelParams, price_eur_l
     }
 
 
+def scenario_curve_payload(
+    df: pd.DataFrame,
+    params: ModelParams,
+    price_min: float = 1.5,
+    price_max: float = 4.0,
+    steps: int = 26,
+) -> dict[str, Any]:
+    """Counties over fuel-income threshold vs €/L (model curve for charts and video)."""
+    thr = params.poverty_threshold_pct
+    prices = np.linspace(price_min, price_max, max(5, int(steps))).round(4).tolist()
+    series = []
+    for p in prices:
+        pct = df.apply(lambda r: poverty_pct_row_series(r, float(p), params), axis=1)
+        n_over = int((pct > thr).sum())
+        series.append(
+            {
+                "price_eur_l": float(p),
+                "counties_over_threshold": n_over,
+                "mean_fuel_share_pct": round(float(pct.mean()), 2),
+            }
+        )
+    return {
+        "poverty_threshold_pct": thr,
+        "price_min": price_min,
+        "price_max": price_max,
+        "points": series,
+    }
+
+
+def ranking_stability_payload(df: pd.DataFrame, params: ModelParams, top_k: int = 10) -> dict[str, Any]:
+    """How stable county vulnerability rankings are under alternative composite weights."""
+    merged_base, _ = load_merged_energy_base()
+    base_scored = score_vulnerability(merged_base, params)
+    base_order = base_scored.sort_values("vulnerability_score", ascending=False)["county"].astype(str).tolist()
+    k = min(top_k, len(base_order))
+    top_set = set(base_order[:k])
+
+    def norm_weights(w: dict[str, float]) -> dict[str, float]:
+        s = sum(w.values())
+        if s <= 0:
+            return dict(w)
+        return {kk: round(float(vv) / s, 4) for kk, vv in w.items()}
+
+    def overlap(wn: dict[str, float]) -> int:
+        p = ModelParams(**{**asdict(params), "weights": wn})
+        alt = score_vulnerability(merged_base, p)
+        ord2 = alt.sort_values("vulnerability_score", ascending=False)["county"].astype(str).tolist()
+        return len(top_set & set(ord2[:k]))
+
+    w0 = dict(params.weights)
+    raw_variants = [
+        ("baseline (current weights)", w0),
+        (
+            "tilt social (+0.10 from fuel)",
+            {
+                "fuel_dependency_score": max(0.12, w0.get("fuel_dependency_score", 0.3) - 0.1),
+                "building_inefficiency_score": w0.get("building_inefficiency_score", 0.25),
+                "social_deprivation_score": min(0.5, w0.get("social_deprivation_score", 0.3) + 0.1),
+                "energy_intensity_score": w0.get("energy_intensity_score", 0.15),
+            },
+        ),
+        (
+            "tilt fuel (+0.10 from social)",
+            {
+                "fuel_dependency_score": min(0.5, w0.get("fuel_dependency_score", 0.3) + 0.1),
+                "building_inefficiency_score": w0.get("building_inefficiency_score", 0.25),
+                "social_deprivation_score": max(0.12, w0.get("social_deprivation_score", 0.3) - 0.1),
+                "energy_intensity_score": w0.get("energy_intensity_score", 0.15),
+            },
+        ),
+    ]
+    out_variants = []
+    for label, w in raw_variants:
+        wn = norm_weights(w)
+        ov = k if label.startswith("baseline") else overlap(wn)
+        out_variants.append(
+            {
+                "label": label,
+                "weights": wn,
+                "top_k": k,
+                "overlap_with_baseline_top_k": ov,
+            }
+        )
+    return {
+        "top_k": k,
+        "baseline_top_counties": base_order[:k],
+        "variants": out_variants,
+        "note": "Overlap = how many of the baseline top-k counties remain in the top-k under alternative weights.",
+    }
+
+
+def narrative_insights_payload(df: pd.DataFrame, params: ModelParams, price_eur_l: float = 2.14) -> dict[str, Any]:
+    """Human-readable bullets for judges, Devpost, and video voiceover."""
+    snap = national_snapshot_payload(df, params, price_eur_l)
+    claims = evaluate_claims(df, params, price_eur_l)
+    breach = flip_points_payload(df, params, reference_price_eur_l=price_eur_l)
+    reg = regional_summary_payload(df, params, price_eur_l)
+    curve = scenario_curve_payload(df, params, price_eur_l - 0.5, price_eur_l + 1.0, 16)
+    thr = params.poverty_threshold_pct
+
+    bullets: list[str] = []
+    bullets.append(
+        f"At €{price_eur_l:.2f}/L, {snap['counties_over_threshold']} of {snap['total_counties']} counties exceed the "
+        f"{thr:g}% modelled fuel-income threshold — mean share {snap['mean_fuel_share_pct']}%."
+    )
+    if snap.get("highest_fuel_share"):
+        hf = snap["highest_fuel_share"]
+        bullets.append(f"Tightest squeeze: {hf['county']} at {hf['poverty_pct']}% of synthetic income on the liquid-fuel proxy.")
+    if snap.get("lowest_fuel_share"):
+        lf = snap["lowest_fuel_share"]
+        bullets.append(f"Lowest proxy burden: {lf['county']} at {lf['poverty_pct']}%.")
+
+    passed = sum(1 for c in claims.get("claims", []) if c.get("holds"))
+    total = len(claims.get("claims", []))
+    bullets.append(
+        f"{total} registered consistency checks: {passed}/{total} pass on the live dataframe (see /model/claims)."
+    )
+
+    finite_b = [x["breach_price_eur_l"] for x in breach.get("counties", []) if x.get("breach_price_eur_l") is not None]
+    if len(finite_b) > 1:
+        bullets.append(
+            f"Breach €/L (where counties cross the threshold) spans €{min(finite_b):.2f}–€{max(finite_b):.2f} — "
+            "a wide geographic spread in price resilience."
+        )
+
+    if reg.get("regions"):
+        top_r = reg["regions"][0]
+        bullets.append(
+            f"By province at this €/L, {top_r['province']} shows the highest mean vulnerability ({top_r['mean_vulnerability']}) "
+            f"and {top_r['counties_over_threshold']}/{top_r['counties']} counties over the line."
+        )
+
+    # Price sensitivity one-liner from curve
+    pts = curve.get("points", [])
+    if len(pts) >= 2:
+        n0 = pts[0]["counties_over_threshold"]
+        n1 = pts[-1]["counties_over_threshold"]
+        p0 = pts[0]["price_eur_l"]
+        p1 = pts[-1]["price_eur_l"]
+        bullets.append(
+            f"Along the model curve from €{p0:.2f} to €{p1:.2f}/L, counties over threshold move from {n0} to {n1}."
+        )
+
+    return {
+        "price_eur_l": price_eur_l,
+        "bullets": bullets,
+        "elevator_pitch": (
+            "Fuel Fault Lines fuses SEAI county energy profiles with CSO deprivation (or fallback), "
+            "adds a heating-demand-aware liquid-fuel proxy, and exposes every assumption through a FastAPI hub "
+            "so policymakers can stress-test price shocks, compare counties, and export briefings."
+        ),
+    }
+
+
 def build_national_briefing_markdown(df: pd.DataFrame, params: ModelParams, price_eur_l: float = 2.14) -> str:
     snap = national_snapshot_payload(df, params, price_eur_l)
     val = validation_payload(df, params, price_eur_l)
@@ -1063,6 +1217,12 @@ def build_national_briefing_markdown(df: pd.DataFrame, params: ModelParams, pric
         lines.append(
             f"- {st} **{c.get('id')}** — r={c.get('r')}, n={c.get('n')}"
         )
+    narr = narrative_insights_payload(df, params, price_eur_l)
+    lines.extend(["", "## Narrative (auto)", ""])
+    for b in narr.get("bullets", []):
+        lines.append(f"- {b}")
+    lines.append("")
+    lines.append(f"*Elevator:* {narr.get('elevator_pitch', '')}")
     lines.extend(
         [
             "",
@@ -1085,7 +1245,7 @@ def model_meta_dict(df: pd.DataFrame, params: ModelParams) -> dict[str, Any]:
     cso_src = df.attrs.get("cso_source", "unknown")
     seai_src = df.attrs.get("seai_source", "unknown")
     return {
-        "api_version": "1.2",
+        "api_version": "1.3",
         "git_rev": git_short_hash(),
         "built_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "zerve_notebook_block": os.environ.get("ZERVE_DATA_BLOCK", "warmer_homes_roi"),
@@ -1102,17 +1262,22 @@ def model_meta_dict(df: pd.DataFrame, params: ModelParams) -> dict[str, Any]:
         "demo_script_for_judges": [
             "1. Zerve: question → notebook blocks → dataframe warmer_homes_df (block warmer_homes_roi).",
             "2. Deploy this FastAPI hub; optional USE_ZERVE_VARIABLE=1 to inject the notebook df.",
-            "3. Open dashboard → Method & lab: /meta, /model/claims, validation, breach-price table.",
-            "4. Scenarios: price sliders + compare; Counties: two-county compare + export markdown.",
-            "5. GET /export/briefing for a one-page national summary for write-ups.",
+            "3. Dashboard: read auto narrative + scenario curve (counties over line vs €/L).",
+            "4. Method & lab: validation, breach €/L table, ranking stability, GET /insights/narrative for voiceover bullets.",
+            "5. Scenarios + compare counties; export county or national markdown for Devpost.",
+            "6. Open /docs — full OpenAPI for integrators and judges who want the contract.",
         ],
         "key_endpoints": [
             "/health",
             "/meta",
+            "/docs",
             "/national/snapshot",
+            "/model/scenario-curve",
             "/model/validation",
             "/model/distribution",
             "/model/breach-prices",
+            "/model/ranking-stability",
+            "/insights/narrative",
             "/insights/regional",
             "/export/briefing",
             "/model/params",

@@ -1784,8 +1784,12 @@
       min-height: 0;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
+      grid-template-rows: auto 1fr 1fr;
       gap: 0.65rem;
+    }
+    .dash-card--full-width {
+      grid-column: 1 / -1;
+      min-height: 200px;
     }
     @media (max-width: 900px) {
       .dashboard-grid {
@@ -2581,6 +2585,23 @@
         </p>
 
   <div class="dashboard-grid">
+    <section class="dash-card dash-card--full-width" aria-labelledby="card-curve-title">
+      <div class="dash-card-head">
+        <div class="dash-card-title-row">
+          <div class="dash-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 12l4-4 4 4 6-6" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          </div>
+          <div>
+            <h2 class="dash-card-title" id="card-curve-title">Scenario curve</h2>
+            <p class="dash-card-sub">Counties over fuel-income threshold vs €/L (live model)</p>
+          </div>
+        </div>
+        <span class="dash-pill-tag" id="curve-pill-range">€/L</span>
+      </div>
+      <div class="dash-chart-wrap" style="min-height:200px">
+        <canvas id="chart-scenario-curve" aria-label="Counties over threshold by fuel price"></canvas>
+      </div>
+    </section>
     <section class="dash-card dash-card--tl" aria-labelledby="card-tl-title">
       <div class="dash-card-head">
         <div class="dash-card-title-row">
@@ -2910,6 +2931,29 @@
           </div>
         </section>
 
+        <section class="method-section" aria-labelledby="m-narrative-h">
+          <h2 id="m-narrative-h">Auto narrative (voiceover / Devpost)</h2>
+          <p>Bullets from <code>GET /insights/narrative</code> — paste into your video script or summary.</p>
+          <pre class="method-pre" id="method-narrative-pre"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-curve-json-h">
+          <h2 id="m-curve-json-h">Scenario curve (API)</h2>
+          <p>Same data as the dashboard chart: counties over threshold vs €/L.</p>
+          <pre class="method-pre" id="method-scenario-curve-pre" style="max-height:14rem"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-rank-h">
+          <h2 id="m-rank-h">Ranking stability</h2>
+          <p>Do the most vulnerable counties stay in the top‑k when we tilt composite weights toward social vs fuel drivers?</p>
+          <pre class="method-pre" id="method-ranking-pre"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-openapi-h">
+          <h2 id="m-openapi-h">OpenAPI contract</h2>
+          <p>Interactive docs for judges and integrators: <a id="method-openapi-link" href="#" target="_blank" rel="noopener noreferrer">Open /docs</a> (grouped tags: core, county, scenario, model, insights, export).</p>
+        </section>
+
         <section class="method-section" aria-labelledby="m-claims-h">
           <h2 id="m-claims-h">Registered claims (pass/fail)</h2>
           <p>Checkable statements evaluated on the live dataframe — useful for demos and write-ups.</p>
@@ -3184,6 +3228,7 @@
   let tierBarChartInstance = null;
   let stressAreaChartInstance = null;
   let tierDonutChartInstance = null;
+  let scenarioCurveChartInstance = null;
   let radarChartInstance = null;
 
   let compareMode = false;
@@ -5103,11 +5148,16 @@
     const preDist = document.getElementById('method-distribution-pre');
     const preBr = document.getElementById('method-breach-pre');
     const preReg = document.getElementById('method-regional-pre');
+    const preNar = document.getElementById('method-narrative-pre');
+    const preCurve = document.getElementById('method-scenario-curve-pre');
+    const preRank = document.getElementById('method-ranking-pre');
+    const oaLink = document.getElementById('method-openapi-link');
     const preC = document.getElementById('method-claims-pre');
     const preS = document.getElementById('method-sensitivity-pre');
     const preP = document.getElementById('method-policy-pre');
     const lin = document.getElementById('method-lineage-p');
     populateJudgeScriptOl();
+    if (oaLink) oaLink.href = API + '/docs';
     if (preMeta) {
       if (metaCache) preMeta.textContent = JSON.stringify(metaCache, null, 2);
       else preMeta.textContent = '(no /meta yet)';
@@ -5179,6 +5229,47 @@
         preReg.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
       } catch (e) {
         preReg.textContent = String(e);
+      }
+    }
+    if (preNar) {
+      try {
+        const r = await fetch(API + '/insights/narrative?price_eur_l=' + encodeURIComponent(price));
+        if (r.ok) {
+          const j = await r.json();
+          const bullets = j.bullets || [];
+          const pitch = j.elevator_pitch || '';
+          preNar.textContent =
+            bullets.map(function (b, i) {
+              return i + 1 + '. ' + b;
+            }).join('\n') + (pitch ? '\n\nElevator: ' + pitch : '');
+        } else preNar.textContent = 'HTTP ' + r.status;
+      } catch (e) {
+        preNar.textContent = String(e);
+      }
+    }
+    if (preCurve) {
+      try {
+        const lo = Math.max(0.5, price - 0.85);
+        const hi = Math.min(8, price + 0.85);
+        const r = await fetch(
+          API +
+            '/model/scenario-curve?price_min=' +
+            encodeURIComponent(lo) +
+            '&price_max=' +
+            encodeURIComponent(hi) +
+            '&steps=24'
+        );
+        preCurve.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+      } catch (e) {
+        preCurve.textContent = String(e);
+      }
+    }
+    if (preRank) {
+      try {
+        const r = await fetch(API + '/model/ranking-stability?top_k=10');
+        preRank.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+      } catch (e) {
+        preRank.textContent = String(e);
       }
     }
     if (preC) {
@@ -5326,6 +5417,112 @@
   }
 
   const TIER_ORDER = ['Critical', 'High', 'Medium', 'Low'];
+
+  async function renderScenarioCurveChart() {
+    const canvas = document.getElementById('chart-scenario-curve');
+    const pill = document.getElementById('curve-pill-range');
+    if (!canvas || typeof Chart === 'undefined') return;
+    const price = getActivePrice();
+    const lo = Math.max(0.5, Math.min(price - 0.85, 3.2));
+    const hi = Math.min(8, Math.max(price + 0.85, lo + 0.5));
+    if (pill) pill.textContent = '€' + lo.toFixed(2) + '–€' + hi.toFixed(2) + '/L';
+    let pts = [];
+    try {
+      const res = await fetch(
+        API +
+          '/model/scenario-curve?price_min=' +
+          encodeURIComponent(lo) +
+          '&price_max=' +
+          encodeURIComponent(hi) +
+          '&steps=28'
+      );
+      if (res.ok) {
+        const j = await res.json();
+        pts = j.points || [];
+      }
+    } catch (eC) {}
+    if (!pts.length) return;
+
+    const labels = pts.map(function (p) {
+      return p.price_eur_l != null ? p.price_eur_l.toFixed(2) : '';
+    });
+    const counts = pts.map(function (p) {
+      return p.counties_over_threshold != null ? p.counties_over_threshold : 0;
+    });
+    const means = pts.map(function (p) {
+      return p.mean_fuel_share_pct != null ? p.mean_fuel_share_pct : null;
+    });
+
+    if (scenarioCurveChartInstance) {
+      scenarioCurveChartInstance.destroy();
+      scenarioCurveChartInstance = null;
+    }
+    const thrLine = povertyThresholdPct;
+    scenarioCurveChartInstance = new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Counties > ' + thrLine + '% line',
+            data: counts,
+            borderColor: '#0d9488',
+            backgroundColor: 'rgba(13, 148, 136, 0.12)',
+            fill: true,
+            tension: 0.25,
+            yAxisID: 'y',
+            pointRadius: 0,
+            borderWidth: 2
+          },
+          {
+            label: 'Mean fuel share %',
+            data: means,
+            borderColor: '#7c3aed',
+            backgroundColor: 'transparent',
+            fill: false,
+            tension: 0.25,
+            yAxisID: 'y1',
+            pointRadius: 0,
+            borderWidth: 1.5
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: { boxWidth: 10, font: { size: 10 }, color: '#334155' }
+          }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: '€/L', font: { size: 10 } },
+            ticks: { maxTicksLimit: 8, font: { size: 9 } },
+            grid: { color: 'rgba(0,0,0,0.06)' }
+          },
+          y: {
+            type: 'linear',
+            position: 'left',
+            min: 0,
+            max: 26,
+            title: { display: true, text: 'Counties', font: { size: 10 } },
+            ticks: { stepSize: 2, font: { size: 9 } },
+            grid: { color: 'rgba(0,0,0,0.06)' }
+          },
+          y1: {
+            type: 'linear',
+            position: 'right',
+            title: { display: true, text: 'Mean %', font: { size: 10 } },
+            grid: { drawOnChartArea: false },
+            ticks: { font: { size: 9 } }
+          }
+        }
+      }
+    });
+  }
 
   function updateDashboardCharts() {
     if (typeof Chart === 'undefined') return;
@@ -5571,6 +5768,7 @@
     }
 
     if (historyCache) renderStressAreaChart(historyCache);
+    renderScenarioCurveChart();
   }
 
   function updateStats() {
