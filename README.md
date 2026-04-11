@@ -32,6 +32,8 @@ The **AI · Gemini** page in `index.html` calls the **Google Generative Language
 | `GET /county/{county}` | County snapshot at `fuel_price` |
 | `GET /national/snapshot` | Headline national stats at `price_eur_l` |
 | `GET /insights/narrative` | Auto bullets + elevator pitch for video / Devpost |
+| `GET /insights/headline` | One composite headline + supporting bullets for the dashboard |
+| `GET /insights/submission-pack` | Devpost ≤300-word draft, video checklist, social draft, rubric hooks, why-Zerve |
 | `GET /insights/regional` | Province roll-ups at `fuel_price` |
 | `GET /model/scenario-curve` | Counties over threshold vs €/L (`price_min`, `price_max`, `steps`) |
 | `GET /model/ranking-stability` | Top‑k overlap when tilting composite weights |

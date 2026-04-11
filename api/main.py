@@ -31,6 +31,7 @@ from pipeline import (
     evaluate_claims,
     flip_points_payload,
     get_county_deep_dive_dict,
+    headline_insight_payload,
     model_meta_dict,
     national_snapshot_payload,
     narrative_insights_payload,
@@ -40,6 +41,7 @@ from pipeline import (
     regional_summary_payload,
     scenario_curve_payload,
     sensitivity_payload,
+    submission_pack_payload,
     validation_payload,
 )
 
@@ -345,6 +347,20 @@ def insights_narrative(
     price_eur_l: float = Query(2.14, ge=0.5, le=8.0),
 ) -> dict[str, Any]:
     return narrative_insights_payload(_df(), state.params, price_eur_l)
+
+
+@app.get("/insights/headline", tags=["insights"])
+def insights_headline(
+    price_eur_l: float = Query(2.14, ge=0.5, le=8.0),
+) -> dict[str, Any]:
+    return headline_insight_payload(_df(), state.params, price_eur_l)
+
+
+@app.get("/insights/submission-pack", tags=["insights"])
+def insights_submission_pack(
+    price_eur_l: float = Query(2.14, ge=0.5, le=8.0),
+) -> dict[str, Any]:
+    return submission_pack_payload(_df(), state.params, price_eur_l)
 
 
 @app.post("/model/params", tags=["model"])
