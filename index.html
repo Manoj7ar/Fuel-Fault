@@ -2865,6 +2865,51 @@
           <pre class="method-pre" id="method-meta-pre" aria-label="API metadata JSON"></pre>
         </section>
 
+        <section class="method-section" aria-labelledby="m-judge-h">
+          <h2 id="m-judge-h">Judge / demo script (from API)</h2>
+          <p>Steps embedded in <code>/meta</code> for video walkthroughs — copy into your Devpost or recording outline.</p>
+          <ol id="method-judge-ol" style="margin:0.5rem 0 0 1.1rem;font-size:0.88rem;color:var(--ink2);line-height:1.55"></ol>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-national-h">
+          <h2 id="m-national-h">National snapshot</h2>
+          <p>Headline counts at the active scenario €/L (same as Scenarios when not in compare A/B).</p>
+          <pre class="method-pre" id="method-national-pre"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-validation-h">
+          <h2 id="m-validation-h">Internal validation (correlations)</h2>
+          <p>Sanity checks on the live model — not official fuel poverty statistics.</p>
+          <pre class="method-pre" id="method-validation-pre"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-dist-h">
+          <h2 id="m-dist-h">Distribution (deciles)</h2>
+          <p>Where fuel-income stress sits across counties at scenario €/L.</p>
+          <pre class="method-pre" id="method-distribution-pre"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-breach-h">
+          <h2 id="m-breach-h">Fault-line €/L (breach prices)</h2>
+          <p>Per county: minimum €/L at which the model crosses the fuel-income threshold — sorted most resilient first.</p>
+          <pre class="method-pre" id="method-breach-pre" style="max-height:18rem"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-regional-h">
+          <h2 id="m-regional-h">Regional summary</h2>
+          <p>Province roll-ups at scenario €/L.</p>
+          <pre class="method-pre" id="method-regional-pre"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-export-h">
+          <h2 id="m-export-h">National markdown export</h2>
+          <p>One-page brief for write-ups: <code>GET /export/briefing</code></p>
+          <div class="method-lab-actions">
+            <button type="button" class="btn-drawer-counties" onclick="window.__fflCopyNationalBriefing()">Copy briefing markdown</button>
+            <button type="button" class="btn-drawer-counties" onclick="window.__fflOpenNationalBriefing()">Open in new tab</button>
+          </div>
+        </section>
+
         <section class="method-section" aria-labelledby="m-claims-h">
           <h2 id="m-claims-h">Registered claims (pass/fail)</h2>
           <p>Checkable statements evaluated on the live dataframe — useful for demos and write-ups.</p>
@@ -2926,6 +2971,8 @@
             <dd>Heating-demand heuristic by county (inland/coastal). Scales the litres proxy only.</dd>
             <dt>Cliff price</dt>
             <dd>First pre-computed price ladder step where the county crosses the threshold.</dd>
+            <dt>Breach price</dt>
+            <dd>€/L solved numerically where modelled fuel share crosses the threshold (may differ slightly from cliff ladder).</dd>
           </dl>
         </section>
 
@@ -4924,6 +4971,17 @@
     updateThresholdLabels();
   }
 
+  function populateJudgeScriptOl() {
+    const ol = document.getElementById('method-judge-ol');
+    if (!ol || !metaCache || !Array.isArray(metaCache.demo_script_for_judges)) return;
+    ol.innerHTML = '';
+    for (let i = 0; i < metaCache.demo_script_for_judges.length; i++) {
+      const li = document.createElement('li');
+      li.textContent = metaCache.demo_script_for_judges[i];
+      ol.appendChild(li);
+    }
+  }
+
   async function refreshThesisBanner() {
     const el = document.getElementById('thesis-banner');
     if (!el) return;
@@ -4943,6 +5001,26 @@
         '/L</strong> against a <strong>' +
         povertyThresholdPct +
         '%</strong> fuel-income threshold, ';
+      let snapLine = '';
+      try {
+        const rs = await fetch(API + '/national/snapshot?price_eur_l=' + encodeURIComponent(price));
+        if (rs.ok) {
+          const s = await rs.json();
+          if (s && s.counties_over_threshold != null) {
+            snapLine =
+              '<br><span style="opacity:0.92">' +
+              '<strong>' +
+              s.counties_over_threshold +
+              '</strong> of <strong>' +
+              (s.total_counties != null ? s.total_counties : 26) +
+              '</strong> counties over the line · <strong>' +
+              (s.critical_tier_counties != null ? s.critical_tier_counties : '—') +
+              '</strong> Critical tier · mean fuel share <strong>' +
+              (s.mean_fuel_share_pct != null ? s.mean_fuel_share_pct : '—') +
+              '%</strong>.</span>';
+          }
+        }
+      } catch (eSnap) {}
       el.innerHTML =
         priceLine +
         '<strong>' +
@@ -4950,7 +5028,8 @@
         '/' +
         n +
         '</strong> registered model claims pass (see Method &amp; lab). ' +
-        'Figures are illustrative — income is synthetic from deprivation, not survey microdata.';
+        snapLine +
+        ' <span style="opacity:0.88">Illustrative model — synthetic income bands, not survey microdata.</span>';
     } catch (e) {
       el.innerHTML =
         'Model compares county-level SEAI energy profiles with CSO deprivation and a liquid-fuel proxy. ' +
@@ -5019,10 +5098,16 @@
   async function refreshMethodPage() {
     if (appPage !== 'method') return;
     const preMeta = document.getElementById('method-meta-pre');
+    const preNat = document.getElementById('method-national-pre');
+    const preVal = document.getElementById('method-validation-pre');
+    const preDist = document.getElementById('method-distribution-pre');
+    const preBr = document.getElementById('method-breach-pre');
+    const preReg = document.getElementById('method-regional-pre');
     const preC = document.getElementById('method-claims-pre');
     const preS = document.getElementById('method-sensitivity-pre');
     const preP = document.getElementById('method-policy-pre');
     const lin = document.getElementById('method-lineage-p');
+    populateJudgeScriptOl();
     if (preMeta) {
       if (metaCache) preMeta.textContent = JSON.stringify(metaCache, null, 2);
       else preMeta.textContent = '(no /meta yet)';
@@ -5054,6 +5139,48 @@
       if (hdd && p.use_hdd_adjustment != null) hdd.checked = !!p.use_hdd_adjustment;
     }
     const price = getActivePrice();
+    if (preNat) {
+      try {
+        const r = await fetch(API + '/national/snapshot?price_eur_l=' + encodeURIComponent(price));
+        preNat.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+      } catch (e) {
+        preNat.textContent = String(e);
+      }
+    }
+    if (preVal) {
+      try {
+        const r = await fetch(API + '/model/validation?price_eur_l=' + encodeURIComponent(price));
+        preVal.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+      } catch (e) {
+        preVal.textContent = String(e);
+      }
+    }
+    if (preDist) {
+      try {
+        const r = await fetch(API + '/model/distribution?price_eur_l=' + encodeURIComponent(price));
+        preDist.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+      } catch (e) {
+        preDist.textContent = String(e);
+      }
+    }
+    if (preBr) {
+      try {
+        const r = await fetch(
+          API + '/model/breach-prices?reference_price_eur_l=' + encodeURIComponent(price)
+        );
+        preBr.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+      } catch (e) {
+        preBr.textContent = String(e);
+      }
+    }
+    if (preReg) {
+      try {
+        const r = await fetch(API + '/insights/regional?fuel_price=' + encodeURIComponent(price));
+        preReg.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+      } catch (e) {
+        preReg.textContent = String(e);
+      }
+    }
     if (preC) {
       try {
         const r = await fetch(API + '/model/claims?price_eur_l=' + encodeURIComponent(price));
@@ -5079,6 +5206,50 @@
       }
     }
   }
+
+  window.__fflOpenNationalBriefing = function () {
+    const price = getActivePrice();
+    const url =
+      API + '/export/briefing?price_eur_l=' + encodeURIComponent(price);
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  window.__fflCopyNationalBriefing = async function () {
+    const price = getActivePrice();
+    const url =
+      API + '/export/briefing?price_eur_l=' + encodeURIComponent(price);
+    try {
+      const res = await fetch(url);
+      if (!res.ok) {
+        showAppNotice({
+          severity: 'warn',
+          title: 'Briefing unavailable',
+          detail: 'HTTP ' + res.status,
+          code: null
+        });
+        return;
+      }
+      const text = await res.text();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        showAppNotice({
+          severity: 'info',
+          title: 'Copied',
+          detail: 'National briefing markdown is on the clipboard.',
+          code: null
+        });
+      } else {
+        window.__fflOpenNationalBriefing();
+      }
+    } catch (e) {
+      showAppNotice({
+        severity: 'warn',
+        title: 'Copy failed',
+        detail: String(e && e.message ? e.message : e),
+        code: null
+      });
+    }
+  };
 
   window.__fflApplyModelLab = async function () {
     const st = document.getElementById('lab-status');
@@ -6149,6 +6320,7 @@
     await fetchCountiesList();
     metaCache = await fetchApiMeta();
     applyMetaToUi(metaCache);
+    populateJudgeScriptOl();
     runLoad(true);
   })();
 })();

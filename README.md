@@ -23,12 +23,18 @@ Open `http://127.0.0.1:5500/`. The dev server proxies `/api/*` to the deployed h
 | Route | Purpose |
 |--------|---------|
 | `GET /health` | Status + `api_version`, `git_rev`, `built_at_utc` |
-| `GET /meta` | Full lineage, limitations, tunable `params`, Zerve notebook hints |
+| `GET /meta` | Lineage, limitations, `params`, Zerve hints, **demo script for judges**, endpoint index |
 | `GET /counties` | County name list (for bootstrapping the UI) |
 | `GET /county/{county}` | County snapshot at `fuel_price` |
+| `GET /national/snapshot` | Headline national stats at `price_eur_l` |
+| `GET /insights/regional` | Province roll-ups at `fuel_price` |
 | `GET /compare/counties` | Side-by-side two counties + narrative delta |
 | `GET /export/county/{county}` | Markdown brief (journalists / briefings) |
-| `GET /model/claims` | Pass/fail checks on the live dataframe |
+| `GET /export/briefing` | **National** one-page markdown (claims summary + validation + lineage) |
+| `GET /model/claims` | Pass/fail checks (incl. correlations + breach-price spread) |
+| `GET /model/validation` | Internal correlation sanity checks |
+| `GET /model/distribution` | Deciles of fuel-income share across counties |
+| `GET /model/breach-prices` | Per-county €/L where stress crosses threshold (“fault line”) |
 | `GET /model/sensitivity` | Stress tests (litres, weights, HDD) |
 | `GET /model/policy` | Illustrative universal vs targeted grant outlay |
 | `POST /model/params` | Session-local assumption tuning (rebuilds model unless `USE_ZERVE_VARIABLE`) |
@@ -42,6 +48,6 @@ Open `http://127.0.0.1:5500/`. The dev server proxies `/api/*` to the deployed h
 
 ## Judging / narrative hooks
 
-- **Method & lab** page in `index.html` surfaces `/meta`, claims, sensitivity, and the parameter lab when the API is current.
+- **Method & lab** page surfaces `/meta`, judge demo script, national snapshot, validation, distribution, breach prices, regional summary, claims, sensitivity, policy, parameter lab, and national briefing export.
 - **Heating-demand (HDD)** multipliers scale the litres proxy by county (documented in code).
 - **Limitations** are returned in `/meta` and repeated in export briefs: synthetic income bands, proxy fuel use, not administrative fuel poverty counts.

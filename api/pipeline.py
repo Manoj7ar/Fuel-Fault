@@ -702,27 +702,6 @@ def build_warmer_homes_dataframe(params: ModelParams | None = None) -> pd.DataFr
     return add_price_shock_and_warmer_homes(scored, params)
 
 
-def model_meta_dict(df: pd.DataFrame, params: ModelParams) -> dict[str, Any]:
-    cso_src = df.attrs.get("cso_source", "unknown")
-    seai_src = df.attrs.get("seai_source", "unknown")
-    return {
-        "api_version": "1.1",
-        "git_rev": git_short_hash(),
-        "built_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "zerve_notebook_block": os.environ.get("ZERVE_DATA_BLOCK", "warmer_homes_roi"),
-        "zerve_notebook_var": os.environ.get("ZERVE_DATA_VAR", "warmer_homes_df"),
-        "use_zerve_variable": os.environ.get("USE_ZERVE_VARIABLE", "").lower() in ("1", "true", "yes"),
-        "params": params.to_public_dict(),
-        "data_lineage": {
-            "seai": seai_src,
-            "cso_deprivation": cso_src,
-            "fuel_prices": "aa_ireland_static_snapshot",
-        },
-        "limitations": df.attrs.get("model_note", ""),
-        "counties": int(len(df)),
-    }
-
-
 def evaluate_claims(df: pd.DataFrame, params: ModelParams, price_eur_l: float = 2.14) -> dict[str, Any]:
     thr = params.poverty_threshold_pct
     pct_at = df.apply(lambda r: poverty_pct_row_series(r, price_eur_l, params), axis=1)
@@ -738,6 +717,17 @@ def evaluate_claims(df: pd.DataFrame, params: ModelParams, price_eur_l: float = 
     params_off = ModelParams(**{**asdict(params), "use_hdd_adjustment": False})
     pct_no_hdd = df.apply(lambda r: poverty_pct_row_series(r, price_eur_l, params_off), axis=1)
     rank_moves = int((pct_at.rank(ascending=False) != pct_no_hdd.rank(ascending=False)).sum())
+
+    val = validation_payload(df, params, price_eur_l)
+    ber_check = next((c for c in val.get("checks", []) if c.get("id") == "ber_bad_vs_fuel_share"), {})
+    vuln_check = next((c for c in val.get("checks", []) if c.get("id") == "vulnerability_vs_fuel_share"), {})
+    fp = flip_points_payload(df, params, reference_price_eur_l=price_eur_l)
+    finite_breach = [
+        x["breach_price_eur_l"]
+        for x in fp.get("counties", [])
+        if x.get("breach_price_eur_l") is not None
+    ]
+    breach_spread = (max(finite_breach) - min(finite_breach)) if len(finite_breach) > 1 else 0.0
 
     claims = [
         {
@@ -760,6 +750,24 @@ def evaluate_claims(df: pd.DataFrame, params: ModelParams, price_eur_l: float = 
             "statement": "Turning off the heating-demand (HDD) multiplier changes at least one county's rank by modelled fuel-income share.",
             "holds": rank_moves > 0,
             "detail": {"counties_with_fuel_share_rank_change": rank_moves, "hdd_adjustment_was_on": hdd_on},
+        },
+        {
+            "id": "ber_correlates_with_stress",
+            "statement": "Poor BER stock (D–G %) is positively correlated with modelled fuel-income share (internal sanity check).",
+            "holds": bool(ber_check.get("passes")),
+            "detail": {"r": ber_check.get("r"), "n": ber_check.get("n")},
+        },
+        {
+            "id": "vulnerability_aligns_with_fuel_share",
+            "statement": "Composite vulnerability index is strongly aligned with modelled fuel-income share (internal consistency).",
+            "holds": bool(vuln_check.get("passes")),
+            "detail": {"r": vuln_check.get("r"), "n": vuln_check.get("n")},
+        },
+        {
+            "id": "breach_price_spread",
+            "statement": "Counties span a non-trivial range of €/L 'breach' prices where they cross the fuel-income threshold (≥ €0.50 spread).",
+            "holds": breach_spread >= 0.5,
+            "detail": {"eur_l_spread": round(breach_spread, 4), "n_with_finite_breach": len(finite_breach)},
         },
     ]
     return {"price_eur_l": price_eur_l, "claims": claims}
@@ -827,3 +835,286 @@ def sensitivity_payload(df: pd.DataFrame, base_params: ModelParams) -> dict[str,
     variants.append({"label": "HDD multiplier off", "counties_over_threshold": n4, "delta_vs_base": n4 - base_n})
 
     return {"baseline": {"counties_over_threshold": base_n, "price_eur_l": price}, "variants": variants}
+
+
+def _pearsonr_xy(x: list[float], y: list[float]) -> tuple[float, int]:
+    """Pearson r using numpy; returns (r, n_pairs). Empty or constant → (nan, 0)."""
+    if len(x) != len(y) or len(x) < 2:
+        return float("nan"), 0
+    a = np.asarray(x, dtype=float)
+    b = np.asarray(y, dtype=float)
+    mask = np.isfinite(a) & np.isfinite(b)
+    a, b = a[mask], b[mask]
+    if len(a) < 2:
+        return float("nan"), int(len(a))
+    if np.std(a) < 1e-12 or np.std(b) < 1e-12:
+        return float("nan"), int(len(a))
+    r = float(np.corrcoef(a, b)[0, 1])
+    return r, int(len(a))
+
+
+def validation_payload(df: pd.DataFrame, params: ModelParams, price_eur_l: float = 2.14) -> dict[str, Any]:
+    """Internal consistency checks — not ground-truth validation against admin fuel poverty stats."""
+    pct = df.apply(lambda r: poverty_pct_row_series(r, price_eur_l, params), axis=1)
+    vuln = df["vulnerability_score"].astype(float)
+    fds = df["fuel_dependency_score"].astype(float)
+    ber_bad = df["pct_ber_defg"].astype(float)
+    r_v, n1 = _pearsonr_xy(vuln.tolist(), pct.tolist())
+    r_fd, n2 = _pearsonr_xy(fds.tolist(), pct.tolist())
+    r_ber, n3 = _pearsonr_xy(ber_bad.tolist(), pct.tolist())
+    cso_src = df.attrs.get("cso_source", "unknown")
+    return {
+        "price_eur_l": price_eur_l,
+        "cso_deprivation_source": cso_src,
+        "checks": [
+            {
+                "id": "vulnerability_vs_fuel_share",
+                "description": "Pearson correlation: composite vulnerability index vs modelled fuel-income share (expect strong positive).",
+                "r": round(r_v, 4) if np.isfinite(r_v) else None,
+                "n": n1,
+                "passes": bool(np.isfinite(r_v) and r_v > 0.55),
+            },
+            {
+                "id": "fuel_driver_vs_fuel_share",
+                "description": "Pearson correlation: fuel dependency sub-score vs modelled fuel-income share (expect positive).",
+                "r": round(r_fd, 4) if np.isfinite(r_fd) else None,
+                "n": n2,
+                "passes": bool(np.isfinite(r_fd) and r_fd > 0.25),
+            },
+            {
+                "id": "ber_bad_vs_fuel_share",
+                "description": "Pearson correlation: % BER D–G vs modelled fuel-income share (expect positive).",
+                "r": round(r_ber, 4) if np.isfinite(r_ber) else None,
+                "n": n3,
+                "passes": bool(np.isfinite(r_ber) and r_ber > 0.15),
+            },
+        ],
+        "note": "Income is a synthetic function of deprivation in this model, so raw deprivation vs fuel % is not a clean sanity test; we use the composite index instead.",
+    }
+
+
+def breach_price_eur_l(r: pd.Series, params: ModelParams) -> float | None:
+    """Minimum €/L at which modelled fuel share crosses poverty threshold (binary search)."""
+    thr = params.poverty_threshold_pct
+
+    def pct(p: float) -> float:
+        return poverty_pct_row_series(r, p, params)
+
+    lo, hi = 0.5, 8.0
+    if pct(hi) <= thr:
+        return None
+    if pct(lo) > thr:
+        return round(lo, 3)
+    for _ in range(45):
+        mid = (lo + hi) / 2.0
+        if pct(mid) > thr:
+            hi = mid
+        else:
+            lo = mid
+    return round(hi, 4)
+
+
+def flip_points_payload(
+    df: pd.DataFrame, params: ModelParams, reference_price_eur_l: float = 2.14
+) -> dict[str, Any]:
+    """Per-county €/L where the model crosses the fuel-income threshold — 'fault line' prices."""
+    ref = float(reference_price_eur_l)
+    rows = []
+    for _, r in df.iterrows():
+        bp = breach_price_eur_l(r, params)
+        rows.append(
+            {
+                "county": str(r["county"]),
+                "province": str(r["province"]),
+                "breach_price_eur_l": bp,
+                "risk_tier": str(r["risk_tier"]),
+                "vulnerability_score": round(float(r["vulnerability_score"]), 2),
+            }
+        )
+    rows.sort(key=lambda x: (x["breach_price_eur_l"] is None, x["breach_price_eur_l"] or 99))
+    already = sum(
+        1 for x in rows if x["breach_price_eur_l"] is not None and x["breach_price_eur_l"] <= ref
+    )
+    return {
+        "poverty_threshold_pct": params.poverty_threshold_pct,
+        "reference_price_eur_l": ref,
+        "counties_already_over_at_reference": already,
+        "counties": rows,
+    }
+
+
+def distribution_payload(df: pd.DataFrame, params: ModelParams, price_eur_l: float = 2.14) -> dict[str, Any]:
+    pct = df.apply(lambda r: poverty_pct_row_series(r, price_eur_l, params), axis=1).astype(float)
+    arr = np.sort(pct.values)
+    n = len(arr)
+    thr = params.poverty_threshold_pct
+
+    def q(p: float) -> float:
+        if n == 0:
+            return float("nan")
+        idx = min(n - 1, max(0, int(round(p * (n - 1)))))
+        return float(arr[idx])
+
+    deciles = {f"D{i}": round(q(i / 10), 2) for i in range(1, 10)}
+    return {
+        "price_eur_l": price_eur_l,
+        "poverty_threshold_pct": thr,
+        "n_counties": n,
+        "mean": round(float(arr.mean()), 2) if n else None,
+        "std": round(float(arr.std()), 2) if n > 1 else None,
+        "min": round(float(arr.min()), 2) if n else None,
+        "max": round(float(arr.max()), 2) if n else None,
+        "deciles": deciles,
+        "counties_over_threshold": int((pct > thr).sum()),
+    }
+
+
+def regional_summary_payload(df: pd.DataFrame, params: ModelParams, fuel_price: float = 2.14) -> dict[str, Any]:
+    thr = params.poverty_threshold_pct
+    out = []
+    for prov, g in df.groupby("province"):
+        pct = g.apply(lambda r: poverty_pct_row_series(r, fuel_price, params), axis=1)
+        out.append(
+            {
+                "province": str(prov),
+                "counties": int(len(g)),
+                "mean_vulnerability": round(float(g["vulnerability_score"].mean()), 2),
+                "mean_fuel_share_pct": round(float(pct.mean()), 2),
+                "counties_over_threshold": int((pct > thr).sum()),
+                "critical_counties": int((g["risk_tier"] == "Critical").sum()),
+            }
+        )
+    out.sort(key=lambda x: -x["mean_vulnerability"])
+    return {"fuel_price_eur_l": fuel_price, "poverty_threshold_pct": thr, "regions": out}
+
+
+def national_snapshot_payload(df: pd.DataFrame, params: ModelParams, price_eur_l: float = 2.14) -> dict[str, Any]:
+    pct = df.apply(lambda r: poverty_pct_row_series(r, price_eur_l, params), axis=1)
+    thr = params.poverty_threshold_pct
+    over = df.loc[pct > thr]
+    crit = df[df["risk_tier"] == "Critical"]
+    worst = df.loc[pct.idxmax()] if len(df) else None
+    best = df.loc[pct.idxmin()] if len(df) else None
+    return {
+        "headline_price_eur_l": price_eur_l,
+        "poverty_threshold_pct": thr,
+        "counties_over_threshold": int((pct > thr).sum()),
+        "total_counties": int(len(df)),
+        "vulnerable_households_modelled": int(df["est_vulnerable_households"].sum()),
+        "vulnerable_households_in_stress_counties": int(over["est_vulnerable_households"].sum()) if len(over) else 0,
+        "critical_tier_counties": int(len(crit)),
+        "highest_fuel_share": (
+            {
+                "county": str(worst["county"]),
+                "poverty_pct": round(float(pct.max()), 2),
+            }
+            if worst is not None
+            else None
+        ),
+        "lowest_fuel_share": (
+            {
+                "county": str(best["county"]),
+                "poverty_pct": round(float(pct.min()), 2),
+            }
+            if best is not None
+            else None
+        ),
+        "mean_fuel_share_pct": round(float(pct.mean()), 2),
+        "data_lineage": {
+            "seai": df.attrs.get("seai_source", "unknown"),
+            "cso": df.attrs.get("cso_source", "unknown"),
+        },
+    }
+
+
+def build_national_briefing_markdown(df: pd.DataFrame, params: ModelParams, price_eur_l: float = 2.14) -> str:
+    snap = national_snapshot_payload(df, params, price_eur_l)
+    val = validation_payload(df, params, price_eur_l)
+    meta = model_meta_dict(df, params)
+    lines = [
+        "# Fuel Fault Lines — national briefing (auto-generated)",
+        "",
+        f"**Scenario:** €{price_eur_l:.2f}/L · **Threshold:** {snap['poverty_threshold_pct']}% modelled fuel-income share",
+        "",
+        "## Headline numbers",
+        "",
+        f"- Counties over threshold: **{snap['counties_over_threshold']}** / {snap['total_counties']}",
+        f"- Critical-tier counties (composite index): **{snap['critical_tier_counties']}**",
+        f"- Modelled vulnerable households (national): **{snap['vulnerable_households_modelled']:,}**",
+        f"- Mean fuel share: **{snap['mean_fuel_share_pct']}%**",
+    ]
+    if snap.get("highest_fuel_share"):
+        lines.append(
+            f"- Highest stress: **{snap['highest_fuel_share']['county']}** ({snap['highest_fuel_share']['poverty_pct']}%)"
+        )
+    if snap.get("lowest_fuel_share"):
+        lines.append(
+            f"- Lowest stress: **{snap['lowest_fuel_share']['county']}** ({snap['lowest_fuel_share']['poverty_pct']}%)"
+        )
+    lines.extend(
+        [
+            "",
+            "## Internal consistency (model)",
+            "",
+        ]
+    )
+    for c in val.get("checks", []):
+        st = "✓" if c.get("passes") else "✗"
+        lines.append(
+            f"- {st} **{c.get('id')}** — r={c.get('r')}, n={c.get('n')}"
+        )
+    lines.extend(
+        [
+            "",
+            "## Data lineage",
+            "",
+            f"- SEAI: {snap['data_lineage']['seai']}",
+            f"- CSO deprivation: {snap['data_lineage']['cso']}",
+            "",
+            "## Limitations",
+            "",
+            meta.get("limitations", ""),
+            "",
+            f"_API {meta.get('api_version', '')} · `{meta.get('git_rev', '')}` · {meta.get('built_at_utc', '')}_",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def model_meta_dict(df: pd.DataFrame, params: ModelParams) -> dict[str, Any]:
+    cso_src = df.attrs.get("cso_source", "unknown")
+    seai_src = df.attrs.get("seai_source", "unknown")
+    return {
+        "api_version": "1.2",
+        "git_rev": git_short_hash(),
+        "built_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "zerve_notebook_block": os.environ.get("ZERVE_DATA_BLOCK", "warmer_homes_roi"),
+        "zerve_notebook_var": os.environ.get("ZERVE_DATA_VAR", "warmer_homes_df"),
+        "use_zerve_variable": os.environ.get("USE_ZERVE_VARIABLE", "").lower() in ("1", "true", "yes"),
+        "params": params.to_public_dict(),
+        "data_lineage": {
+            "seai": seai_src,
+            "cso_deprivation": cso_src,
+            "fuel_prices": "aa_ireland_static_snapshot",
+        },
+        "limitations": df.attrs.get("model_note", ""),
+        "counties": int(len(df)),
+        "demo_script_for_judges": [
+            "1. Zerve: question → notebook blocks → dataframe warmer_homes_df (block warmer_homes_roi).",
+            "2. Deploy this FastAPI hub; optional USE_ZERVE_VARIABLE=1 to inject the notebook df.",
+            "3. Open dashboard → Method & lab: /meta, /model/claims, validation, breach-price table.",
+            "4. Scenarios: price sliders + compare; Counties: two-county compare + export markdown.",
+            "5. GET /export/briefing for a one-page national summary for write-ups.",
+        ],
+        "key_endpoints": [
+            "/health",
+            "/meta",
+            "/national/snapshot",
+            "/model/validation",
+            "/model/distribution",
+            "/model/breach-prices",
+            "/insights/regional",
+            "/export/briefing",
+            "/model/params",
+        ],
+    }

@@ -23,15 +23,21 @@ from fastapi.responses import PlainTextResponse
 
 from pipeline import (
     ModelParams,
+    build_national_briefing_markdown,
     build_price_history_payload,
     build_warmer_homes_dataframe,
     county_row_to_api,
+    distribution_payload,
     evaluate_claims,
+    flip_points_payload,
     get_county_deep_dive_dict,
     model_meta_dict,
+    national_snapshot_payload,
     policy_options_payload,
     poverty_pct_row_series,
+    regional_summary_payload,
     sensitivity_payload,
+    validation_payload,
 )
 
 # --- Optional: Zerve notebook injection (block title must match your notebook UI) ---
@@ -255,6 +261,49 @@ def model_sensitivity() -> dict[str, Any]:
 @app.get("/model/policy")
 def model_policy() -> dict[str, Any]:
     return policy_options_payload(_df(), state.params)
+
+
+@app.get("/model/validation")
+def model_validation(
+    price_eur_l: float = Query(2.14, ge=0.5, le=8.0),
+) -> dict[str, Any]:
+    return validation_payload(_df(), state.params, price_eur_l)
+
+
+@app.get("/model/distribution")
+def model_distribution(
+    price_eur_l: float = Query(2.14, ge=0.5, le=8.0),
+) -> dict[str, Any]:
+    return distribution_payload(_df(), state.params, price_eur_l)
+
+
+@app.get("/model/breach-prices")
+def model_breach_prices(
+    reference_price_eur_l: float = Query(2.14, ge=0.5, le=8.0),
+) -> dict[str, Any]:
+    return flip_points_payload(_df(), state.params, reference_price_eur_l=reference_price_eur_l)
+
+
+@app.get("/national/snapshot")
+def national_snapshot(
+    price_eur_l: float = Query(2.14, ge=0.5, le=8.0),
+) -> dict[str, Any]:
+    return national_snapshot_payload(_df(), state.params, price_eur_l)
+
+
+@app.get("/insights/regional")
+def insights_regional(
+    fuel_price: float = Query(2.14, ge=0.5, le=8.0),
+) -> dict[str, Any]:
+    return regional_summary_payload(_df(), state.params, fuel_price)
+
+
+@app.get("/export/briefing", response_class=PlainTextResponse)
+def export_national_briefing(
+    price_eur_l: float = Query(2.14, ge=0.5, le=8.0),
+) -> PlainTextResponse:
+    body = build_national_briefing_markdown(_df(), state.params, price_eur_l)
+    return PlainTextResponse(body, media_type="text/markdown; charset=utf-8")
 
 
 @app.post("/model/params")
