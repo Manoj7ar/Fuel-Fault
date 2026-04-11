@@ -2545,7 +2545,7 @@
         <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h8M8 15h4"/></svg></span><span>Method &amp; lab</span>
       </button>
       <button type="button" class="nav-item" data-page="ai" onclick="window.__fflSetPage('ai')">
-        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 0-7 7v3l-2 2h18l-2-2v-3a7 7 0 0 0-7-7z"/><path d="M9 18h6"/></svg></span><span>AI analyst</span>
+        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 0-7 7v3l-2 2h18l-2-2v-3a7 7 0 0 0-7-7z"/><path d="M9 18h6"/></svg></span><span>AI · Gemini</span>
       </button>
     </nav>
     <div class="sidebar-foot">Ireland · 26 counties · SEAI / CSO / AA</div>
@@ -3024,13 +3024,13 @@
       </div>
     </div>
 
-    <div id="page-ai" class="page-view" role="region" aria-label="AI analyst">
+    <div id="page-ai" class="page-view" role="region" aria-label="AI policy analyst powered by Google Gemini">
       <div class="page-inner" style="max-width:720px">
         <div class="ai-page">
           <div class="ai-page-head">
             <h2>AI policy analyst</h2>
-            <p class="sub">Gemini · optional API key stored in this browser only</p>
-            <p class="ai-key-notice-page">Add a key from Google AI Studio to send messages.</p>
+            <p class="sub"><strong>Google Gemini</strong> (Generative Language API) · chat is generated client-side; optional API key stays in this browser only</p>
+            <p class="ai-key-notice-page">Get a key from <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a> — we call Gemini directly from your browser, not through the Fuel Fault Lines API.</p>
             <div class="ai-page-key">
               <input type="password" id="ai-api-key" placeholder="Gemini API key…" autocomplete="off" aria-label="Google Gemini API key"
                      onblur="window.__fflSaveAiKey()">
@@ -3262,7 +3262,7 @@
   let aiChatMessages = [];
 
   const AI_SYSTEM =
-    'You are an expert Irish energy policy analyst. You have access to the Fuel Fault Lines dataset — a county-level energy vulnerability model for Ireland built on Zerve AI.\n\nThe live API may expose /meta (lineage), /model/claims (pass/fail checks), and /model/sensitivity (stress tests). Exact counts change with data pulls and assumption sliders — prefer qualitative patterns unless the user supplied current numbers.\n\nIllustrative snapshot (often true but verify against the app): several counties are Critical tier; rural oil-heavy counties tend to show higher modelled fuel-income stress than Dublin; retrofit paybacks are often long at illustrative grant levels.\n\nData sources: SEAI-style profiles, CSO deprivation (or synthetic fallback), AA Ireland price snapshot.\n\nAnswer concisely. Use Irish county names. Note limitations: synthetic income bands from deprivation, not survey microdata; fuel use is a proxy. When asked to write documents, format them clearly for policymakers.';
+    'You are the in-app assistant for Fuel Fault Lines, answering as Google Gemini via the Generative Language API. You are an expert Irish energy policy analyst. The dashboard uses a county-level energy vulnerability model for Ireland built on Zerve AI.\n\nThe live API may expose /meta (lineage), /model/claims (pass/fail checks), and /model/sensitivity (stress tests). Exact counts change with data pulls and assumption sliders — prefer qualitative patterns unless the user supplied current numbers.\n\nIllustrative snapshot (often true but verify against the app): several counties are Critical tier; rural oil-heavy counties tend to show higher modelled fuel-income stress than Dublin; retrofit paybacks are often long at illustrative grant levels.\n\nData sources: SEAI-style profiles, CSO deprivation (or synthetic fallback), AA Ireland price snapshot.\n\nAnswer concisely. Use Irish county names. Note limitations: synthetic income bands from deprivation, not survey microdata; fuel use is a proxy. When asked to write documents, format them clearly for policymakers.';
 
   function getActivePrice() {
     return compareMode ? priceA : currentPrice;
@@ -4568,7 +4568,7 @@
     compare: 'Compare',
     counties: 'Counties',
     method: 'Method & lab',
-    ai: 'AI analyst'
+    ai: 'AI · Gemini'
   };
 
   window.__fflSetPage = function (page) {

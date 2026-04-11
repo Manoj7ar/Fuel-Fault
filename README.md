@@ -18,6 +18,10 @@ node dev-server.mjs
 
 Open `http://127.0.0.1:5500/`. The dev server proxies `/api/*` to the deployed hub by default; for local FastAPI, set `window.__FFL_API_BASE__ = 'http://127.0.0.1:8000'` in the browser console before load, or use the API directly.
 
+## AI chat (Google Gemini)
+
+The **AI · Gemini** page in `index.html` calls the **Google Generative Language API** from the **browser** using an API key you paste in the UI (stored in `localStorage` as `ffl_gemini_key`). The FastAPI backend is **not** involved in chat — only in the county/model data the assistant is told about in its system prompt. Default model id is set in the page script as `gemini-2.5-flash` (change if your key requires another model). Keys come from [Google AI Studio](https://aistudio.google.com/apikey).
+
 ## API highlights
 
 | Route | Purpose |
