@@ -11,30 +11,32 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
   <style>
     :root {
-      --paper: #f4f2f8;
-      --paper2: #ece8f4;
-      --surface: rgba(255, 255, 255, 0.72);
+      --paper: #ececee;
+      --paper2: #e4e5e9;
+      --surface: #ffffff;
       --surface-solid: #ffffff;
-      --ink: #14121c;
-      --ink2: #3f3a4d;
-      --ink3: #6b6578;
-      --rule: rgba(99, 91, 130, 0.14);
-      --rule-light: rgba(99, 91, 130, 0.1);
-      --critical: #e11d48;
+      --ink: #1a1a1c;
+      --ink2: #3d3d42;
+      --ink3: #71717a;
+      --rule: #e4e4e7;
+      --rule-light: #f4f4f5;
+      --critical: #dc2626;
       --high: #ea580c;
-      --medium: #a855f7;
-      --low: #0d9488;
-      --warn-fill: rgba(251, 191, 36, 0.18);
-      --err-fill: rgba(244, 63, 94, 0.1);
-      --accent: #7c3aed;
-      --accent-soft: rgba(124, 58, 237, 0.12);
-      --pill-bg: #1e1b2e;
-      --pill-fg: #faf8ff;
-      --shadow-sm: 0 4px 24px rgba(91, 33, 182, 0.07);
-      --shadow-md: 0 12px 40px rgba(91, 33, 182, 0.1);
-      --radius-lg: 28px;
-      --radius-md: 18px;
-      --radius-sm: 12px;
+      --medium: #7c3aed;
+      --low: #059669;
+      --warn-fill: #fef9c3;
+      --err-fill: #fef2f2;
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.08);
+      --pill-bg: #18181b;
+      --pill-fg: #fafafa;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+      --radius-lg: 12px;
+      --radius-md: 8px;
+      --radius-sm: 6px;
+      --sidebar-w: 220px;
+      --sidebar-w-collapsed: 56px;
       --display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
       --sans: "Inter", system-ui, sans-serif;
       --mono: "IBM Plex Mono", ui-monospace, monospace;
@@ -48,21 +50,302 @@
     body {
       font-family: var(--sans);
       color: var(--ink);
-      line-height: 1.55;
+      line-height: 1.5;
       min-height: 100vh;
       min-height: 100dvh;
       height: 100dvh;
       overflow: hidden;
+      margin: 0;
+      background: var(--paper);
+    }
+
+    /* App shell + sidebar (minimal SaaS) */
+    .app-shell {
+      display: flex;
+      height: 100dvh;
+      width: 100%;
+      overflow: hidden;
+    }
+    .app-sidebar {
+      flex-shrink: 0;
+      width: var(--sidebar-w);
+      background: #18181b;
+      color: #e4e4e7;
       display: flex;
       flex-direction: column;
-      background-color: var(--paper);
-      background-image:
-        radial-gradient(ellipse 120% 80% at 0% -20%, rgba(167, 139, 250, 0.35), transparent 55%),
-        radial-gradient(ellipse 100% 60% at 100% 0%, rgba(244, 114, 182, 0.22), transparent 50%),
-        radial-gradient(ellipse 80% 50% at 50% 100%, rgba(96, 165, 250, 0.2), transparent 45%),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cpath fill='%236366f1' fill-opacity='0.045' d='M28 4c2.2 0 4.2 1.2 5.3 3.1l10.4 18c1.1 1.9 1.1 4.3 0 6.2l-10.4 18c-1.1 1.9-3.1 3.1-5.3 3.1H16.7c-2.2 0-4.2-1.2-5.3-3.1l-10.4-18c-1.1-1.9-1.1-4.3 0-6.2l10.4-18C12.5 5.2 14.5 4 16.7 4H28z'/%3E%3C/svg%3E");
-      background-attachment: fixed;
+      transition: width 0.2s ease;
+      border-right: 1px solid #27272a;
     }
+    .app-sidebar.collapsed {
+      width: var(--sidebar-w-collapsed);
+    }
+    .app-sidebar.collapsed .sidebar-title-text,
+    .app-sidebar.collapsed .nav-item span:not(.nav-ico),
+    .app-sidebar.collapsed .sidebar-foot {
+      display: none;
+    }
+    .app-sidebar.collapsed .nav-item {
+      justify-content: center;
+      padding: 0.65rem 0.5rem;
+    }
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 0.65rem;
+      border-bottom: 1px solid #27272a;
+    }
+    .sidebar-toggle {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: #27272a;
+      color: #a1a1aa;
+      cursor: pointer;
+      font-size: 0.85rem;
+      line-height: 1;
+    }
+    .sidebar-toggle:hover { background: #3f3f46; color: #fff; }
+    .sidebar-title-text {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: -0.02em;
+      color: #fafafa;
+      line-height: 1.2;
+      min-width: 0;
+    }
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem 0.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+      text-align: left;
+      padding: 0.55rem 0.6rem;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: #a1a1aa;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .nav-item:hover { background: #27272a; color: #fafafa; }
+    .nav-item.active {
+      background: #27272a;
+      color: #fff;
+      box-shadow: inset 2px 0 0 var(--accent);
+    }
+    .nav-ico {
+      width: 1.1rem;
+      text-align: center;
+      opacity: 0.85;
+      flex-shrink: 0;
+    }
+    .sidebar-foot {
+      padding: 0.65rem 0.75rem;
+      font-size: 0.62rem;
+      color: #71717a;
+      border-top: 1px solid #27272a;
+      line-height: 1.4;
+    }
+
+    .app-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--paper);
+      overflow: hidden;
+    }
+    .main-topbar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.65rem 1.25rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--rule);
+    }
+    .main-topbar h1 {
+      font-family: var(--display);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+    .main-topbar-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 0.72rem;
+      color: var(--ink3);
+    }
+    .main-topbar .pill-live {
+      margin-top: 0;
+    }
+    .global-error { margin: 0 1.25rem; }
+
+    .page-view {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      min-height: 0;
+      overflow: auto;
+      padding: 0.85rem 1.25rem 1rem;
+    }
+    .page-view.active { display: flex; }
+
+    .page-inner {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* AI full page */
+    .ai-page {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .ai-page-head {
+      padding: 1rem 1.15rem;
+      border-bottom: 1px solid var(--rule);
+      background: #fafafa;
+    }
+    .ai-page-head h2 {
+      font-family: var(--display);
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+    .ai-page-head .sub {
+      font-size: 0.75rem;
+      color: var(--ink3);
+      margin-top: 0.25rem;
+    }
+    .ai-page-key {
+      margin-top: 0.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .ai-page-key input {
+      flex: 1;
+      min-width: 12rem;
+      padding: 0.45rem 0.55rem;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-sm);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+    }
+    .ai-page-key button {
+      padding: 0.45rem 0.85rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--rule);
+      background: var(--ink);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .ai-key-notice-page {
+      font-size: 0.68rem;
+      color: var(--high);
+      margin-top: 0.35rem;
+      max-width: 36rem;
+    }
+    .ai-chips-page {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--rule-light);
+      background: #fafafa;
+    }
+    .ai-chip-page {
+      font-size: 0.72rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: 999px;
+      border: 1px solid var(--rule);
+      background: #fff;
+      color: var(--ink2);
+      cursor: pointer;
+    }
+    .ai-chip-page:hover { border-color: var(--accent); color: var(--accent); }
+    .ai-thread-page {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      background: #fafafa;
+    }
+    .ai-msg-page {
+      max-width: 42rem;
+      padding: 0.65rem 0.85rem;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+    .ai-msg-page.user {
+      align-self: flex-end;
+      background: var(--accent-soft);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+    .ai-msg-page.bot {
+      align-self: flex-start;
+      background: #fff;
+      border: 1px solid var(--rule);
+    }
+    .ai-msg-page.bot.typing { font-style: italic; color: var(--ink3); }
+    .ai-input-row-page {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.85rem 1rem;
+      border-top: 1px solid var(--rule);
+      background: #fff;
+    }
+    .ai-input-row-page input {
+      flex: 1;
+      padding: 0.55rem 0.65rem;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+    }
+    .ai-input-row-page button {
+      padding: 0.55rem 1rem;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .ai-input-row-page button:disabled { opacity: 0.45; cursor: not-allowed; }
 
     /* Masthead */
     .masthead {
@@ -729,37 +1012,34 @@
       margin-bottom: 0.65rem;
     }
     .btn-mode {
-      font-family: var(--mono);
-      font-size: 0.55rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 0.45rem 0.85rem;
-      border: 1px solid var(--rule-light);
-      background: rgba(255, 255, 255, 0.85);
-      border-radius: 999px;
+      font-family: var(--sans);
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.4rem 0.75rem;
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      border-radius: var(--radius-sm);
       cursor: pointer;
-      transition: background 0.15s ease, box-shadow 0.15s ease;
+      color: var(--ink2);
     }
-    .btn-mode:hover { background: rgba(124, 58, 237, 0.08); }
+    .btn-mode:hover { border-color: var(--accent); color: var(--accent); }
     .btn-mode.active {
-      background: var(--pill-bg);
-      color: var(--pill-fg);
-      border-color: transparent;
-      box-shadow: 0 4px 16px rgba(30, 27, 46, 0.2);
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
     }
     .btn-compare-run {
       font-family: var(--sans);
-      font-size: 0.72rem;
-      padding: 0.5rem 1.1rem;
-      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      font-size: 0.78rem;
+      padding: 0.45rem 1rem;
+      background: var(--accent);
       color: #fff;
       border: none;
       font-weight: 600;
       cursor: pointer;
-      border-radius: 999px;
-      box-shadow: 0 6px 20px rgba(234, 88, 12, 0.35);
+      border-radius: var(--radius-sm);
     }
-    .btn-compare-run:hover { filter: brightness(1.06); }
+    .btn-compare-run:hover { opacity: 0.92; }
     .compare-sliders { display: none; }
     .compare-sliders.show { display: block; }
     .compare-row { margin-bottom: 0.75rem; }
@@ -1171,19 +1451,10 @@
     }
     .ai-input-row button:disabled { opacity: 0.45; cursor: not-allowed; }
 
-    /* —— Full-page dashboard (reference layout) —— */
-    .app-root {
-      flex: 1;
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-      padding: clamp(0.5rem, 1.2vw, 0.85rem) clamp(0.65rem, 1.8vw, 1.1rem);
-      gap: 0.55rem;
-    }
-    .app-root .global-error,
-    .app-root .crisis-alert,
-    .app-root .scenario-summary.show {
-      margin-bottom: 0.35rem;
+    /* —— Dashboard pages —— */
+    .crisis-alert,
+    .scenario-summary.show {
+      margin-bottom: 0.5rem;
     }
     .dash-top {
       flex-shrink: 0;
@@ -1205,13 +1476,10 @@
     }
     .dash-brand h1 {
       font-family: var(--display);
-      font-size: clamp(1.15rem, 2.2vw, 1.45rem);
-      font-weight: 700;
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      font-weight: 600;
       letter-spacing: -0.02em;
-      background: linear-gradient(120deg, #4c1d95 0%, #7c3aed 40%, #db2777 70%, #ea580c 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
+      color: var(--ink);
     }
     .dash-tagline {
       font-size: 0.68rem;
@@ -1262,14 +1530,13 @@
       align-items: center;
     }
     .stat-chip {
-      padding: 0.4rem 0.65rem;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.75);
-      border: 1px solid var(--rule-light);
+      padding: 0.35rem 0.55rem;
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      border: 1px solid var(--rule);
       font-family: var(--mono);
-      font-size: 0.55rem;
+      font-size: 0.58rem;
       color: var(--ink2);
-      box-shadow: var(--shadow-sm);
     }
     .stat-chip strong {
       font-family: var(--display);
@@ -1286,10 +1553,8 @@
       gap: 0.5rem 0.75rem;
       padding: 0.55rem 0.75rem;
       border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.65);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--rule-light);
-      box-shadow: var(--shadow-sm);
+      background: var(--surface);
+      border: 1px solid var(--rule);
     }
     .dash-controls .price-mode-bar { margin: 0; }
     .dash-controls .assumption { margin: 0; padding: 0; border: none; box-shadow: none; background: transparent; flex: 1 1 12rem; min-width: 0; }
@@ -1298,19 +1563,15 @@
       font-family: var(--sans);
       font-size: 0.72rem;
       font-weight: 600;
-      padding: 0.5rem 1rem;
-      border-radius: 999px;
-      border: 1px solid var(--rule-light);
-      background: rgba(124, 58, 237, 0.12);
-      color: #5b21b6;
+      padding: 0.45rem 0.85rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      color: var(--ink);
       cursor: pointer;
       white-space: nowrap;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .btn-drawer-counties:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(124, 58, 237, 0.2);
-    }
+    .btn-drawer-counties:hover { border-color: var(--accent); color: var(--accent); }
 
     .dashboard-grid {
       flex: 1;
@@ -1334,26 +1595,10 @@
       display: flex;
       flex-direction: column;
       background: var(--surface);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-radius: var(--radius-lg);
-      border: 1px solid rgba(255, 255, 255, 0.72);
-      box-shadow: var(--shadow-md);
-      padding: 1rem 1.1rem 1rem;
-      opacity: 0;
-      animation: card-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
-    .dash-card--tl { animation-delay: 0.05s; }
-    .dash-card--tr { animation-delay: 0.12s; }
-    .dash-card--bl { animation-delay: 0.19s; }
-    .dash-card--br { animation-delay: 0.26s; }
-    @keyframes card-in {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .dash-card { animation: none; opacity: 1; }
-      .btn-drawer-counties:hover { transform: none; }
+      border-radius: var(--radius-md);
+      border: 1px solid var(--rule);
+      box-shadow: var(--shadow-sm);
+      padding: 0.85rem 1rem;
     }
 
     .dash-card-head {
@@ -1371,16 +1616,16 @@
       min-width: 0;
     }
     .dash-card-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(145deg, rgba(167, 139, 250, 0.35), rgba(96, 165, 250, 0.2));
+      background: var(--rule-light);
       flex-shrink: 0;
     }
-    .dash-card-icon svg { width: 20px; height: 20px; stroke: #5b21b6; fill: none; stroke-width: 1.5; }
+    .dash-card-icon svg { width: 18px; height: 18px; stroke: var(--ink2); fill: none; stroke-width: 1.5; }
     .dash-card-title {
       font-family: var(--display);
       font-size: 0.95rem;
@@ -1571,54 +1816,12 @@
       opacity: 0.85;
     }
 
-    /* —— MATRICES-style compare workspace —— */
-    .workspace-tabs {
-      flex-shrink: 0;
-      display: flex;
-      gap: 0.15rem;
-      padding: 0.2rem;
-      background: rgba(255, 255, 255, 0.55);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--rule-light);
-      width: fit-content;
-      max-width: 100%;
-    }
-    .workspace-tab {
-      font-family: var(--sans);
-      font-size: 0.78rem;
-      font-weight: 600;
-      padding: 0.45rem 1rem;
-      border: none;
-      border-radius: 10px;
-      background: transparent;
-      color: var(--ink3);
-      cursor: pointer;
-      transition: background 0.15s ease, color 0.15s ease;
-    }
-    .workspace-tab:hover { color: var(--ink2); background: rgba(124, 58, 237, 0.06); }
-    .workspace-tab.active {
-      background: #fff;
-      color: var(--ink);
-      box-shadow: 0 1px 4px rgba(30, 27, 46, 0.08);
-    }
-
-    .workspace-panels {
+    .matrices-page-wrap {
       flex: 1;
       min-height: 0;
       display: flex;
       flex-direction: column;
-      position: relative;
     }
-    .workspace-panel {
-      display: none;
-      flex: 1;
-      min-height: 0;
-      flex-direction: column;
-      gap: 0.55rem;
-      overflow: hidden;
-    }
-    .workspace-panel.active { display: flex; }
-
     .matrices-shell {
       flex: 1;
       min-height: 280px;
@@ -1998,87 +2201,59 @@
   <p>Loading county responses from the model.</p>
 </div>
 
-<div class="app-root">
-  <div class="workspace-tabs" role="tablist" aria-label="Workspace">
-    <button type="button" class="workspace-tab active" id="tab-overview" role="tab" aria-selected="true"
-            onclick="window.__fflSetWorkspace('overview')">Overview</button>
-    <button type="button" class="workspace-tab" id="tab-compare" role="tab" aria-selected="false"
-            onclick="window.__fflSetWorkspace('compare')">Compare workspace</button>
-  </div>
+<div class="app-shell">
+  <aside class="app-sidebar" id="app-sidebar" aria-label="Main navigation">
+    <div class="sidebar-brand">
+      <button type="button" class="sidebar-toggle" id="sidebar-toggle" onclick="window.__fflToggleSidebar()" title="Collapse sidebar" aria-expanded="true">«</button>
+      <span class="sidebar-title-text">Fuel fault lines</span>
+    </div>
+    <nav class="sidebar-nav" aria-label="Pages">
+      <button type="button" class="nav-item active" data-page="dashboard" onclick="window.__fflSetPage('dashboard')">
+        <span class="nav-ico">▣</span><span>Dashboard</span>
+      </button>
+      <button type="button" class="nav-item" data-page="scenarios" onclick="window.__fflSetPage('scenarios')">
+        <span class="nav-ico">≋</span><span>Scenarios</span>
+      </button>
+      <button type="button" class="nav-item" data-page="compare" onclick="window.__fflSetPage('compare')">
+        <span class="nav-ico">▤</span><span>Compare</span>
+      </button>
+      <button type="button" class="nav-item" data-page="counties" onclick="window.__fflSetPage('counties')">
+        <span class="nav-ico">☰</span><span>Counties</span>
+      </button>
+      <button type="button" class="nav-item" data-page="ai" onclick="window.__fflSetPage('ai')">
+        <span class="nav-ico">◆</span><span>AI analyst</span>
+      </button>
+    </nav>
+    <div class="sidebar-foot">26 counties · live API</div>
+  </aside>
 
-  <div class="workspace-panels">
-  <div id="workspace-panel-overview" class="workspace-panel active" role="tabpanel" aria-labelledby="tab-overview">
-  <header class="dash-top">
-    <div class="dash-brand">
-      <h1>Fuel fault lines</h1>
-      <p class="dash-tagline">Ireland · 26 counties · live model</p>
-    </div>
-    <div class="stat-strip" id="stat-strip" aria-live="polite">
-      <span class="stat-chip">Critical<strong id="stat-critical">—</strong></span>
-      <span class="stat-chip">&gt;10% line<strong id="stat-poverty">—</strong></span>
-      <span class="stat-chip">Vulnerable HH<strong id="stat-vuln-hh">—</strong></span>
-      <span class="stat-chip">10yr vs retrofit<strong id="stat-overspend">—</strong></span>
-      <span class="stat-chip">€/L<strong id="stat-price">€2.14</strong></span>
-    </div>
-    <div class="dash-top-meta">
-      <span class="pill-live" title="Data from API"><i aria-hidden="true"></i> Live</span>
-      <span class="dash-date" id="doc-date"></span>
-      <span class="dash-api" id="dash-api-endpoint" title="API base"></span>
-    </div>
-    <div class="dash-controls">
-      <div class="assumption">
-        <div class="price-mode-bar">
-          <button type="button" class="btn-mode active" id="btn-single-mode" onclick="window.__fflSetCompareMode(false)">Single price</button>
-          <button type="button" class="btn-mode" id="btn-compare-mode" onclick="window.__fflSetCompareMode(true)">Compare scenarios</button>
-        </div>
-        <div class="single-slider-wrap" id="single-price-ui">
-          <div class="assumption-top">
-            <label for="price-slider">Retail diesel, €/L</label>
-            <div class="price-readout"><span id="price-val">€2.14</span> <small>/L</small></div>
-          </div>
-          <input type="range" id="price-slider"
-                 min="1.50" max="4.00" step="0.01" value="2.14"
-                 aria-label="Fuel price per litre"
-                 oninput="onSliderInput(this.value)">
-          <div class="ticks">
-            <span>1.50</span><span>2.00</span><span>2.50</span><span>3.00</span><span>4.00</span>
-          </div>
-        </div>
-        <div class="compare-sliders" id="compare-price-ui">
-          <div class="compare-row">
-            <label for="price-slider-a">Scenario A — €/L</label>
-            <div class="assumption-top" style="margin-bottom:0.35rem">
-              <span></span>
-              <div class="price-readout" style="font-size:1.35rem"><span id="price-val-a">€2.14</span> <small>/L</small></div>
-            </div>
-            <input type="range" id="price-slider-a" min="1.50" max="4.00" step="0.01" value="2.14"
-                   aria-label="Scenario A price" oninput="window.__fflOnCompareA(this.value)">
-            <div class="ticks"><span>1.50</span><span>4.00</span></div>
-          </div>
-          <div class="compare-row">
-            <label for="price-slider-b">Scenario B — €/L</label>
-            <div class="assumption-top" style="margin-bottom:0.35rem">
-              <span></span>
-              <div class="price-readout" style="font-size:1.35rem"><span id="price-val-b">€3.00</span> <small>/L</small></div>
-            </div>
-            <input type="range" id="price-slider-b" min="1.50" max="4.00" step="0.01" value="3.00"
-                   aria-label="Scenario B price" oninput="window.__fflOnCompareB(this.value)">
-            <div class="ticks"><span>1.50</span><span>4.00</span></div>
-          </div>
-          <button type="button" class="btn-compare-run" onclick="window.__fflRunScenarioCompare()">Compare</button>
-        </div>
+  <div class="app-main">
+    <header class="main-topbar">
+      <h1 id="page-title">Dashboard</h1>
+      <div class="main-topbar-meta">
+        <span class="pill-live" title="Data from API"><i aria-hidden="true"></i> Live</span>
+        <span class="dash-date" id="doc-date"></span>
+        <span class="dash-api" id="dash-api-endpoint" title="API base"></span>
       </div>
-      <button type="button" class="btn-drawer-counties" id="btn-open-counties" onclick="window.__fflOpenCountyDrawer()">All counties</button>
-    </div>
-  </header>
+    </header>
 
-  <p class="scenario-err" id="scenario-err" role="status"></p>
-  <div class="scenario-summary" id="scenario-summary"></div>
-  <div class="global-error" id="global-error" role="alert"></div>
-  <div class="crisis-alert" id="crisis-alert">
-    <strong id="crisis-count">0</strong> counties above the 10% income share line.
-    Households in those counties: <strong id="crisis-households">0</strong>.
-  </div>
+    <div class="global-error" id="global-error" role="alert"></div>
+
+    <div id="page-dashboard" class="page-view active" role="region" aria-labelledby="page-title">
+      <div class="page-inner">
+        <header class="dash-top" style="margin-bottom:0">
+          <div class="dash-brand">
+            <h1>At a glance</h1>
+            <p class="dash-tagline">Ireland · model outputs at current scenario</p>
+          </div>
+          <div class="stat-strip" id="stat-strip" aria-live="polite">
+            <span class="stat-chip">Critical<strong id="stat-critical">—</strong></span>
+            <span class="stat-chip">&gt;10% line<strong id="stat-poverty">—</strong></span>
+            <span class="stat-chip">Vulnerable HH<strong id="stat-vuln-hh">—</strong></span>
+            <span class="stat-chip">10yr vs retrofit<strong id="stat-overspend">—</strong></span>
+            <span class="stat-chip">€/L<strong id="stat-price">€2.14</strong></span>
+          </div>
+        </header>
 
   <div class="dashboard-grid">
     <section class="dash-card dash-card--tl" aria-labelledby="card-tl-title">
@@ -2165,9 +2340,74 @@
   </div>
 
   <footer class="site-footer--compact">Sources: SEAI · CSO · AA Ireland · Zerve model API</footer>
-  </div>
+      </div>
+    </div>
 
-  <div id="workspace-panel-compare" class="workspace-panel" role="tabpanel" aria-labelledby="tab-compare">
+    <div id="page-scenarios" class="page-view" role="region" aria-label="Scenarios">
+      <div class="page-inner">
+        <p class="scenario-err" id="scenario-err" role="status"></p>
+        <div class="scenario-summary" id="scenario-summary"></div>
+        <div class="crisis-alert" id="crisis-alert">
+          <strong id="crisis-count">0</strong> counties above the 10% income share line.
+          Households in those counties: <strong id="crisis-households">0</strong>.
+        </div>
+        <header class="dash-top" style="margin-bottom:0">
+          <div class="dash-brand">
+            <h1>Price scenarios</h1>
+            <p class="dash-tagline">Single €/L or compare A vs B — table updates on load</p>
+          </div>
+        </header>
+        <div class="dash-controls" style="max-width:42rem">
+          <div class="assumption" style="flex:1;min-width:0">
+            <div class="price-mode-bar">
+              <button type="button" class="btn-mode active" id="btn-single-mode" onclick="window.__fflSetCompareMode(false)">Single price</button>
+              <button type="button" class="btn-mode" id="btn-compare-mode" onclick="window.__fflSetCompareMode(true)">Compare scenarios</button>
+            </div>
+            <div class="single-slider-wrap" id="single-price-ui">
+              <div class="assumption-top">
+                <label for="price-slider">Retail diesel, €/L</label>
+                <div class="price-readout"><span id="price-val">€2.14</span> <small>/L</small></div>
+              </div>
+              <input type="range" id="price-slider"
+                     min="1.50" max="4.00" step="0.01" value="2.14"
+                     aria-label="Fuel price per litre"
+                     oninput="onSliderInput(this.value)">
+              <div class="ticks">
+                <span>1.50</span><span>2.00</span><span>2.50</span><span>3.00</span><span>4.00</span>
+              </div>
+            </div>
+            <div class="compare-sliders" id="compare-price-ui">
+              <div class="compare-row">
+                <label for="price-slider-a">Scenario A — €/L</label>
+                <div class="assumption-top" style="margin-bottom:0.35rem">
+                  <span></span>
+                  <div class="price-readout" style="font-size:1.35rem"><span id="price-val-a">€2.14</span> <small>/L</small></div>
+                </div>
+                <input type="range" id="price-slider-a" min="1.50" max="4.00" step="0.01" value="2.14"
+                       aria-label="Scenario A price" oninput="window.__fflOnCompareA(this.value)">
+                <div class="ticks"><span>1.50</span><span>4.00</span></div>
+              </div>
+              <div class="compare-row">
+                <label for="price-slider-b">Scenario B — €/L</label>
+                <div class="assumption-top" style="margin-bottom:0.35rem">
+                  <span></span>
+                  <div class="price-readout" style="font-size:1.35rem"><span id="price-val-b">€3.00</span> <small>/L</small></div>
+                </div>
+                <input type="range" id="price-slider-b" min="1.50" max="4.00" step="0.01" value="3.00"
+                       aria-label="Scenario B price" oninput="window.__fflOnCompareB(this.value)">
+                <div class="ticks"><span>1.50</span><span>4.00</span></div>
+              </div>
+              <button type="button" class="btn-compare-run" onclick="window.__fflRunScenarioCompare()">Compare</button>
+            </div>
+          </div>
+        </div>
+        <p class="table-label" style="margin-top:0.5rem"><strong>County register</strong> — open full list from Counties</p>
+        <footer class="site-footer--compact">Adjust sliders · use Compare for A/B · county grid on Counties page</footer>
+      </div>
+    </div>
+
+    <div id="page-compare" class="page-view" role="region" aria-label="Compare charts">
+      <div class="page-inner matrices-page-wrap">
     <div class="matrices-shell">
       <nav class="matrices-nav" aria-label="Datasets">
         <div class="matrices-nav-top">
@@ -2252,8 +2492,52 @@
         <div class="matrices-palette" id="matrices-palette"></div>
       </aside>
     </div>
-    <footer class="site-footer--compact">Compare view · same API data as Overview · SEAI · CSO · AA · Zerve</footer>
-  </div>
+    <footer class="site-footer--compact">Stacked comparison · SEAI · CSO · AA · Zerve</footer>
+      </div>
+    </div>
+
+    <div id="page-counties" class="page-view" role="region" aria-label="Counties">
+      <div class="page-inner">
+        <header class="dash-top" style="margin-bottom:0.75rem">
+          <div class="dash-brand">
+            <h1>Counties</h1>
+            <p class="dash-tagline">All counties · sort by vulnerability</p>
+          </div>
+          <button type="button" class="btn-drawer-counties" onclick="window.__fflOpenCountyDrawer()">Open register</button>
+        </header>
+        <p style="font-size:0.85rem;color:var(--ink3);max-width:32rem">Select a row to open the county brief. Use <strong>Scenarios</strong> to change €/L first.</p>
+        <footer class="site-footer--compact">Same data as dashboard · 26 counties</footer>
+      </div>
+    </div>
+
+    <div id="page-ai" class="page-view" role="region" aria-label="AI analyst">
+      <div class="page-inner" style="max-width:720px">
+        <div class="ai-page">
+          <div class="ai-page-head">
+            <h2>AI policy analyst</h2>
+            <p class="sub">Gemini · optional API key stored in this browser only</p>
+            <p class="ai-key-notice-page">Add a key from Google AI Studio to send messages.</p>
+            <div class="ai-page-key">
+              <input type="password" id="ai-api-key" placeholder="Gemini API key…" autocomplete="off" aria-label="Google Gemini API key"
+                     onblur="window.__fflSaveAiKey()">
+              <button type="button" onclick="window.__fflSaveAiKey()">Save key</button>
+            </div>
+          </div>
+          <div class="ai-chips-page" id="ai-chips">
+            <button type="button" class="ai-chip-page" data-q="Which county needs help most urgently?">Urgent county?</button>
+            <button type="button" class="ai-chip-page" data-q="What would retrofitting Donegal cost the state?">Donegal retrofit cost</button>
+            <button type="button" class="ai-chip-page" data-q="Write a briefing note for the Minister">Minister briefing</button>
+            <button type="button" class="ai-chip-page" data-q="What happens at €3 diesel?">€3 diesel</button>
+          </div>
+          <div class="ai-thread-page" id="ai-thread"></div>
+          <div class="ai-input-row-page">
+            <input type="text" id="ai-input" placeholder="Message…" maxlength="2000" aria-label="Message to analyst">
+            <button type="button" id="ai-send" onclick="window.__fflAiSend()">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -2302,32 +2586,6 @@
     <div class="modal-body" id="modal-body"></div>
   </div>
 </div>
-
-<button type="button" class="ai-fab" id="ai-fab" onclick="window.__fflOpenAiDrawer()">🤖 Ask AI Analyst</button>
-<div class="ai-backdrop" id="ai-backdrop" onclick="window.__fflCloseAiDrawer()"></div>
-<aside class="ai-drawer" id="ai-drawer" aria-label="AI policy analyst">
-  <div class="ai-drawer-head">
-    <h3>AI Policy Analyst</h3>
-    <p class="sub">Powered by Google Gemini · Zerve AI data</p>
-    <p class="ai-key-notice">Enter your Gemini API key (Google AI Studio) to activate. Stored in this browser only (localStorage).</p>
-    <div class="ai-key-row">
-      <input type="password" id="ai-api-key" placeholder="Gemini API key…" autocomplete="off" aria-label="Google Gemini API key"
-             onblur="window.__fflSaveAiKey()">
-      <button type="button" onclick="window.__fflSaveAiKey()">Save</button>
-    </div>
-  </div>
-  <div class="ai-chips" id="ai-chips">
-    <button type="button" class="ai-chip" data-q="Which county needs help most urgently?">Which county needs help most urgently?</button>
-    <button type="button" class="ai-chip" data-q="What would retrofitting Donegal cost the state?">What would retrofitting Donegal cost the state?</button>
-    <button type="button" class="ai-chip" data-q="Write a briefing note for the Minister">Write a briefing note for the Minister</button>
-    <button type="button" class="ai-chip" data-q="What happens at €3 diesel?">What happens at €3 diesel?</button>
-  </div>
-  <div class="ai-thread" id="ai-thread"></div>
-  <div class="ai-input-row">
-    <input type="text" id="ai-input" placeholder="Message…" maxlength="2000" aria-label="Message to analyst">
-    <button type="button" id="ai-send" onclick="window.__fflAiSend()">Send</button>
-  </div>
-</aside>
 
 <script>
 (function () {
@@ -2461,7 +2719,8 @@
   let matricesChartInstance = null;
   let matricesHoverMove = null;
   let matricesHoverLeave = null;
-  let matricesWorkspace = 'overview';
+  let appPage = 'dashboard';
+  let sidebarCollapsed = false;
   let matricesActiveView = 'tier-stress';
   let matricesChartType = 'line';
   let matricesSort = 'tier';
@@ -3401,7 +3660,7 @@
   }
 
   function refreshMatricesIfCompare() {
-    if (matricesWorkspace !== 'compare') return;
+    if (appPage !== 'compare') return;
     refreshMatricesChart();
   }
 
@@ -3741,24 +4000,45 @@
     fillMatricesTable(labels, seriesForTable);
   }
 
-  window.__fflSetWorkspace = function (name) {
-    matricesWorkspace = name === 'compare' ? 'compare' : 'overview';
-    var o = document.getElementById('tab-overview');
-    var c = document.getElementById('tab-compare');
-    var po = document.getElementById('workspace-panel-overview');
-    var pc = document.getElementById('workspace-panel-compare');
-    if (o && c) {
-      o.classList.toggle('active', matricesWorkspace === 'overview');
-      c.classList.toggle('active', matricesWorkspace === 'compare');
-      o.setAttribute('aria-selected', matricesWorkspace === 'overview' ? 'true' : 'false');
-      c.setAttribute('aria-selected', matricesWorkspace === 'compare' ? 'true' : 'false');
-    }
-    if (po && pc) {
-      po.classList.toggle('active', matricesWorkspace === 'overview');
-      pc.classList.toggle('active', matricesWorkspace === 'compare');
-    }
-    if (matricesWorkspace === 'compare') {
+  var PAGE_TITLES = {
+    dashboard: 'Dashboard',
+    scenarios: 'Scenarios',
+    compare: 'Compare',
+    counties: 'Counties',
+    ai: 'AI analyst'
+  };
+
+  window.__fflSetPage = function (page) {
+    appPage = page || 'dashboard';
+    if (!PAGE_TITLES[appPage]) appPage = 'dashboard';
+    document.querySelectorAll('.nav-item[data-page]').forEach(function (btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-page') === appPage);
+    });
+    document.querySelectorAll('.page-view').forEach(function (el) {
+      el.classList.remove('active');
+    });
+    var panel = document.getElementById('page-' + appPage);
+    if (panel) panel.classList.add('active');
+    var titleEl = document.getElementById('page-title');
+    if (titleEl) titleEl.textContent = PAGE_TITLES[appPage] || 'Dashboard';
+    if (appPage === 'compare') {
       refreshMatricesChart();
+    }
+    try {
+      localStorage.setItem('ffl_page', appPage);
+    } catch (eP) {}
+  };
+
+  window.__fflToggleSidebar = function () {
+    var sb = document.getElementById('app-sidebar');
+    var tg = document.getElementById('sidebar-toggle');
+    if (!sb) return;
+    sidebarCollapsed = !sidebarCollapsed;
+    sb.classList.toggle('collapsed', sidebarCollapsed);
+    if (tg) {
+      tg.textContent = sidebarCollapsed ? '»' : '«';
+      tg.setAttribute('aria-expanded', sidebarCollapsed ? 'false' : 'true');
+      tg.setAttribute('title', sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar');
     }
   };
 
@@ -4783,26 +5063,14 @@
     var th = document.getElementById('ai-thread');
     if (!th) return null;
     var d = document.createElement('div');
-    d.className = 'ai-msg ' + cls;
+    var role = cls.indexOf('user') !== -1 ? 'user' : 'bot';
+    var typing = cls.indexOf('typing') !== -1 ? ' typing' : '';
+    d.className = 'ai-msg-page ' + role + typing;
     d.textContent = text;
     th.appendChild(d);
     th.scrollTop = th.scrollHeight;
     return d;
   }
-
-  window.__fflOpenAiDrawer = function () {
-    var dr = document.getElementById('ai-drawer');
-    var bd = document.getElementById('ai-backdrop');
-    if (dr) dr.classList.add('open');
-    if (bd) bd.classList.add('open');
-  };
-
-  window.__fflCloseAiDrawer = function () {
-    var dr = document.getElementById('ai-drawer');
-    var bd = document.getElementById('ai-backdrop');
-    if (dr) dr.classList.remove('open');
-    if (bd) bd.classList.remove('open');
-  };
 
   window.__fflSaveAiKey = function () {
     var inp = document.getElementById('ai-api-key');
@@ -4912,13 +5180,12 @@
     if (ev.key !== 'Escape') return;
     closeCountyModal();
     window.__fflCloseCountyDrawer();
-    window.__fflCloseAiDrawer();
   });
 
   var chipsHost = document.getElementById('ai-chips');
   if (chipsHost) {
     chipsHost.addEventListener('click', function (ev) {
-      var t = ev.target.closest('.ai-chip');
+      var t = ev.target.closest('.ai-chip-page');
       if (!t) return;
       var q = t.getAttribute('data-q');
       var inp = document.getElementById('ai-input');
@@ -4934,6 +5201,10 @@
   setSliderVisualA('2.14');
   setSliderVisualB('3');
   initMatricesNav();
+  try {
+    var savedPage = localStorage.getItem('ffl_page');
+    if (savedPage && PAGE_TITLES[savedPage]) window.__fflSetPage(savedPage);
+  } catch (eBoot) {}
   (async function boot() {
     await fetchCountiesList();
     runLoad(true);
