@@ -195,7 +195,91 @@
     .main-topbar .pill-live {
       margin-top: 0;
     }
-    .global-error { margin: 0 1.25rem; }
+    .app-notice-wrap {
+      flex-shrink: 0;
+      padding: 0 1.25rem;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.2s ease;
+    }
+    .app-notice-wrap.visible {
+      max-height: 200px;
+      opacity: 1;
+      padding: 0.5rem 1.25rem 0;
+    }
+    .app-notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      padding: 0.65rem 0.85rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      font-size: 0.8rem;
+      line-height: 1.45;
+      box-shadow: var(--shadow-sm);
+    }
+    .app-notice--error {
+      border-color: #fecaca;
+      background: #fef2f2;
+      color: #991b1b;
+    }
+    .app-notice--warn {
+      border-color: #fde047;
+      background: #fefce8;
+      color: #854d0e;
+    }
+    .app-notice--info {
+      border-color: #bfdbfe;
+      background: #eff6ff;
+      color: #1e40af;
+    }
+    .app-notice-ico {
+      flex-shrink: 0;
+      width: 1.35rem;
+      height: 1.35rem;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .app-notice--error .app-notice-ico { background: #fecaca; color: #991b1b; }
+    .app-notice--warn .app-notice-ico { background: #fef08a; color: #854d0e; }
+    .app-notice--info .app-notice-ico { background: #bfdbfe; color: #1e40af; }
+    .app-notice-body { min-width: 0; flex: 1; }
+    .app-notice-title {
+      font-weight: 600;
+      color: inherit;
+      margin: 0 0 0.2rem;
+    }
+    .app-notice-detail {
+      margin: 0;
+      font-size: 0.78rem;
+      opacity: 0.92;
+    }
+    .app-notice-code {
+      margin: 0.35rem 0 0;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      opacity: 0.75;
+    }
+    .app-notice-dismiss {
+      flex-shrink: 0;
+      padding: 0.3rem 0.55rem;
+      font-size: 0.72rem;
+      font-weight: 500;
+      border: 1px solid currentColor;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      opacity: 0.85;
+      align-self: flex-start;
+    }
+    .app-notice-dismiss:hover { opacity: 1; }
 
     .page-view {
       display: none;
@@ -617,20 +701,6 @@
       color: var(--ink3);
       margin-top: 0.35rem;
     }
-
-    .global-error {
-      display: none;
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      padding: 0.75rem 1rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid rgba(244, 63, 94, 0.35);
-      background: var(--err-fill);
-      color: #be123c;
-      margin-bottom: 1rem;
-      line-height: 1.45;
-    }
-    .global-error.show { display: block; }
 
     .crisis-alert {
       display: none;
@@ -1057,15 +1127,6 @@
       color: var(--ink2);
     }
     .scenario-summary.show { display: block; }
-    .scenario-err {
-      display: none;
-      font-family: var(--mono);
-      font-size: 0.68rem;
-      color: var(--critical);
-      margin-bottom: 0.75rem;
-    }
-    .scenario-err.show { display: block; }
-
     .county-head.compare {
       grid-template-columns: minmax(4.5rem, 1.1fr) 2.6rem 2.5rem 2.5rem 3.8rem 1fr;
     }
@@ -2237,7 +2298,7 @@
       </div>
     </header>
 
-    <div class="global-error" id="global-error" role="alert"></div>
+    <div class="app-notice-wrap" id="app-notice-wrap" aria-live="assertive" aria-atomic="true"></div>
 
     <div id="page-dashboard" class="page-view active" role="region" aria-labelledby="page-title">
       <div class="page-inner">
@@ -2345,7 +2406,6 @@
 
     <div id="page-scenarios" class="page-view" role="region" aria-label="Scenarios">
       <div class="page-inner">
-        <p class="scenario-err" id="scenario-err" role="status"></p>
         <div class="scenario-summary" id="scenario-summary"></div>
         <div class="crisis-alert" id="crisis-alert">
           <strong id="crisis-count">0</strong> counties above the 10% income share line.
@@ -2681,13 +2741,20 @@
     try {
       const res = await fetch(API + '/counties');
       if (!res.ok) return false;
-      const j = await res.json();
+      let j;
+      try {
+        j = await res.json();
+      } catch (eJson) {
+        return false;
+      }
       const list = normalizeCountiesPayload(j);
       if (list && list.length) {
         COUNTIES = list;
         return true;
       }
-    } catch (eC) {}
+    } catch (eC) {
+      /* keep FALLBACK_COUNTIES */
+    }
     return false;
   }
 
@@ -2873,16 +2940,25 @@
   async function fetchScenarioApi(pa, pb) {
     const url =
       API + '/scenario?price_a=' + encodeURIComponent(pa) + '&price_b=' + encodeURIComponent(pb);
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const j = await res.json();
-    return (
-      normalizeScenario(j) ||
-      normalizeScenario(j.data) ||
-      normalizeScenarioFromHub(j, COUNTIES) ||
-      normalizeScenarioFromHub(j.data, COUNTIES) ||
-      null
-    );
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      let j;
+      try {
+        j = await res.json();
+      } catch (eJ) {
+        return null;
+      }
+      return (
+        normalizeScenario(j) ||
+        normalizeScenario(j.data) ||
+        normalizeScenarioFromHub(j, COUNTIES) ||
+        normalizeScenarioFromHub(j.data, COUNTIES) ||
+        null
+      );
+    } catch (eFetch) {
+      return null;
+    }
   }
 
   async function loadScenarioViaDualFetch(pa, pb) {
@@ -2964,10 +3040,18 @@
       encodeURIComponent(county) +
       '?fuel_price=' +
       encodeURIComponent(price);
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const j = await res.json();
-    return j && typeof j === 'object' ? j : null;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      try {
+        const j = await res.json();
+        return j && typeof j === 'object' ? j : null;
+      } catch (eJ) {
+        return null;
+      }
+    } catch (eF) {
+      return null;
+    }
   }
 
   function pickDeep(d, keyVariants) {
@@ -4162,16 +4246,30 @@
 
   async function fetchCounty(county, price) {
     const url = `${API}/county/${encodeURIComponent(county)}?fuel_price=${price}`;
-    const res = await fetch(url);
+    let res;
+    try {
+      res = await fetch(url);
+    } catch (eNet) {
+      const err = new Error(eNet && eNet.message ? String(eNet.message) : 'Network error');
+      err.name = eNet && eNet.name ? eNet.name : 'TypeError';
+      throw err;
+    }
     if (!res.ok) {
       const err = new Error(res.statusText || 'HTTP ' + res.status);
       err.status = res.status;
       throw err;
     }
-    const raw = await res.json();
+    let raw;
+    try {
+      raw = await res.json();
+    } catch (eJson) {
+      const err = new Error('Invalid JSON from API');
+      err.status = res.status;
+      throw err;
+    }
     const data = normalizeCountyPayload(raw);
     if (!data || typeof data.county !== 'string') {
-      const err = new Error('Invalid response');
+      const err = new Error('Invalid county payload');
       err.status = res.status;
       throw err;
     }
@@ -4194,34 +4292,46 @@
     return results;
   }
 
-  function describeLoadFailure(sampleErr) {
+  function classifyApiError(sampleErr) {
     var proto = location.protocol;
     var host = location.hostname;
     if (proto === 'file:') {
-      return (
-        'This page was opened as a local file (file://). Run `node dev-server.mjs` in the fuel-fault-lines-app folder, ' +
-        'then open http://127.0.0.1:5500/ in your browser.'
-      );
+      return {
+        severity: 'error',
+        title: 'Open via local server',
+        detail:
+          'This file was opened with file://. Run node dev-server.mjs and open http://127.0.0.1:5500/ so the API proxy works.',
+        code: 'FILE_PROTOCOL'
+      };
     }
     var st = sampleErr && sampleErr.status;
     if (st === 503 || st === 502) {
-      return (
-        'The Zerve model hub is temporarily unavailable (HTTP ' +
-        st +
-        '). Your local proxy is not the problem if you are using one — try again later.'
-      );
+      return {
+        severity: 'error',
+        title: 'Service temporarily unavailable',
+        detail:
+          'The model API returned HTTP ' +
+          st +
+          '. Wait a moment and try again, or check hub status.',
+        code: 'HTTP_' + st
+      };
     }
     if (typeof st === 'number' && st >= 400) {
       if (st === 404) {
-        return (
-          'The model API returned HTTP 404. The app expects https://fuel.hub.zerve.cloud. ' +
-          'Do not put /api on the hub URL — ' +
-          'routes are /counties, /county/..., /scenario, /history, /deep-dive/… at the root. Hard-refresh this page, ' +
-          'or set window.__FFL_API_BASE__ to your hub origin before the script runs. ' +
-          'If you use node dev-server.mjs, open the app at http://127.0.0.1:5500/ so requests go through /api.'
-        );
+        return {
+          severity: 'error',
+          title: 'API not found',
+          detail:
+            'Expected hub routes at the root (/county/…, /history). If you use dev-server.mjs, open http://127.0.0.1:5500/. You can set window.__FFL_API_BASE__ before load.',
+          code: 'HTTP_404'
+        };
       }
-      return 'The model API returned HTTP ' + st + '. Check the hub URL or your connection.';
+      return {
+        severity: 'error',
+        title: 'Request failed',
+        detail: 'The API returned HTTP ' + st + '. Check the endpoint and your connection.',
+        code: 'HTTP_' + st
+      };
     }
     var msg = sampleErr && sampleErr.message ? String(sampleErr.message) : '';
     var isNet =
@@ -4232,18 +4342,70 @@
         host === '127.0.0.1' ||
         host === '[::1]' ||
         host === '0.0.0.0';
-      if (local) {
-        return (
-          'Cannot reach the API from this page. Start the proxy with `node dev-server.mjs` in fuel-fault-lines-app, ' +
-          'then open http://127.0.0.1:5500/ (not a raw file or a different port without /api).'
-        );
-      }
-      return (
-        'Cannot reach the API (network or browser CORS). Serve this app from http://127.0.0.1:5500 with dev-server.mjs, ' +
-        'or open the deployed site.'
-      );
+      return {
+        severity: 'error',
+        title: 'Cannot reach API',
+        detail: local
+          ? 'Start the dev server (node dev-server.mjs) and use http://127.0.0.1:5500/ with the /api proxy.'
+          : 'Network or CORS blocked the request. Use the deployed site or serve locally with dev-server.mjs.',
+        code: 'NETWORK'
+      };
     }
-    return 'API unreachable.';
+    return {
+      severity: 'error',
+      title: 'Something went wrong',
+      detail: msg || 'The API did not return usable data.',
+      code: 'UNKNOWN'
+    };
+  }
+
+  function showAppNotice(opts) {
+    var wrap = document.getElementById('app-notice-wrap');
+    if (!wrap) return;
+    var sev = opts.severity === 'warn' || opts.severity === 'info' ? opts.severity : 'error';
+    var title = opts.title || (sev === 'error' ? 'Error' : 'Notice');
+    var detail = opts.detail || '';
+    var code = opts.code || '';
+    var dismissible = opts.dismissible !== false;
+    var ico = sev === 'error' ? '!' : sev === 'warn' ? '!' : 'i';
+    wrap.innerHTML =
+      '<div class="app-notice app-notice--' +
+      sev +
+      '" role="alert">' +
+      '<span class="app-notice-ico" aria-hidden="true">' +
+      ico +
+      '</span>' +
+      '<div class="app-notice-body">' +
+      '<p class="app-notice-title">' +
+      escapeHtml(title) +
+      '</p>' +
+      (detail
+        ? '<p class="app-notice-detail">' + escapeHtml(detail) + '</p>'
+        : '') +
+      (code
+        ? '<p class="app-notice-code">' + escapeHtml(code) + '</p>'
+        : '') +
+      '</div>' +
+      (dismissible
+        ? '<button type="button" class="app-notice-dismiss" onclick="window.__fflDismissNotice()">Dismiss</button>'
+        : '') +
+      '</div>';
+    wrap.classList.add('visible');
+  }
+
+  function clearAppNotice() {
+    var wrap = document.getElementById('app-notice-wrap');
+    if (!wrap) return;
+    wrap.classList.remove('visible');
+    wrap.innerHTML = '';
+  }
+
+  window.__fflDismissNotice = function () {
+    clearAppNotice();
+  };
+
+  function describeLoadFailure(sampleErr) {
+    return classifyApiError(sampleErr).detail;
   }
 
   function getTierClass(d) {
@@ -4811,8 +4973,15 @@
       var failed = COUNTIES.filter(function (c) {
         return countyData[c] === null;
       }).length;
-      if (failed === 0) hideGlobalError();
-      else showGlobalError('Partial data (' + failed + ' failed). Click row to retry.');
+      if (failed === 0) clearAppNotice();
+      else {
+        showAppNotice({
+          severity: 'warn',
+          title: 'Partial data',
+          detail: failed + ' counties still failed. Click those rows to retry.',
+          code: null
+        });
+      }
       updateStats();
       renderGrid();
       updateDashboardCharts();
@@ -4821,6 +4990,14 @@
       countyData[county] = null;
       renderGrid();
       updateDashboardCharts();
+      showAppNotice({
+        severity: 'warn',
+        title: 'County request failed',
+        detail:
+          (e && e.message ? String(e.message) : 'Request failed') +
+          (county ? ' — ' + county : ''),
+        code: e && e.status ? 'HTTP_' + e.status : null
+      });
     }
   };
 
@@ -4880,13 +5057,16 @@
   };
 
   function showGlobalError(msg) {
-    const ge = document.getElementById('global-error');
-    ge.textContent = msg;
-    ge.classList.add('show');
+    showAppNotice({
+      severity: 'error',
+      title: 'Data could not load',
+      detail: msg,
+      code: null
+    });
   }
 
   function hideGlobalError() {
-    document.getElementById('global-error').classList.remove('show');
+    clearAppNotice();
   }
 
   /* Compare mode: national chart and grid vulnerability scores stay tied to scenario A (priceA). */
@@ -4899,33 +5079,52 @@
         var failed = results.find(function (r) {
           return !r.ok && r.err;
         });
-        showGlobalError(describeLoadFailure(failed ? failed.err : null));
+        var classified = classifyApiError(failed ? failed.err : null);
+        showAppNotice(classified);
       } else {
-        hideGlobalError();
+        clearAppNotice();
         if (okCount < COUNTIES.length) {
-          showGlobalError(
-            'Incomplete load — ' +
-              (COUNTIES.length - okCount) +
-              ' counties missing. Click row to retry.'
-          );
+          showAppNotice({
+            severity: 'warn',
+            title: 'Partial load',
+            detail:
+              COUNTIES.length -
+              okCount +
+              ' counties failed to load. Click a failed row in the register to retry.',
+            code: null
+          });
         }
       }
       updateStats();
       renderGrid();
       updateDashboardCharts();
       if (isInitial) {
-        ensureHistoryStressRendered().then(function () {
-          updateDashboardCharts();
-        });
+        ensureHistoryStressRendered()
+          .then(function () {
+            updateDashboardCharts();
+          })
+          .catch(function () {
+            /* history optional */
+          });
       }
       if (selectedCounty && countyData[selectedCounty]) {
         renderDetail(countyData[selectedCounty]);
       } else if (selectedCounty && countyData[selectedCounty] === null) {
         renderDetailError(selectedCounty, 'No row data at this price.');
       }
+    } catch (errLoad) {
+      var wrapErr =
+        errLoad && typeof errLoad === 'object' && 'status' in errLoad
+          ? errLoad
+          : { message: errLoad && errLoad.message ? String(errLoad.message) : String(errLoad || 'Load failed') };
+      showAppNotice(classifyApiError(wrapErr));
+      updateStats();
+      renderGrid();
+      updateDashboardCharts();
     } finally {
       if (isInitial) {
-        document.getElementById('load-overlay').classList.add('hidden');
+        var lo = document.getElementById('load-overlay');
+        if (lo) lo.classList.add('hidden');
       }
     }
   }
@@ -4934,32 +5133,34 @@
     compareMode = !!on;
     scenarioCompared = false;
     scenarioByCounty = null;
-    var errEl = document.getElementById('scenario-err');
-    if (errEl) {
-      errEl.classList.remove('show');
-      errEl.textContent = '';
-    }
+    clearAppNotice();
     var sumEl = document.getElementById('scenario-summary');
     if (sumEl) {
       sumEl.classList.remove('show');
       sumEl.textContent = '';
     }
 
-    document.getElementById('btn-single-mode').classList.toggle('active', !compareMode);
-    document.getElementById('btn-compare-mode').classList.toggle('active', compareMode);
-    document.getElementById('single-price-ui').classList.toggle('hidden', compareMode);
-    document.getElementById('compare-price-ui').classList.toggle('show', compareMode);
+    var bsm = document.getElementById('btn-single-mode');
+    var bcm = document.getElementById('btn-compare-mode');
+    var spu = document.getElementById('single-price-ui');
+    var cpu = document.getElementById('compare-price-ui');
+    if (bsm) bsm.classList.toggle('active', !compareMode);
+    if (bcm) bcm.classList.toggle('active', compareMode);
+    if (spu) spu.classList.toggle('hidden', compareMode);
+    if (cpu) cpu.classList.toggle('show', compareMode);
 
     if (compareMode) {
       var sa = document.getElementById('price-slider-a');
       var sb = document.getElementById('price-slider-b');
       if (sa) priceA = parseFloat(sa.value);
       if (sb) priceB = parseFloat(sb.value);
-      document.getElementById('stat-price').textContent = '€' + priceA.toFixed(2);
+      var sp = document.getElementById('stat-price');
+      if (sp) sp.textContent = '€' + priceA.toFixed(2);
       setSliderVisualA(String(priceA));
       setSliderVisualB(String(priceB));
     } else {
-      document.getElementById('stat-price').textContent = '€' + currentPrice.toFixed(2);
+      var sp2 = document.getElementById('stat-price');
+      if (sp2) sp2.textContent = '€' + currentPrice.toFixed(2);
     }
     updateCompareHeads();
     renderGrid();
@@ -4980,8 +5181,6 @@
         s.classList.remove('show');
         s.textContent = '';
       }
-      var er = document.getElementById('scenario-err');
-      if (er) er.classList.remove('show');
     }
     updateCompareHeads();
     renderGrid();
@@ -5004,21 +5203,17 @@
         s.classList.remove('show');
         s.textContent = '';
       }
-      var er = document.getElementById('scenario-err');
-      if (er) er.classList.remove('show');
     }
     updateCompareHeads();
     renderGrid();
   };
 
   window.__fflRunScenarioCompare = async function () {
-    var el = document.getElementById('scenario-err');
-    if (el) {
-      el.classList.remove('show');
-      el.textContent = '';
-    }
-    priceA = parseFloat(document.getElementById('price-slider-a').value);
-    priceB = parseFloat(document.getElementById('price-slider-b').value);
+    var saEl = document.getElementById('price-slider-a');
+    var sbEl = document.getElementById('price-slider-b');
+    if (!saEl || !sbEl) return;
+    priceA = parseFloat(saEl.value);
+    priceB = parseFloat(sbEl.value);
     var by = await fetchScenarioApi(priceA, priceB);
     if (!by || Object.keys(by).length === 0) {
       try {
@@ -5028,11 +5223,12 @@
       }
     }
     if (!by || Object.keys(by).length === 0) {
-      if (el) {
-        el.textContent =
-          'Scenario comparison unavailable — could not load A/B pricing data.';
-        el.classList.add('show');
-      }
+      showAppNotice({
+        severity: 'warn',
+        title: 'Scenario comparison unavailable',
+        detail: 'Could not load A/B data from the API or from paired county requests.',
+        code: null
+      });
       scenarioCompared = false;
       scenarioByCounty = null;
       updateCompareHeads();
@@ -5163,8 +5359,10 @@
     if (compareMode) return;
     currentPrice = parseFloat(val);
     setSliderVisual(val);
-    document.getElementById('price-val').textContent = '€' + currentPrice.toFixed(2);
-    document.getElementById('stat-price').textContent = '€' + currentPrice.toFixed(2);
+    var pv = document.getElementById('price-val');
+    var st = document.getElementById('stat-price');
+    if (pv) pv.textContent = '€' + currentPrice.toFixed(2);
+    if (st) st.textContent = '€' + currentPrice.toFixed(2);
 
     clearTimeout(sliderDebounce);
     sliderDebounce = setTimeout(function () {
@@ -5180,6 +5378,7 @@
     if (ev.key !== 'Escape') return;
     closeCountyModal();
     window.__fflCloseCountyDrawer();
+    window.__fflDismissNotice();
   });
 
   var chipsHost = document.getElementById('ai-chips');
