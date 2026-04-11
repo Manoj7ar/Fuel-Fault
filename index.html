@@ -51,6 +51,8 @@
       line-height: 1.55;
       min-height: 100vh;
       min-height: 100dvh;
+      height: 100dvh;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       background-color: var(--paper);
@@ -1168,6 +1170,465 @@
       border-radius: var(--radius-sm);
     }
     .ai-input-row button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* —— Full-page dashboard (reference layout) —— */
+    .app-root {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      padding: clamp(0.5rem, 1.2vw, 0.85rem) clamp(0.65rem, 1.8vw, 1.1rem);
+      gap: 0.55rem;
+    }
+    .app-root .global-error,
+    .app-root .crisis-alert,
+    .app-root .scenario-summary.show {
+      margin-bottom: 0.35rem;
+    }
+    .dash-top {
+      flex-shrink: 0;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-rows: auto auto auto;
+      gap: 0.45rem 1rem;
+      align-items: center;
+    }
+    @media (min-width: 900px) {
+      .dash-top {
+        grid-template-columns: minmax(12rem, 1.1fr) 1fr auto;
+        grid-template-rows: auto auto;
+      }
+      .dash-brand { grid-column: 1; grid-row: 1 / -1; }
+      .stat-strip { grid-column: 2; grid-row: 1; }
+      .dash-top-meta { grid-column: 3; grid-row: 1; justify-self: end; }
+      .dash-controls { grid-column: 2 / -1; grid-row: 2; }
+    }
+    .dash-brand h1 {
+      font-family: var(--display);
+      font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(120deg, #4c1d95 0%, #7c3aed 40%, #db2777 70%, #ea580c 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .dash-tagline {
+      font-size: 0.68rem;
+      color: var(--ink3);
+      margin-top: 0.15rem;
+      font-family: var(--mono);
+      letter-spacing: 0.04em;
+    }
+    .dash-top-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem;
+      justify-content: flex-end;
+    }
+    .pill-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.28rem 0.55rem;
+      border-radius: 999px;
+      background: var(--pill-bg);
+      color: var(--pill-fg);
+      font-family: var(--mono);
+      font-size: 0.52rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .pill-live i {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.4);
+    }
+    .dash-date, .dash-api {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      color: var(--ink3);
+    }
+    .dash-api { max-width: 14rem; text-align: right; line-height: 1.35; }
+
+    .stat-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      align-items: center;
+    }
+    .stat-chip {
+      padding: 0.4rem 0.65rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid var(--rule-light);
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      color: var(--ink2);
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-chip strong {
+      font-family: var(--display);
+      font-size: 0.78rem;
+      color: var(--ink);
+      margin-left: 0.35rem;
+      font-weight: 700;
+    }
+
+    .dash-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 0.75rem;
+      padding: 0.55rem 0.75rem;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--rule-light);
+      box-shadow: var(--shadow-sm);
+    }
+    .dash-controls .price-mode-bar { margin: 0; }
+    .dash-controls .assumption { margin: 0; padding: 0; border: none; box-shadow: none; background: transparent; flex: 1 1 12rem; min-width: 0; }
+    .dash-controls .single-slider-wrap, .dash-controls .compare-sliders { width: 100%; }
+    .btn-drawer-counties {
+      font-family: var(--sans);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      border: 1px solid var(--rule-light);
+      background: rgba(124, 58, 237, 0.12);
+      color: #5b21b6;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-drawer-counties:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(124, 58, 237, 0.2);
+    }
+
+    .dashboard-grid {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 0.65rem;
+    }
+    @media (max-width: 900px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: none;
+        grid-auto-rows: minmax(220px, 1fr);
+        overflow-y: auto;
+      }
+    }
+
+    .dash-card {
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      box-shadow: var(--shadow-md);
+      padding: 1rem 1.1rem 1rem;
+      opacity: 0;
+      animation: card-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .dash-card--tl { animation-delay: 0.05s; }
+    .dash-card--tr { animation-delay: 0.12s; }
+    .dash-card--bl { animation-delay: 0.19s; }
+    .dash-card--br { animation-delay: 0.26s; }
+    @keyframes card-in {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .dash-card { animation: none; opacity: 1; }
+      .btn-drawer-counties:hover { transform: none; }
+    }
+
+    .dash-card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      flex-shrink: 0;
+    }
+    .dash-card-title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 0;
+    }
+    .dash-card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, rgba(167, 139, 250, 0.35), rgba(96, 165, 250, 0.2));
+      flex-shrink: 0;
+    }
+    .dash-card-icon svg { width: 20px; height: 20px; stroke: #5b21b6; fill: none; stroke-width: 1.5; }
+    .dash-card-title {
+      font-family: var(--display);
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .dash-card-sub {
+      font-family: var(--mono);
+      font-size: 0.52rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink3);
+      margin-top: 0.15rem;
+    }
+    .dash-pill-tag {
+      flex-shrink: 0;
+      padding: 0.28rem 0.55rem;
+      border-radius: 999px;
+      background: var(--pill-bg);
+      color: var(--pill-fg);
+      font-family: var(--mono);
+      font-size: 0.52rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+
+    .dash-chart-wrap {
+      flex: 1;
+      min-height: 140px;
+      position: relative;
+    }
+    .dash-chart-wrap canvas { display: block; }
+
+    .dash-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 0.85rem;
+      margin-bottom: 0.45rem;
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      color: var(--ink2);
+    }
+    .dash-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .dash-legend i {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .adoption-totals {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.35rem;
+      justify-content: center;
+    }
+    .adoption-totals .pill {
+      padding: 0.25rem 0.55rem;
+      border-radius: 999px;
+      background: var(--pill-bg);
+      color: var(--pill-fg);
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      font-weight: 600;
+    }
+
+    .bubble-chart {
+      flex: 1;
+      min-height: 160px;
+      position: relative;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px dashed rgba(124, 58, 237, 0.15);
+    }
+    .bubble-grid-line {
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      height: 1px;
+      border-top: 1px dashed rgba(124, 58, 237, 0.12);
+      pointer-events: none;
+    }
+    .bubble-node {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(0.65rem, 1.1vw, 0.82rem);
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 8px 24px rgba(91, 33, 182, 0.18);
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      z-index: 2;
+      border: none;
+      padding: 0.15rem;
+    }
+    .bubble-node:hover {
+      transform: translate(-50%, -50%) scale(1.06);
+      box-shadow: 0 12px 28px rgba(91, 33, 182, 0.28);
+      z-index: 3;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .bubble-node { transition: none; }
+      .bubble-node:hover { transform: translate(-50%, -50%); }
+    }
+
+    .overview-split {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    @media (max-width: 500px) {
+      .overview-split { grid-template-columns: 1fr; }
+    }
+    .overview-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      font-family: var(--sans);
+      font-size: 0.72rem;
+      color: var(--ink2);
+      padding: 0.25rem 0;
+    }
+    .overview-legend-row {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .overview-legend-row i {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .overview-sub {
+      font-family: var(--sans);
+      font-size: 0.72rem;
+      color: var(--ink3);
+      margin-top: 0.15rem;
+      line-height: 1.35;
+    }
+    .overview-sub strong { color: var(--ink); }
+
+    .donut-wrap-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 160px;
+    }
+    .donut-center-pill {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      padding: 0.35rem 0.65rem;
+      border-radius: 999px;
+      background: var(--pill-bg);
+      color: var(--pill-fg);
+      font-family: var(--display);
+      font-size: clamp(1.1rem, 2.5vw, 1.45rem);
+      font-weight: 800;
+      line-height: 1;
+      pointer-events: none;
+      box-shadow: 0 6px 20px rgba(30, 27, 46, 0.2);
+    }
+
+    .site-footer--compact {
+      flex-shrink: 0;
+      padding: 0.35rem 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.52rem;
+      color: var(--ink3);
+      text-align: center;
+      opacity: 0.85;
+    }
+
+    /* County drawer */
+    .county-drawer-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 2400;
+      background: rgba(20, 18, 28, 0.25);
+      backdrop-filter: blur(4px);
+    }
+    .county-drawer-backdrop.open { display: block; }
+    .county-drawer-panel {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: min(100%, 440px);
+      height: 100%;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(20px);
+      box-shadow: -8px 0 40px rgba(30, 27, 46, 0.12);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      border-left: 1px solid var(--rule-light);
+    }
+    .county-drawer-backdrop.open .county-drawer-panel { transform: translateX(0); }
+    @media (prefers-reduced-motion: reduce) {
+      .county-drawer-panel { transition: none; }
+    }
+    .county-drawer-head {
+      padding: 1rem 1rem 0.75rem;
+      border-bottom: 1px solid var(--rule-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .county-drawer-head h2 {
+      font-family: var(--display);
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    .county-drawer-close {
+      border: none;
+      background: rgba(124, 58, 237, 0.1);
+      width: 2rem;
+      height: 2rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.25rem;
+      line-height: 1;
+      color: var(--ink2);
+    }
+    .county-drawer-body {
+      flex: 1;
+      overflow: auto;
+      padding: 0.65rem 0.75rem 1rem;
+    }
   </style>
 </head>
 <body>
@@ -1177,60 +1638,25 @@
   <p>Loading county responses from the model.</p>
 </div>
 
-<header class="masthead">
-  <div>
-    <h1 class="masthead-title">
-      <span>Working index</span>
-      Fuel fault lines
-    </h1>
-  </div>
-  <div class="masthead-aside">
-    Heating-oil and income stress by county. Figures refresh from the deployed API.
-    <div class="live-line" title="Connected endpoint">
-      <i aria-hidden="true"></i> Zerve · live
+<div class="app-root">
+  <header class="dash-top">
+    <div class="dash-brand">
+      <h1>Fuel fault lines</h1>
+      <p class="dash-tagline">Ireland · 26 counties · live model</p>
     </div>
-  </div>
-</header>
-
-<div class="doc-band">
-  <span>ZerveHack 2026</span>
-  <span>Republic of Ireland · 26 counties</span>
-  <span id="doc-date"></span>
-</div>
-
-<dl class="kpi-row">
-  <div class="kpi-cell">
-    <dt>Critical tier</dt>
-    <dd class="muted" id="stat-critical">—</dd>
-  </div>
-  <div class="kpi-cell">
-    <dt>Over 10% threshold</dt>
-    <dd class="muted" id="stat-poverty">—</dd>
-  </div>
-  <div class="kpi-cell">
-    <dt>Vulnerable h’holds</dt>
-    <dd>490,130</dd>
-  </div>
-  <div class="kpi-cell">
-    <dt>10yr overspend</dt>
-    <dd>€808M</dd>
-  </div>
-  <div class="kpi-cell">
-    <dt>Price assumption</dt>
-    <dd id="stat-price">€2.14</dd>
-  </div>
-</dl>
-
-<div class="sheet">
-  <div class="main-col">
-    <section class="figure-block">
-      <p class="caption" id="fig1-caption"><strong>Fig. 1</strong> — County vulnerability index (0–100) at current price</p>
-      <div class="chart-box">
-        <canvas id="chart-national" aria-label="County vulnerability bars"></canvas>
-      </div>
-    </section>
-
-    <div class="body-block">
+    <div class="stat-strip" id="stat-strip" aria-live="polite">
+      <span class="stat-chip">Critical<strong id="stat-critical">—</strong></span>
+      <span class="stat-chip">&gt;10% line<strong id="stat-poverty">—</strong></span>
+      <span class="stat-chip">Vulnerable HH<strong id="stat-vuln-hh">—</strong></span>
+      <span class="stat-chip">10yr vs retrofit<strong id="stat-overspend">—</strong></span>
+      <span class="stat-chip">€/L<strong id="stat-price">€2.14</strong></span>
+    </div>
+    <div class="dash-top-meta">
+      <span class="pill-live" title="Data from API"><i aria-hidden="true"></i> Live</span>
+      <span class="dash-date" id="doc-date"></span>
+      <span class="dash-api" id="dash-api-endpoint" title="API base"></span>
+    </div>
+    <div class="dash-controls">
       <div class="assumption">
         <div class="price-mode-bar">
           <button type="button" class="btn-mode active" id="btn-single-mode" onclick="window.__fflSetCompareMode(false)">Single price</button>
@@ -1238,7 +1664,7 @@
         </div>
         <div class="single-slider-wrap" id="single-price-ui">
           <div class="assumption-top">
-            <label for="price-slider">Retail diesel, € per litre</label>
+            <label for="price-slider">Retail diesel, €/L</label>
             <div class="price-readout"><span id="price-val">€2.14</span> <small>/L</small></div>
           </div>
           <input type="range" id="price-slider"
@@ -1273,18 +1699,115 @@
           <button type="button" class="btn-compare-run" onclick="window.__fflRunScenarioCompare()">Compare</button>
         </div>
       </div>
+      <button type="button" class="btn-drawer-counties" id="btn-open-counties" onclick="window.__fflOpenCountyDrawer()">All counties</button>
+    </div>
+  </header>
 
-      <p class="scenario-err" id="scenario-err" role="status"></p>
-      <div class="scenario-summary" id="scenario-summary"></div>
+  <p class="scenario-err" id="scenario-err" role="status"></p>
+  <div class="scenario-summary" id="scenario-summary"></div>
+  <div class="global-error" id="global-error" role="alert"></div>
+  <div class="crisis-alert" id="crisis-alert">
+    <strong id="crisis-count">0</strong> counties above the 10% income share line.
+    Households in those counties: <strong id="crisis-households">0</strong>.
+  </div>
 
-      <div class="global-error" id="global-error" role="alert"></div>
-
-      <div class="crisis-alert" id="crisis-alert">
-        <strong id="crisis-count">0</strong> counties above the 10% income share line.
-        Households in those counties: <strong id="crisis-households">0</strong>.
+  <div class="dashboard-grid">
+    <section class="dash-card dash-card--tl" aria-labelledby="card-tl-title">
+      <div class="dash-card-head">
+        <div class="dash-card-title-row">
+          <div class="dash-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <h2 class="dash-card-title" id="card-tl-title">Index by tier</h2>
+            <p class="dash-card-sub">Mean vulnerability (0–100) · CSO 2022 cohort</p>
+          </div>
+        </div>
+        <span class="dash-pill-tag" id="tier-pill-active">—</span>
       </div>
+      <div class="dash-chart-wrap">
+        <canvas id="chart-tier-bars" aria-label="Mean index by risk tier"></canvas>
+      </div>
+    </section>
 
-      <p class="table-label"><strong>Table 1</strong> — County register (highest index first)</p>
+    <section class="dash-card dash-card--tr" aria-labelledby="card-tr-title">
+      <div class="dash-card-head">
+        <div class="dash-card-title-row">
+          <div class="dash-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <div>
+            <h2 class="dash-card-title" id="card-tr-title">Stress trajectory</h2>
+            <p class="dash-card-sub">Counties over 10% fuel share of income</p>
+          </div>
+        </div>
+        <span class="dash-pill-tag" id="stress-pill-threshold">€2.14/L</span>
+      </div>
+      <div class="dash-legend" id="adoption-legend">
+        <span><i style="background:#7c3aed"></i> Historical</span>
+        <span><i style="background:#ea580c"></i> Projected</span>
+        <span><i style="background:#e11d48"></i> Stress band</span>
+      </div>
+      <div class="dash-chart-wrap">
+        <canvas id="chart-stress-area" aria-label="Counties in energy poverty over time"></canvas>
+      </div>
+      <div class="adoption-totals" id="adoption-totals"></div>
+    </section>
+
+    <section class="dash-card dash-card--bl" aria-labelledby="card-bl-title">
+      <div class="dash-card-head">
+        <div class="dash-card-title-row">
+          <div class="dash-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          </div>
+          <div>
+            <h2 class="dash-card-title" id="card-bl-title">County spotlight</h2>
+            <p class="dash-card-sub">Index → fuel % income · top by score</p>
+          </div>
+        </div>
+      </div>
+      <div class="bubble-chart" id="bubble-chart-host" role="img" aria-label="County index versus fuel share"></div>
+    </section>
+
+    <section class="dash-card dash-card--br" aria-labelledby="card-br-title">
+      <div class="dash-card-head">
+        <div class="dash-card-title-row">
+          <div class="dash-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div>
+            <h2 class="dash-card-title" id="card-br-title">Risk mix</h2>
+            <p class="dash-card-sub" id="overview-sub-line">Share of counties by tier</p>
+          </div>
+        </div>
+        <span class="dash-pill-tag" id="overview-pill-total">26</span>
+      </div>
+      <div class="overview-split">
+        <div class="dash-chart-wrap" style="min-height:160px">
+          <div class="donut-wrap-inner">
+            <canvas id="chart-tier-donut" aria-label="County count by risk tier"></canvas>
+            <div class="donut-center-pill" id="donut-center-pill" aria-hidden="true">—</div>
+          </div>
+        </div>
+        <div class="overview-legend" id="overview-legend"></div>
+      </div>
+      <p class="overview-sub" id="overview-foot">Largest segment: <strong id="overview-largest">—</strong></p>
+    </section>
+  </div>
+
+  <footer class="site-footer--compact">Sources: SEAI · CSO · AA Ireland · Zerve model API</footer>
+</div>
+
+<div class="county-drawer-backdrop" id="county-drawer-backdrop" onclick="window.__fflCloseCountyDrawer()">
+  <aside class="county-drawer-panel" onclick="event.stopPropagation()" aria-label="County list">
+    <div class="county-drawer-head">
+      <div>
+        <h2>Counties</h2>
+        <p class="dash-card-sub" style="margin-top:0.25rem">Tap a row for details</p>
+      </div>
+      <button type="button" class="county-drawer-close" onclick="window.__fflCloseCountyDrawer()" aria-label="Close">&times;</button>
+    </div>
+    <div class="county-drawer-body">
       <div class="county-register" id="county-register">
         <div class="county-head" id="county-head-single">
           <span>County</span>
@@ -1303,41 +1826,9 @@
         </div>
         <div class="county-body" id="county-grid"></div>
       </div>
-
-      <div class="history-block">
-        <button type="button" class="history-toggle" id="history-toggle" aria-expanded="false"
-                onclick="window.__fflToggleHistory()">📈 Price history and forecast</button>
-        <div class="history-panel" id="history-panel">
-          <div class="history-chart-shell">
-            <div class="history-chart-wrap">
-              <canvas id="chart-history" aria-label="Diesel price history"></canvas>
-            </div>
-            <div class="history-unavail" id="history-unavail" style="display:none"></div>
-          </div>
-          <div class="history-callouts" id="history-callouts">
-            <div class="history-callout"><strong>Today</strong><span id="hc-today">11 counties in energy poverty</span></div>
-            <div class="history-callout"><strong>By July 2026</strong><span id="hc-july">—</span></div>
-            <div class="history-callout"><strong>By Oct 2026</strong><span id="hc-oct">—</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <aside class="notes-col">
-    <p class="caption"><strong>Notes</strong> — selection</p>
-    <div id="detail-panel">
-      <div class="empty-state">
-        Choose a row in Table 1. The panel shows driver scores, the fuel share of income, and grant-scheme cashflows.
-      </div>
     </div>
   </aside>
 </div>
-
-<footer class="site-footer">
-  <span>Sources: SEAI · CSO 2022 · AA Ireland</span>
-  <span>Model API: Zerve · built for ZerveHack 2026</span>
-</footer>
 
 <div class="modal-backdrop" id="county-modal" role="dialog" aria-modal="true" aria-labelledby="modal-county-title">
   <div class="modal-dialog" onclick="event.stopPropagation()">
@@ -1419,6 +1910,14 @@
   var useLocalProxy = __fflIsLocalDevHost(h);
   var API = useLocalProxy ? location.origin.replace(/\/+$/, '') + '/api' : API_PUBLIC;
 
+  (function labelApiEndpoint() {
+    var el = document.getElementById('dash-api-endpoint');
+    if (!el) return;
+    el.textContent = useLocalProxy ? 'Local · /api → hub' : API_PUBLIC.replace(/^https?:\/\//, '');
+  })();
+
+  const LITRES_PER_HH_PA = 1275;
+
   const FALLBACK_COUNTIES = [
     'Longford', 'Donegal', 'Leitrim', 'Roscommon', 'Mayo', 'Monaghan',
     'Offaly', 'Sligo', 'Cavan', 'Kerry', 'Westmeath', 'Laois', 'Tipperary',
@@ -1488,7 +1987,9 @@
   let countyData = {};
   let selectedCounty = null;
   let sliderDebounce = null;
-  let nationalChartInstance = null;
+  let tierBarChartInstance = null;
+  let stressAreaChartInstance = null;
+  let tierDonutChartInstance = null;
   let radarChartInstance = null;
 
   let compareMode = false;
@@ -1498,8 +1999,6 @@
   let scenarioByCounty = null;
   let scenarioCompared = false;
   let historyCache = null;
-  let historyChartInstance = null;
-  let historyFetchDone = false;
   let radarModalInstance = null;
   const LS_AI_KEY = 'ffl_gemini_key';
   const GEMINI_MODEL = 'gemini-2.5-flash';
@@ -2144,85 +2643,85 @@
     };
   }
 
-  function renderHistoryChart(data) {
-    const canvas = document.getElementById('chart-history');
-    const un = document.getElementById('history-unavail');
+  function povertyCountAtPrice(price) {
+    const p = num(price);
+    if (!Number.isFinite(p) || p <= 0) return 0;
+    let n = 0;
+    for (let i = 0; i < COUNTIES.length; i++) {
+      const d = countyData[COUNTIES[i]];
+      if (!d) continue;
+      const inc = num(d.estimated_annual_income);
+      if (!Number.isFinite(inc) || inc <= 0) continue;
+      const dep = num(d.fuel_dependency_score);
+      const litres = LITRES_PER_HH_PA * (0.5 + (Number.isFinite(dep) ? dep : 0) / 100);
+      const pct = (litres * p) / inc * 100;
+      if (pct > 10) n++;
+    }
+    return n;
+  }
+
+  function renderStressAreaChart(data) {
+    const canvas = document.getElementById('chart-stress-area');
     if (!canvas || typeof Chart === 'undefined') return;
     const h = data.historical || [];
     const p = data.projected || [];
-    if (h.length === 0 && p.length === 0) {
-      if (un) {
-        un.style.display = 'block';
-        un.textContent = 'Forecast API unavailable.';
-      }
-      return;
-    }
-    if (un) un.style.display = 'none';
+    if (h.length === 0 && p.length === 0) return;
 
-    const labels = [];
-    const histData = [];
-    const projData = [];
-    const histSet = new Set();
+    const labelSet = {};
     h.forEach(function (pt) {
       const ds = pt.date || pt.t;
-      labels.push(ds);
-      histSet.add(ds);
-      histData.push(num(pt.price != null ? pt.price : pt.value));
-      projData.push(null);
+      if (ds) labelSet[ds] = true;
     });
     p.forEach(function (pt) {
       const ds = pt.date || pt.t;
-      if (labels.indexOf(ds) === -1) labels.push(ds);
+      if (ds) labelSet[ds] = true;
     });
-    labels.sort();
+    const labels = Object.keys(labelSet).sort();
 
     const hMap = {};
     h.forEach(function (pt) {
-      hMap[pt.date || pt.t] = num(pt.price != null ? pt.price : pt.value);
+      const ds = pt.date || pt.t;
+      if (ds) hMap[ds] = num(pt.price != null ? pt.price : pt.value);
     });
     const pMap = {};
     p.forEach(function (pt) {
-      pMap[pt.date || pt.t] = num(pt.price != null ? pt.price : pt.value);
+      const ds = pt.date || pt.t;
+      if (ds) pMap[ds] = num(pt.price != null ? pt.price : pt.value);
     });
 
     const hArr = [];
     const pArr = [];
-    let maxY = 0;
+    let maxY = 1;
     labels.forEach(function (lb) {
       const hv = hMap[lb];
       const pv = pMap[lb];
       if (hv != null && !Number.isNaN(hv)) {
-        hArr.push(hv);
+        const c = povertyCountAtPrice(hv);
+        hArr.push(c);
         pArr.push(null);
-        maxY = Math.max(maxY, hv);
+        maxY = Math.max(maxY, c);
       } else if (pv != null && !Number.isNaN(pv)) {
+        const c = povertyCountAtPrice(pv);
         hArr.push(null);
-        pArr.push(pv);
-        maxY = Math.max(maxY, pv);
+        pArr.push(c);
+        maxY = Math.max(maxY, c);
       } else {
         hArr.push(null);
         pArr.push(null);
       }
     });
-    maxY = Math.max(maxY, data.threshold + 0.5, 4);
+    maxY = Math.min(26, Math.max(maxY, 1));
+    const yCeil = Math.min(26, maxY + 2);
 
-    const ann = {
-      redStress: {
-        type: 'box',
-        yMin: data.threshold,
-        yMax: maxY,
-        backgroundColor: 'rgba(244, 63, 94, 0.1)',
-        borderWidth: 0
-      }
-    };
+    const ann = {};
     (data.events || []).forEach(function (ev, idx) {
       const ds = ev.date || ev.x;
-      if (!ds) return;
+      if (!ds || labels.indexOf(ds) === -1) return;
       ann['ev' + idx] = {
         type: 'line',
         xMin: ds,
         xMax: ds,
-        borderColor: 'rgba(124, 58, 237, 0.25)',
+        borderColor: 'rgba(124, 58, 237, 0.22)',
         borderWidth: 1,
         borderDash: [4, 4],
         label: {
@@ -2230,93 +2729,137 @@
           content: ev.label || '',
           color: '#6b6578',
           position: 'start',
-          font: { size: 9, family: CHART_FONT }
+          font: { size: 8, family: CHART_FONT }
         }
       };
     });
-    ann.thresholdLine = {
-      type: 'line',
-      yMin: data.threshold,
-      yMax: data.threshold,
-      borderColor: '#e11d48',
-      borderWidth: 1.5,
-      borderDash: [5, 4],
-      label: {
-        display: true,
-        content: 'Poverty threshold €' + data.threshold,
-        color: '#be123c',
-        position: 'end',
-        font: { size: 9, family: CHART_FONT }
-      }
-    };
 
-    if (historyChartInstance) {
-      historyChartInstance.destroy();
-      historyChartInstance = null;
+    const pillTh = document.getElementById('stress-pill-threshold');
+    if (pillTh) {
+      const th = num(data.threshold);
+      pillTh.textContent =
+        Number.isFinite(th) ? '€' + th.toFixed(2) + '/L line' : '10% line';
     }
 
-    historyChartInstance = new Chart(canvas.getContext('2d'), {
+    const totals = document.getElementById('adoption-totals');
+    if (totals) {
+      const lastH = h.length ? h[h.length - 1] : null;
+      const lastP = p.length ? p[p.length - 1] : null;
+      const cH = lastH ? povertyCountAtPrice(num(lastH.price != null ? lastH.price : lastH.value)) : null;
+      const cP = lastP ? povertyCountAtPrice(num(lastP.price != null ? lastP.price : lastP.value)) : null;
+      const julyN =
+        data.july && data.july.counties_in_poverty != null ? data.july.counties_in_poverty : null;
+      const octN =
+        data.oct && data.oct.counties_in_poverty != null ? data.oct.counties_in_poverty : null;
+      totals.innerHTML =
+        (cH != null
+          ? '<span class="pill">Latest hist. · ' + cH + '</span>'
+          : '') +
+        (cP != null ? '<span class="pill">Forecast end · ' + cP + '</span>' : '') +
+        (julyN != null ? '<span class="pill">July est. · ' + julyN + '</span>' : '') +
+        (octN != null ? '<span class="pill">Oct est. · ' + octN + '</span>' : '');
+    }
+
+    if (stressAreaChartInstance) {
+      stressAreaChartInstance.destroy();
+      stressAreaChartInstance = null;
+    }
+
+    stressAreaChartInstance = new Chart(canvas.getContext('2d'), {
       type: 'line',
       data: {
         labels: labels,
         datasets: [
           {
-            label: 'Historical',
+            label: 'Historical stress',
             data: hArr,
             borderColor: '#7c3aed',
-            backgroundColor: 'rgba(124, 58, 237, 0.12)',
-            tension: 0.35,
+            backgroundColor: 'rgba(124, 58, 237, 0.18)',
+            tension: 0.4,
             spanGaps: false,
             fill: true,
-            pointRadius: 0
+            pointRadius: 0,
+            borderWidth: 2
           },
           {
-            label: 'Projected',
+            label: 'Projected stress',
             data: pArr,
             borderColor: '#ea580c',
             borderDash: [6, 4],
-            tension: 0.35,
+            backgroundColor: 'rgba(234, 88, 12, 0.12)',
+            tension: 0.4,
             spanGaps: false,
             fill: true,
-            backgroundColor: 'rgba(234, 88, 12, 0.08)',
-            pointRadius: 0
+            pointRadius: 0,
+            borderWidth: 2
           }
         ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: { duration: 700, easing: 'easeOutQuart' },
         interaction: { mode: 'index', intersect: false },
         plugins: {
-          legend: {
-            labels: {
-              color: '#3f3a4d',
-              font: { family: CHART_FONT, size: 11 },
-              usePointStyle: true,
-              pointStyle: 'circle',
-              padding: 16
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function (ctx) {
+                const v = ctx.raw;
+                if (v == null) return '';
+                return ctx.dataset.label + ': ' + v + ' counties';
+              }
             }
           },
-          annotation: {
-            annotations: ann
-          }
+          annotation: Object.keys(ann).length ? { annotations: ann } : undefined
         },
         scales: {
           x: {
             grid: { color: 'rgba(124, 58, 237, 0.06)', drawBorder: false },
-            ticks: { color: '#6b6578', maxRotation: 45, font: { size: 9, family: CHART_FONT } },
+            ticks: {
+              color: '#6b6578',
+              maxRotation: 0,
+              maxTicksLimit: 6,
+              font: { size: 8, family: CHART_FONT }
+            },
             border: { display: false }
           },
           y: {
             min: 0,
-            max: maxY,
+            max: yCeil,
             grid: { color: 'rgba(124, 58, 237, 0.08)', drawBorder: false },
-            ticks: { color: '#6b6578', font: { size: 9, family: CHART_FONT } },
+            ticks: {
+              color: '#6b6578',
+              stepSize: 1,
+              font: { size: 9, family: CHART_FONT }
+            },
             border: { display: false }
           }
         }
       }
     });
+  }
+
+  async function ensureHistoryStressRendered() {
+    if (!historyCache) {
+      let data = null;
+      try {
+        const res = await fetch(API + '/history');
+        if (res.ok) {
+          const j = await res.json();
+          data = normalizeHistoryPayload(j);
+        }
+      } catch (eH) {}
+      if (
+        !data ||
+        ((!data.historical || !data.historical.length) &&
+          (!data.projected || !data.projected.length))
+      ) {
+        data = buildSyntheticHistory();
+      }
+      historyCache = data;
+    }
+    renderStressAreaChart(historyCache);
   }
 
   function sliderPct(val) {
@@ -2467,122 +3010,297 @@
     }
   }
 
-  function updateNationalChart() {
-    const sorted = [...COUNTIES]
-      .filter((c) => countyData[c])
-      .sort((a, b) => countyData[b].vulnerability_score - countyData[a].vulnerability_score);
-    const ctx = document.getElementById('chart-national');
-    if (!ctx || typeof Chart === 'undefined') return;
+  const TIER_ORDER = ['Critical', 'High', 'Medium', 'Low'];
 
-    if (sorted.length === 0) {
-      if (nationalChartInstance) {
-        nationalChartInstance.destroy();
-        nationalChartInstance = null;
+  function updateDashboardCharts() {
+    if (typeof Chart === 'undefined') return;
+
+    const tierLabels = TIER_ORDER;
+    const sums = { Critical: 0, High: 0, Medium: 0, Low: 0 };
+    const counts = { Critical: 0, High: 0, Medium: 0, Low: 0 };
+    let maxIdxCounty = '';
+    let maxIdx = -1;
+
+    for (let i = 0; i < COUNTIES.length; i++) {
+      const c = COUNTIES[i];
+      const d = countyData[c];
+      if (!d) continue;
+      const t = d.risk_tier;
+      if (sums[t] != null) {
+        sums[t] += num(d.vulnerability_score) || 0;
+        counts[t]++;
       }
-      return;
+      const vs = num(d.vulnerability_score) || 0;
+      if (vs > maxIdx) {
+        maxIdx = vs;
+        maxIdxCounty = c;
+      }
     }
 
-    const labels = sorted;
-    const data = sorted.map((c) => countyData[c].vulnerability_score);
-    const colors = sorted.map((c) => tierColor(countyData[c]));
+    const tierMeans = tierLabels.map(function (t) {
+      return counts[t] ? sums[t] / counts[t] : 0;
+    });
+    const tierMaxIdx = tierLabels.reduce(function (best, t, idx) {
+      return tierMeans[idx] > tierMeans[best] ? idx : best;
+    }, 0);
+    const pill = document.getElementById('tier-pill-active');
+    if (pill) pill.textContent = tierLabels[tierMaxIdx] + ' · ' + tierMeans[tierMaxIdx].toFixed(1);
 
-    const commonOptions = {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#1e1b2e',
-          titleColor: '#faf8ff',
-          bodyColor: '#e8e4f5',
-          borderColor: 'rgba(167, 139, 250, 0.35)',
-          borderWidth: 1,
-          cornerRadius: 12,
-          padding: 12,
-          titleFont: { family: CHART_FONT, size: 11, weight: '600' },
-          bodyFont: { family: CHART_FONT, size: 11 },
-          padding: 10,
-          callbacks: {
-            label: function (ctx) {
-              const c = sorted[ctx.dataIndex];
-              const d = countyData[c];
-              if (!d) return '';
-              return [
-                'Index ' + formatNum(d.vulnerability_score),
-                'Fuel share ' + povertyPct(d).toFixed(1) + '% of income',
-                d.in_energy_poverty ? 'Above 10% line' : 'Below 10% line'
-              ];
+    const barCanvas = document.getElementById('chart-tier-bars');
+    if (barCanvas) {
+      const barColors = tierLabels.map(function (t) {
+        const fake = { risk_tier: t };
+        return COLORS[getTierClass(fake)] || COLORS.low;
+      });
+      const faded = barColors.map(function (hex, idx) {
+        return idx === tierMaxIdx ? hex : hexToRgba(hex, 0.22);
+      });
+
+      if (tierBarChartInstance) {
+        tierBarChartInstance.data.datasets[0].data = tierMeans.slice();
+        tierBarChartInstance.data.datasets[0].backgroundColor = faded;
+        tierBarChartInstance.update('active');
+      } else {
+        tierBarChartInstance = new Chart(barCanvas.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: tierLabels,
+            datasets: [
+              {
+                label: 'Mean index',
+                data: tierMeans.slice(),
+                backgroundColor: faded,
+                borderWidth: 0,
+                borderRadius: 14,
+                maxBarThickness: 36
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 650, easing: 'easeOutQuart' },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  afterLabel: function (ctx) {
+                    const t = tierLabels[ctx.dataIndex];
+                    return counts[t] ? t + ' · n=' + counts[t] : '';
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { color: '#3f3a4d', font: { family: CHART_FONT, size: 10, weight: '600' } },
+                border: { display: false }
+              },
+              y: {
+                min: 0,
+                max: 100,
+                grid: { color: 'rgba(124, 58, 237, 0.08)' },
+                ticks: { color: '#6b6578', font: { family: CHART_FONT, size: 9 } },
+                border: { display: false }
+              }
             }
           }
-        }
-      },
-      scales: {
-        x: {
-          min: 0,
-          max: 100,
-          grid: { color: 'rgba(124, 58, 237, 0.08)' },
-          ticks: { color: '#6b6578', font: { family: CHART_FONT, size: 9 } },
-          border: { color: 'rgba(124, 58, 237, 0.12)' }
-        },
-        y: {
-          grid: { display: false },
-          ticks: {
-            color: '#3f3a4d',
-            font: { family: CHART_FONT, size: 9 },
-            autoSkipPadding: 4
-          },
-          border: { display: false }
-        }
+        });
       }
-    };
+    }
 
-    if (nationalChartInstance) {
-      nationalChartInstance.data.labels = labels;
-      nationalChartInstance.data.datasets[0].data = data;
-      nationalChartInstance.data.datasets[0].backgroundColor = colors;
-      nationalChartInstance.update('none');
-    } else {
-      nationalChartInstance = new Chart(ctx.getContext('2d'), {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Index',
-            data,
-            backgroundColor: colors,
-            borderWidth: 0,
-            borderRadius: { topRight: 10, bottomRight: 10, topLeft: 4, bottomLeft: 4 },
-            barThickness: 9
-          }]
-        },
-        options: commonOptions
+    const donutCanvas = document.getElementById('chart-tier-donut');
+    const donutCounts = tierLabels.map(function (t) {
+      return counts[t] || 0;
+    });
+    const totalCounties = donutCounts.reduce(function (a, b) {
+      return a + b;
+    }, 0);
+    const ovPill = document.getElementById('overview-pill-total');
+    if (ovPill) ovPill.textContent = String(totalCounties || COUNTIES.length);
+    const leg = document.getElementById('overview-legend');
+    if (leg) {
+      leg.innerHTML = tierLabels
+        .map(function (t, idx) {
+          const fake = { risk_tier: t };
+          const col = COLORS[getTierClass(fake)];
+          return (
+            '<div class="overview-legend-row"><i style="background:' +
+            col +
+            '"></i><span>' +
+            escapeHtml(t) +
+            ' · ' +
+            donutCounts[idx] +
+            '</span></div>'
+          );
+        })
+        .join('');
+    }
+    let largestIdx = 0;
+    for (let j = 1; j < donutCounts.length; j++) {
+      if (donutCounts[j] > donutCounts[largestIdx]) largestIdx = j;
+    }
+    const largestEl = document.getElementById('overview-largest');
+    if (largestEl) {
+      largestEl.textContent =
+        tierLabels[largestIdx] + ' · ' + donutCounts[largestIdx] + ' counties';
+    }
+    const donutPill = document.getElementById('donut-center-pill');
+    if (donutPill) donutPill.textContent = String(donutCounts[largestIdx] || 0);
+
+    if (donutCanvas) {
+      const donutColors = tierLabels.map(function (t) {
+        const fake = { risk_tier: t };
+        return COLORS[getTierClass(fake)];
+      });
+      if (tierDonutChartInstance) {
+        tierDonutChartInstance.data.datasets[0].data = donutCounts;
+        tierDonutChartInstance.data.datasets[0].backgroundColor = donutColors;
+        tierDonutChartInstance.update('active');
+      } else {
+        tierDonutChartInstance = new Chart(donutCanvas.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: tierLabels,
+            datasets: [
+              {
+                data: donutCounts,
+                backgroundColor: donutColors,
+                borderWidth: 3,
+                borderColor: '#fff',
+                hoverOffset: 8,
+                borderRadius: 12,
+                spacing: 2
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '62%',
+            animation: { animateRotate: true, duration: 900 },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function (ctx) {
+                    const n = ctx.raw;
+                    const pct =
+                      totalCounties > 0 ? ((n / totalCounties) * 100).toFixed(0) : '0';
+                    return ctx.label + ': ' + n + ' (' + pct + '%)';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    const bubbleHost = document.getElementById('bubble-chart-host');
+    if (bubbleHost) {
+      bubbleHost.innerHTML = '';
+      for (let g = 1; g <= 4; g++) {
+        const line = document.createElement('div');
+        line.className = 'bubble-grid-line';
+        line.style.top = 20 + g * 16 + '%';
+        bubbleHost.appendChild(line);
+      }
+      const sortedB = [...COUNTIES]
+        .filter(function (c) {
+          return countyData[c];
+        })
+        .sort(function (a, b) {
+          return countyData[b].vulnerability_score - countyData[a].vulnerability_score;
+        })
+        .slice(0, 6);
+      const grad = [
+        'linear-gradient(145deg,#fb923c,#ea580c)',
+        'linear-gradient(145deg,#f472b6,#db2777)',
+        'linear-gradient(145deg,#a78bfa,#7c3aed)',
+        'linear-gradient(145deg,#38bdf8,#2563eb)',
+        'linear-gradient(145deg,#2dd4bf,#0d9488)',
+        'linear-gradient(145deg,#fcd34d,#d97706)'
+      ];
+      const maxPov = Math.max(
+        1,
+        sortedB.reduce(function (m, c) {
+          return Math.max(m, povertyPct(countyData[c]));
+        }, 0)
+      );
+      sortedB.forEach(function (c, idx) {
+        const d = countyData[c];
+        const x =
+          sortedB.length <= 1 ? 50 : 12 + (idx / (sortedB.length - 1)) * 72;
+        const pov = povertyPct(d);
+        const y = 88 - (pov / maxPov) * 68;
+        const w = 52 + (num(d.vulnerability_score) / 100) * 28;
+        const h = 36 + (pov / maxPov) * 22;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'bubble-node';
+        btn.style.left = x + '%';
+        btn.style.top = y + '%';
+        btn.style.width = w + 'px';
+        btn.style.height = h + 'px';
+        btn.style.background = grad[idx % grad.length];
+        btn.textContent = formatNum(d.vulnerability_score);
+        btn.title = c + ' · ' + pov.toFixed(1) + '% income · tap';
+        btn.setAttribute('aria-label', c + ', index ' + formatNum(d.vulnerability_score));
+        btn.onclick = function () {
+          window.__fflSelectCounty(c);
+        };
+        bubbleHost.appendChild(btn);
       });
     }
+
+    if (historyCache) renderStressAreaChart(historyCache);
   }
 
   function updateStats() {
     const vals = COUNTIES.map((c) => countyData[c]).filter(Boolean);
     const critical = vals.filter((d) => d.risk_tier === 'Critical').length;
     const inPoverty = vals.filter((d) => d.in_energy_poverty).length;
+    const vulnHh = vals.reduce(function (s, d) {
+      return s + (Number(d.est_vulnerable_households) || 0);
+    }, 0);
+    const overspend = vals.reduce(function (s, d) {
+      const r = Number(d.retrofit_roi_saving_10yr);
+      return s + (Number.isFinite(r) && r < 0 ? Math.abs(r) : 0);
+    }, 0);
 
     const elC = document.getElementById('stat-critical');
     const elP = document.getElementById('stat-poverty');
-    elC.textContent = critical;
-    elP.textContent = inPoverty;
-    elC.classList.remove('muted');
-    elP.classList.remove('muted');
+    const elV = document.getElementById('stat-vuln-hh');
+    const elO = document.getElementById('stat-overspend');
+    if (elC) {
+      elC.textContent = critical;
+      elC.classList.remove('muted');
+    }
+    if (elP) {
+      elP.textContent = inPoverty;
+      elP.classList.remove('muted');
+    }
+    if (elV) elV.textContent = vulnHh.toLocaleString();
+    if (elO) {
+      if (overspend >= 1e6) elO.textContent = '€' + (overspend / 1e6).toFixed(2) + 'M';
+      else if (overspend >= 1000) elO.textContent = '€' + Math.round(overspend / 1000) + 'k';
+      else elO.textContent = overspend > 0 ? '€' + Math.round(overspend).toLocaleString() : '—';
+    }
 
     const alert = document.getElementById('crisis-alert');
     const households = vals
       .filter((d) => d.in_energy_poverty)
       .reduce((s, d) => s + (Number(d.est_vulnerable_households) || 0), 0);
 
-    if (inPoverty > 0) {
+    if (inPoverty > 0 && alert) {
       alert.classList.add('show');
-      document.getElementById('crisis-count').textContent = String(inPoverty);
-      document.getElementById('crisis-households').textContent = households.toLocaleString();
-    } else {
+      const cc = document.getElementById('crisis-count');
+      const ch = document.getElementById('crisis-households');
+      if (cc) cc.textContent = String(inPoverty);
+      if (ch) ch.textContent = households.toLocaleString();
+    } else if (alert) {
       alert.classList.remove('show');
     }
   }
@@ -2725,13 +3443,16 @@
 
   function renderDetailError(county, message) {
     destroyRadar();
-    document.getElementById('detail-panel').innerHTML =
-      '<div class="note-panel">' +
-      '<h2>' + escapeHtml(county) + '</h2>' +
-      '<p style="color:var(--critical);font-size:0.82rem;margin-top:0.65rem;line-height:1.5">' +
-      escapeHtml(message) + '</p>' +
-      '<p class="panel-refresh-hint">Change the price or retry.</p>' +
-      '</div>';
+    var dp = document.getElementById('detail-panel');
+    if (dp) {
+      dp.innerHTML =
+        '<div class="note-panel">' +
+        '<h2>' + escapeHtml(county) + '</h2>' +
+        '<p style="color:var(--critical);font-size:0.82rem;margin-top:0.65rem;line-height:1.5">' +
+        escapeHtml(message) + '</p>' +
+        '<p class="panel-refresh-hint">Change the price or retry.</p>' +
+        '</div>';
+    }
   }
 
   function buildRadar(d, scoreColor) {
@@ -2794,10 +3515,12 @@
 
   function renderDetail(d) {
     destroyRadar();
+    var dp = document.getElementById('detail-panel');
+    if (!dp) return;
     const tier = getTierClass(d);
     const scoreColor = COLORS[tier];
 
-    document.getElementById('detail-panel').innerHTML =
+    dp.innerHTML =
       '<div class="detail-stack">' +
       '<div class="note-panel">' +
       '<h2>' + escapeHtml(d.county) + '</h2>' +
@@ -2831,25 +3554,29 @@
       else showGlobalError('Partial data (' + failed + ' failed). Click row to retry.');
       updateStats();
       renderGrid();
-      updateNationalChart();
+      updateDashboardCharts();
       if (selectedCounty === county) renderDetail(d);
     } catch (e) {
       countyData[county] = null;
       renderGrid();
-      updateNationalChart();
+      updateDashboardCharts();
     }
   };
 
   window.__fflSelectCounty = async function (county) {
     selectedCounty = county;
+    window.__fflCloseCountyDrawer();
     renderGrid();
     openCountyModal();
     const mb = document.getElementById('modal-body');
     mb.innerHTML =
       '<div class="loading-inline"><div class="spinner"></div> Loading deep dive…</div>';
 
-    document.getElementById('detail-panel').innerHTML =
-      '<div class="loading-inline"><div class="spinner"></div> Fetching county…</div>';
+    var dpLoad = document.getElementById('detail-panel');
+    if (dpLoad) {
+      dpLoad.innerHTML =
+        '<div class="loading-inline"><div class="spinner"></div> Fetching county…</div>';
+    }
 
     const price = getActivePrice();
     let d = null;
@@ -2881,7 +3608,7 @@
       renderDetail(merged);
       updateStats();
       renderGrid();
-      updateNationalChart();
+      updateDashboardCharts();
     } catch (err) {
       mb.innerHTML =
         '<p style="color:var(--critical);font-size:0.82rem">' +
@@ -2924,7 +3651,12 @@
       }
       updateStats();
       renderGrid();
-      updateNationalChart();
+      updateDashboardCharts();
+      if (isInitial) {
+        ensureHistoryStressRendered().then(function () {
+          updateDashboardCharts();
+        });
+      }
       if (selectedCounty && countyData[selectedCounty]) {
         renderDetail(countyData[selectedCounty]);
       } else if (selectedCounty && countyData[selectedCounty] === null) {
@@ -2957,7 +3689,6 @@
     document.getElementById('single-price-ui').classList.toggle('hidden', compareMode);
     document.getElementById('compare-price-ui').classList.toggle('show', compareMode);
 
-    var cap = document.getElementById('fig1-caption');
     if (compareMode) {
       var sa = document.getElementById('price-slider-a');
       var sb = document.getElementById('price-slider-b');
@@ -2966,16 +3697,8 @@
       document.getElementById('stat-price').textContent = '€' + priceA.toFixed(2);
       setSliderVisualA(String(priceA));
       setSliderVisualB(String(priceB));
-      if (cap) {
-        cap.innerHTML =
-          '<strong>Fig. 1</strong> — Index at scenario A (€' + priceA.toFixed(2) + '/L)';
-      }
     } else {
       document.getElementById('stat-price').textContent = '€' + currentPrice.toFixed(2);
-      if (cap) {
-        cap.innerHTML =
-          '<strong>Fig. 1</strong> — County vulnerability index (0–100) at current price';
-      }
     }
     updateCompareHeads();
     renderGrid();
@@ -3063,50 +3786,16 @@
     renderGrid();
   };
 
-  window.__fflToggleHistory = async function () {
-    var panel = document.getElementById('history-panel');
-    var btn = document.getElementById('history-toggle');
-    if (!panel || !btn) return;
-    var opening = !panel.classList.contains('open');
-    panel.classList.toggle('open', opening);
-    btn.classList.toggle('expanded', opening);
-    btn.setAttribute('aria-expanded', opening ? 'true' : 'false');
-    if (!opening) return;
-    if (historyFetchDone) return;
-    historyFetchDone = true;
-    var data = null;
-    try {
-      var res = await fetch(API + '/history');
-      if (res.ok) {
-        var j = await res.json();
-        data = normalizeHistoryPayload(j);
-      }
-    } catch (e2) {}
-    if (
-      !data ||
-      ((!data.historical || !data.historical.length) &&
-        (!data.projected || !data.projected.length))
-    ) {
-      data = buildSyntheticHistory();
-    }
-    historyCache = data;
-    var lastHistPt =
-      data.historical && data.historical.length
-        ? data.historical[data.historical.length - 1]
-        : null;
-    document.getElementById('hc-today').textContent =
-      lastHistPt && lastHistPt.counties_in_poverty != null
-        ? String(lastHistPt.counties_in_poverty) + ' counties in energy poverty (latest history point)'
-        : '11 counties in energy poverty';
-    document.getElementById('hc-july').textContent =
-      data.july && data.july.counties_in_poverty != null
-        ? String(data.july.counties_in_poverty) + ' counties projected'
-        : '—';
-    document.getElementById('hc-oct').textContent =
-      data.oct && data.oct.counties_in_poverty != null
-        ? String(data.oct.counties_in_poverty) + ' counties projected'
-        : '—';
-    renderHistoryChart(data);
+  window.__fflOpenCountyDrawer = function () {
+    var bd = document.getElementById('county-drawer-backdrop');
+    if (bd) bd.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.__fflCloseCountyDrawer = function () {
+    var bd = document.getElementById('county-drawer-backdrop');
+    if (bd) bd.classList.remove('open');
+    document.body.style.overflow = '';
   };
 
   function appendAiMsg(cls, text) {
@@ -3241,6 +3930,7 @@
   document.addEventListener('keydown', function (ev) {
     if (ev.key !== 'Escape') return;
     closeCountyModal();
+    window.__fflCloseCountyDrawer();
     window.__fflCloseAiDrawer();
   });
 
