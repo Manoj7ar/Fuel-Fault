@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fuel Fault Lines — Ireland</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -11,11 +12,12 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
   <style>
     :root {
-      --paper: #e8eaef;
-      --paper2: #dfe3eb;
+      --paper: #eceff4;
+      --paper2: #e2e6ee;
       --surface: #ffffff;
       --surface-solid: #ffffff;
-      --surface-muted: #f8fafc;
+      --surface-muted: #f4f6f9;
+      --surface-elevated: #fafbfc;
       --ink: #0f172a;
       --ink2: #334155;
       --ink3: #64748b;
@@ -30,18 +32,18 @@
       --accent: #0d9488;
       --accent-deep: #0f766e;
       --accent-soft: rgba(13, 148, 136, 0.1);
-      --accent-glow: rgba(13, 148, 136, 0.35);
+      --accent-glow: rgba(13, 148, 136, 0.28);
       --sidebar-bg: #0f172a;
       --sidebar-border: #1e293b;
       --sidebar-hover: #1e293b;
       --pill-bg: #0f172a;
       --pill-fg: #f8fafc;
-      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
-      --shadow-md: 0 4px 20px rgba(15, 23, 42, 0.08);
-      --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.05), 0 8px 24px rgba(15, 23, 42, 0.04);
-      --radius-lg: 14px;
-      --radius-md: 10px;
-      --radius-sm: 7px;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+      --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.07);
+      --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 32px rgba(15, 23, 42, 0.05);
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
       --sidebar-w: 232px;
       --sidebar-w-collapsed: 58px;
       --display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
@@ -57,7 +59,7 @@
     body {
       font-family: var(--sans);
       color: var(--ink);
-      line-height: 1.5;
+      line-height: 1.55;
       min-height: 100vh;
       min-height: 100dvh;
       height: 100dvh;
@@ -67,8 +69,8 @@
       -moz-osx-font-smoothing: grayscale;
       background-color: var(--paper);
       background-image:
-        radial-gradient(ellipse 100% 80% at 100% 0%, rgba(13, 148, 136, 0.07), transparent 50%),
-        radial-gradient(ellipse 70% 50% at 0% 100%, rgba(37, 99, 235, 0.05), transparent 45%);
+        radial-gradient(ellipse 90% 70% at 100% -10%, rgba(13, 148, 136, 0.065), transparent 52%),
+        radial-gradient(ellipse 80% 55% at 0% 100%, rgba(37, 99, 235, 0.045), transparent 48%);
     }
 
     :focus-visible {
@@ -121,9 +123,18 @@
       width: 32px;
       height: 32px;
       border-radius: var(--radius-sm);
-      background: linear-gradient(145deg, var(--accent) 0%, #0891b2 100%);
+      background: #0f172a;
       flex-shrink: 0;
-      box-shadow: 0 2px 8px var(--accent-glow);
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(13, 148, 136, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .sidebar-logo svg {
+      width: 22px;
+      height: 22px;
+      display: block;
     }
     .sidebar-toggle {
       flex-shrink: 0;
@@ -201,7 +212,7 @@
       height: 18px;
       stroke: currentColor;
       fill: none;
-      stroke-width: 1.75;
+      stroke-width: 1.65;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
@@ -227,12 +238,12 @@
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
-      padding: 0.75rem 1.35rem;
-      background: rgba(255, 255, 255, 0.82);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--rule);
-      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+      padding: 0.8rem 1.35rem;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(14px) saturate(1.2);
+      -webkit-backdrop-filter: blur(14px) saturate(1.2);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.75) inset;
     }
     .main-topbar h1 {
       font-family: var(--display);
@@ -350,7 +361,7 @@
       flex-direction: column;
       min-height: 0;
       overflow: auto;
-      padding: 0.85rem 1.25rem 1rem;
+      padding: 1rem 1.35rem 1.15rem;
     }
     .page-view.active { display: flex; }
 
@@ -359,7 +370,7 @@
       min-height: 0;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0.9rem;
       max-width: 1400px;
       width: 100%;
       margin: 0 auto;
@@ -367,10 +378,10 @@
 
     .page-panel {
       background: var(--surface);
-      border: 1px solid var(--rule);
+      border: 1px solid rgba(226, 232, 240, 0.95);
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-card);
-      padding: 1.25rem 1.35rem;
+      padding: 1.25rem 1.4rem;
     }
     .page-panel--tight { padding: 1rem 1.15rem; }
     .prose-hint {
@@ -401,9 +412,9 @@
       overflow: hidden;
     }
     .ai-page-head {
-      padding: 1rem 1.15rem;
+      padding: 1.05rem 1.2rem;
       border-bottom: 1px solid var(--rule);
-      background: #fafafa;
+      background: var(--surface-elevated);
     }
     .ai-page-head h2 {
       font-family: var(--display);
@@ -432,14 +443,20 @@
       font-size: 0.72rem;
     }
     .ai-page-key button {
-      padding: 0.45rem 0.85rem;
+      padding: 0.48rem 0.9rem;
       border-radius: var(--radius-sm);
-      border: 1px solid var(--rule);
-      background: var(--ink);
+      border: 1px solid rgba(13, 148, 136, 0.35);
+      background: linear-gradient(165deg, var(--accent) 0%, var(--accent-deep) 100%);
       color: #fff;
       font-size: 0.75rem;
       font-weight: 600;
       cursor: pointer;
+      box-shadow: 0 1px 3px rgba(13, 148, 136, 0.25);
+      transition: filter 0.15s ease, box-shadow 0.15s ease;
+    }
+    .ai-page-key button:hover {
+      filter: brightness(1.05);
+      box-shadow: 0 2px 8px rgba(13, 148, 136, 0.3);
     }
     .ai-key-notice-page {
       font-size: 0.68rem;
@@ -450,29 +467,34 @@
     .ai-chips-page {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.4rem;
-      padding: 0.65rem 1rem;
+      gap: 0.45rem;
+      padding: 0.7rem 1.1rem;
       border-bottom: 1px solid var(--rule-light);
-      background: #fafafa;
+      background: var(--surface-muted);
     }
     .ai-chip-page {
       font-size: 0.72rem;
-      padding: 0.35rem 0.65rem;
+      padding: 0.38rem 0.72rem;
       border-radius: 999px;
       border: 1px solid var(--rule);
-      background: #fff;
+      background: var(--surface);
       color: var(--ink2);
       cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
     }
-    .ai-chip-page:hover { border-color: var(--accent); color: var(--accent); }
+    .ai-chip-page:hover {
+      border-color: rgba(13, 148, 136, 0.4);
+      background: var(--accent-soft);
+      color: var(--accent-deep);
+    }
     .ai-thread-page {
       flex: 1;
       overflow-y: auto;
-      padding: 1rem;
+      padding: 1rem 1.1rem;
       display: flex;
       flex-direction: column;
       gap: 0.65rem;
-      background: #fafafa;
+      background: var(--surface-muted);
     }
     .ai-msg-page {
       max-width: 42rem;
@@ -484,8 +506,8 @@
     }
     .ai-msg-page.user {
       align-self: flex-end;
-      background: var(--accent-soft);
-      border: 1px solid rgba(37, 99, 235, 0.2);
+      background: linear-gradient(135deg, rgba(13, 148, 136, 0.14), rgba(13, 148, 136, 0.08));
+      border: 1px solid rgba(13, 148, 136, 0.22);
     }
     .ai-msg-page.bot {
       align-self: flex-start;
@@ -496,26 +518,36 @@
     .ai-input-row-page {
       display: flex;
       gap: 0.5rem;
-      padding: 0.85rem 1rem;
-      border-top: 1px solid var(--rule);
-      background: #fff;
+      padding: 0.9rem 1.1rem;
+      border-top: 1px solid var(--rule-light);
+      background: var(--surface);
     }
     .ai-input-row-page input {
       flex: 1;
-      padding: 0.55rem 0.65rem;
+      padding: 0.55rem 0.7rem;
       border: 1px solid var(--rule);
       border-radius: var(--radius-sm);
       font-size: 0.85rem;
+      background: var(--surface-elevated);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .ai-input-row-page input:focus {
+      outline: none;
+      border-color: rgba(13, 148, 136, 0.4);
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
     }
     .ai-input-row-page button {
       padding: 0.55rem 1rem;
       border-radius: var(--radius-sm);
-      border: none;
-      background: var(--accent);
+      border: 1px solid rgba(13, 148, 136, 0.3);
+      background: linear-gradient(165deg, var(--accent) 0%, var(--accent-deep) 100%);
       color: #fff;
       font-weight: 600;
       cursor: pointer;
+      box-shadow: 0 1px 3px rgba(13, 148, 136, 0.22);
+      transition: filter 0.15s ease;
     }
+    .ai-input-row-page button:hover:not(:disabled) { filter: brightness(1.06); }
     .ai-input-row-page button:disabled { opacity: 0.45; cursor: not-allowed; }
 
     /* Masthead */
@@ -1124,9 +1156,9 @@
     .load-overlay-card {
       background: var(--surface);
       border-radius: var(--radius-lg);
-      border: 1px solid var(--rule);
-      box-shadow: var(--shadow-md);
-      padding: 1.75rem 2rem;
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      box-shadow: var(--shadow-md), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+      padding: 1.85rem 2rem;
       max-width: 20rem;
       text-align: center;
     }
@@ -1659,11 +1691,12 @@
       color: var(--ink);
     }
     .dash-tagline {
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       color: var(--ink3);
-      margin-top: 0.15rem;
-      font-family: var(--mono);
-      letter-spacing: 0.04em;
+      margin-top: 0.2rem;
+      font-family: var(--sans);
+      font-weight: 450;
+      letter-spacing: 0.01em;
     }
     .dash-top-meta {
       display: flex;
@@ -1728,15 +1761,15 @@
       align-items: center;
     }
     .stat-chip {
-      padding: 0.4rem 0.65rem;
-      border-radius: var(--radius-sm);
-      background: var(--surface-muted);
+      padding: 0.42rem 0.68rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
       border: 1px solid var(--rule);
       font-family: var(--mono);
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       color: var(--ink3);
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
     }
     .stat-chip strong {
       font-family: var(--display);
@@ -1763,20 +1796,22 @@
     .dash-controls .single-slider-wrap, .dash-controls .compare-sliders { width: 100%; }
     .btn-drawer-counties {
       font-family: var(--sans);
-      font-size: 0.72rem;
+      font-size: 0.74rem;
       font-weight: 600;
-      padding: 0.45rem 0.85rem;
+      padding: 0.48rem 0.9rem;
       border-radius: var(--radius-sm);
       border: 1px solid var(--rule);
       background: var(--surface);
-      color: var(--ink);
+      color: var(--ink2);
       cursor: pointer;
       white-space: nowrap;
+      transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
     }
     .btn-drawer-counties:hover {
-      border-color: var(--accent);
+      border-color: rgba(13, 148, 136, 0.45);
       background: var(--accent-soft);
       color: var(--accent-deep);
+      box-shadow: 0 1px 3px rgba(13, 148, 136, 0.12);
     }
 
     .dashboard-grid {
@@ -1806,14 +1841,14 @@
       flex-direction: column;
       background: var(--surface);
       border-radius: var(--radius-lg);
-      border: 1px solid var(--rule);
+      border: 1px solid rgba(226, 232, 240, 0.95);
       box-shadow: var(--shadow-card);
-      padding: 1rem 1.1rem;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      padding: 1.05rem 1.15rem;
+      transition: border-color 0.2s ease, box-shadow 0.22s ease;
     }
     .dash-card:hover {
-      border-color: #cbd5e1;
-      box-shadow: var(--shadow-md);
+      border-color: rgba(13, 148, 136, 0.22);
+      box-shadow: var(--shadow-md), 0 0 0 1px rgba(13, 148, 136, 0.06);
     }
 
     .dash-card-head {
@@ -1831,16 +1866,25 @@
       min-width: 0;
     }
     .dash-card-icon {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--accent-soft);
+      background: linear-gradient(145deg, rgba(13, 148, 136, 0.12), rgba(13, 148, 136, 0.06));
+      border: 1px solid rgba(13, 148, 136, 0.12);
       flex-shrink: 0;
     }
-    .dash-card-icon svg { width: 18px; height: 18px; stroke: var(--accent-deep); fill: none; stroke-width: 1.65; }
+    .dash-card-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--accent-deep);
+      fill: none;
+      stroke-width: 1.65;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
     .dash-card-title {
       font-family: var(--display);
       font-size: 0.95rem;
@@ -1858,14 +1902,15 @@
     }
     .dash-pill-tag {
       flex-shrink: 0;
-      padding: 0.28rem 0.55rem;
+      padding: 0.3rem 0.6rem;
       border-radius: 999px;
-      background: var(--pill-bg);
+      background: linear-gradient(165deg, #1e293b 0%, #0f172a 100%);
       color: var(--pill-fg);
       font-family: var(--mono);
       font-size: 0.52rem;
       font-weight: 600;
       letter-spacing: 0.06em;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
     }
 
     .dash-chart-wrap {
@@ -2023,13 +2068,14 @@
 
     .site-footer--compact {
       flex-shrink: 0;
-      padding: 0.65rem 0;
+      padding: 0.75rem 0.5rem;
       font-family: var(--mono);
       font-size: 0.62rem;
       color: var(--ink3);
       text-align: center;
-      border-top: 1px solid var(--rule);
+      border-top: 1px solid rgba(226, 232, 240, 0.85);
       margin-top: auto;
+      opacity: 0.92;
     }
 
     .matrices-page-wrap {
@@ -2044,11 +2090,11 @@
       display: grid;
       grid-template-columns: minmax(0, 200px) minmax(0, 1fr) minmax(0, 240px);
       gap: 0;
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-lg);
       overflow: hidden;
-      border: 1px solid #e2e4ea;
-      background: #f6f7f9;
-      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      background: var(--surface-muted);
+      box-shadow: var(--shadow-card);
     }
     @media (max-width: 1024px) {
       .matrices-shell {
@@ -2356,8 +2402,9 @@
       position: fixed;
       inset: 0;
       z-index: 2400;
-      background: rgba(20, 18, 28, 0.25);
-      backdrop-filter: blur(4px);
+      background: rgba(15, 23, 42, 0.22);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
     }
     .county-drawer-backdrop.open { display: block; }
     .county-drawer-panel {
@@ -2368,7 +2415,7 @@
       height: 100%;
       background: rgba(255, 255, 255, 0.96);
       backdrop-filter: blur(20px);
-      box-shadow: -8px 0 40px rgba(30, 27, 46, 0.12);
+      box-shadow: -12px 0 48px rgba(15, 23, 42, 0.1);
       display: flex;
       flex-direction: column;
       transform: translateX(100%);
@@ -2417,22 +2464,47 @@
 
     .thesis-banner {
       margin: 0 0 1rem;
-      padding: 0.85rem 1rem;
-      background: linear-gradient(120deg, rgba(13, 148, 136, 0.12), rgba(37, 99, 235, 0.08));
-      border: 1px solid var(--rule);
+      padding: 0.95rem 1.1rem;
+      background: linear-gradient(118deg, rgba(13, 148, 136, 0.1) 0%, rgba(255, 255, 255, 0.92) 48%, rgba(37, 99, 235, 0.06) 100%);
+      border: 1px solid rgba(226, 232, 240, 0.9);
       border-radius: var(--radius-md);
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       color: var(--ink2);
-      line-height: 1.45;
+      line-height: 1.5;
+      box-shadow: var(--shadow-sm);
     }
     .thesis-banner strong { color: var(--ink); }
 
+    .key-finding-card {
+      margin: 0 0 1rem;
+      padding: 1rem 1.15rem;
+      background: var(--surface);
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      border-left: 4px solid var(--accent);
+    }
+    .key-finding-card .kf-label {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent-deep);
+      margin-bottom: 0.45rem;
+    }
+    .key-finding-card .kf-body {
+      font-size: 0.92rem;
+      line-height: 1.55;
+      color: var(--ink2);
+    }
+    .key-finding-card .kf-body strong { color: var(--ink); }
+
     .method-page .method-section {
-      margin-bottom: 1.35rem;
-      padding: 1rem 1.1rem;
+      margin-bottom: 1.25rem;
+      padding: 1.1rem 1.2rem;
       background: var(--surface);
       border-radius: var(--radius-md);
-      border: 1px solid var(--rule);
+      border: 1px solid rgba(226, 232, 240, 0.95);
       box-shadow: var(--shadow-sm);
     }
     .method-page .method-section h2 {
@@ -2508,6 +2580,130 @@
       cursor: pointer;
     }
     .modal-export-row button:hover { border-color: var(--accent); }
+
+    .method-human-box {
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: var(--ink2);
+      margin: 0.5rem 0 0.75rem;
+    }
+    .method-human-box ul { margin: 0.35rem 0 0 1.15rem; }
+    .method-human-box li { margin: 0.2rem 0; }
+    .method-kv {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.25rem 0.85rem;
+      font-size: 0.84rem;
+      margin: 0.35rem 0;
+    }
+    .method-kv dt {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink3);
+    }
+    .method-kv dd { margin: 0; color: var(--ink2); }
+    details.method-raw {
+      margin-top: 0.35rem;
+      border-radius: var(--radius-sm);
+      border: 1px dashed var(--rule);
+      background: var(--surface-muted);
+    }
+    details.method-raw summary {
+      cursor: pointer;
+      padding: 0.45rem 0.65rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--ink3);
+      list-style: none;
+    }
+    details.method-raw summary::-webkit-details-marker { display: none; }
+    details.method-raw[open] summary { border-bottom: 1px solid var(--rule); }
+    details.method-raw .method-pre {
+      margin: 0;
+      border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+      max-height: 12rem;
+    }
+
+    .submit-page .submit-hero {
+      padding: 1.1rem 1.2rem;
+      background: linear-gradient(118deg, rgba(13, 148, 136, 0.09) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(37, 99, 235, 0.05) 100%);
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      border-radius: var(--radius-md);
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .submit-page .submit-hero h2 {
+      font-family: var(--display);
+      font-size: 1.05rem;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.02em;
+    }
+    .submit-page .submit-checklist {
+      list-style: none;
+      margin: 0.5rem 0 0;
+      padding: 0;
+    }
+    .submit-page .submit-checklist li {
+      position: relative;
+      padding-left: 1.35rem;
+      margin: 0.45rem 0;
+      font-size: 0.86rem;
+      color: var(--ink2);
+      line-height: 1.45;
+    }
+    .submit-page .submit-checklist li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.35rem;
+      width: 0.55rem;
+      height: 0.55rem;
+      border: 2px solid var(--accent);
+      border-radius: 3px;
+      background: var(--surface);
+    }
+    .submit-page .submit-shot-list {
+      margin: 0.5rem 0 0;
+      padding-left: 1.25rem;
+      font-size: 0.86rem;
+      color: var(--ink2);
+      line-height: 1.5;
+    }
+    .submit-page .submit-shot-list li { margin: 0.4rem 0; }
+    .submit-copy-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 0.65rem;
+    }
+    .submit-textarea {
+      width: 100%;
+      min-height: 9rem;
+      margin-top: 0.5rem;
+      padding: 0.7rem 0.85rem;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-sm);
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: var(--ink);
+      resize: vertical;
+      background: var(--surface-elevated);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .submit-textarea:focus {
+      outline: none;
+      border-color: rgba(13, 148, 136, 0.45);
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+    }
+    .submit-word-count {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--ink3);
+      margin-top: 0.35rem;
+    }
   </style>
 </head>
 <body>
@@ -2524,28 +2720,47 @@
 <div class="app-shell">
   <aside class="app-sidebar" id="app-sidebar" aria-label="Main navigation">
     <div class="sidebar-brand">
-      <div class="sidebar-logo" aria-hidden="true"></div>
+      <div class="sidebar-logo" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="ffl-logo-ln" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#14b8a6"/>
+              <stop offset="100%" stop-color="#5eead4"/>
+            </linearGradient>
+            <linearGradient id="ffl-logo-dot" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#60a5fa"/>
+              <stop offset="100%" stop-color="#3b82f6"/>
+            </linearGradient>
+          </defs>
+          <path fill="none" stroke="url(#ffl-logo-ln)" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" d="M5 23 10 13l5 4 5-10 7 8"/>
+          <circle cx="27" cy="15" r="2.5" fill="url(#ffl-logo-dot)"/>
+          <path stroke="#64748b" stroke-width="1.25" stroke-linecap="round" d="M6 26h20" opacity="0.85"/>
+        </svg>
+      </div>
       <button type="button" class="sidebar-toggle" id="sidebar-toggle" onclick="window.__fflToggleSidebar()" title="Collapse sidebar" aria-expanded="true">«</button>
       <span class="sidebar-title-text">Fuel fault lines<small>Energy vulnerability</small></span>
     </div>
     <nav class="sidebar-nav" aria-label="Pages">
       <button type="button" class="nav-item active" data-page="dashboard" onclick="window.__fflSetPage('dashboard')">
-        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span><span>Dashboard</span>
+        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg></span><span>Dashboard</span>
       </button>
       <button type="button" class="nav-item" data-page="scenarios" onclick="window.__fflSetPage('scenarios')">
-        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg></span><span>Scenarios</span>
+        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 13V3M20 21v-5M20 9V3"/><circle cx="4" cy="13" r="2"/><circle cx="12" cy="11" r="2"/><circle cx="20" cy="14" r="2"/></svg></span><span>Scenarios</span>
       </button>
       <button type="button" class="nav-item" data-page="compare" onclick="window.__fflSetPage('compare')">
         <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></span><span>Compare</span>
       </button>
       <button type="button" class="nav-item" data-page="counties" onclick="window.__fflSetPage('counties')">
-        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/><path d="M8 6v12"/></svg></span><span>Counties</span>
+        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-8-6.5-8-11a8 8 0 1116 0c0 4.5-8 11-8 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span>Counties</span>
       </button>
       <button type="button" class="nav-item" data-page="method" onclick="window.__fflSetPage('method')">
-        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h8M8 15h4"/></svg></span><span>Method &amp; lab</span>
+        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v15H6.5A2.5 2.5 0 0 1 4 14.5v-10A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 10h6M9 14h4M8 22h8l-1-4H9l-1 4z"/></svg></span><span>Method &amp; lab</span>
+      </button>
+      <button type="button" class="nav-item" data-page="submit" onclick="window.__fflSetPage('submit')">
+        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span><span>Demo &amp; submit</span>
       </button>
       <button type="button" class="nav-item" data-page="ai" onclick="window.__fflSetPage('ai')">
-        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 0-7 7v3l-2 2h18l-2-2v-3a7 7 0 0 0-7-7z"/><path d="M9 18h6"/></svg></span><span>AI · Gemini</span>
+        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4h11a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-5l-3 3v-3H8a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3z"/><circle cx="10" cy="11" r="1"/><circle cx="14" cy="11" r="1"/><path d="M10 14c.8.6 1.8.9 3 .9s2.2-.3 3-.9"/></svg></span><span>AI · Gemini</span>
       </button>
     </nav>
     <div class="sidebar-foot">Ireland · 26 counties · SEAI / CSO / AA</div>
@@ -2584,12 +2799,17 @@
           <strong>Loading headline…</strong>
         </p>
 
+        <div class="key-finding-card" id="key-finding-card" aria-live="polite">
+          <div class="kf-label">Key finding</div>
+          <p class="kf-body" id="key-finding-body">Loading insight from the live model…</p>
+        </div>
+
   <div class="dashboard-grid">
     <section class="dash-card dash-card--full-width" aria-labelledby="card-curve-title">
       <div class="dash-card-head">
         <div class="dash-card-title-row">
           <div class="dash-card-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 12l4-4 4 4 6-6" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16"/><path d="M6 16l3.5-4 3 2.5L17 8l3 3.5"/></svg>
           </div>
           <div>
             <h2 class="dash-card-title" id="card-curve-title">Scenario curve</h2>
@@ -2606,7 +2826,7 @@
       <div class="dash-card-head">
         <div class="dash-card-title-row">
           <div class="dash-card-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M5 20V12M9 20V8M13 20V10M17 20V6M21 20V14"/></svg>
           </div>
           <div>
             <h2 class="dash-card-title" id="card-tl-title">Index by tier</h2>
@@ -2624,7 +2844,7 @@
       <div class="dash-card-head">
         <div class="dash-card-title-row">
           <div class="dash-card-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M3 12c2.5-4 6-6 9-6s6.5 2 9 6c-2.5 4-6 6-9 6s-6.5-2-9-6z"/><circle cx="12" cy="12" r="2.5"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>
           </div>
           <div>
             <h2 class="dash-card-title" id="card-tr-title">Stress trajectory</h2>
@@ -2648,7 +2868,7 @@
       <div class="dash-card-head">
         <div class="dash-card-title-row">
           <div class="dash-card-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            <svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="3.5"/><circle cx="16" cy="8" r="4.5"/><circle cx="14" cy="16" r="3"/><path d="M4 20c2-2 4.5-3 7-3s5 1 7 3"/></svg>
           </div>
           <div>
             <h2 class="dash-card-title" id="card-bl-title">County spotlight</h2>
@@ -2663,7 +2883,7 @@
       <div class="dash-card-head">
         <div class="dash-card-title-row">
           <div class="dash-card-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18"/><path d="M3 12h18"/></svg>
           </div>
           <div>
             <h2 class="dash-card-title" id="card-br-title">Risk mix</h2>
@@ -2863,7 +3083,10 @@
               <select id="compare-county-b" aria-label="County B"></select>
               <button type="button" class="btn-drawer-counties" onclick="window.__fflRunCountyCompare()">Compare</button>
             </div>
-            <pre class="method-pre" id="compare-two-out" style="max-height:12rem"></pre>
+            <details class="method-raw" style="margin-top:0.5rem">
+              <summary>Raw JSON (delta)</summary>
+              <pre class="method-pre" id="compare-two-out" style="max-height:12rem"></pre>
+            </details>
             <div class="takeaway-box" id="compare-two-takeaway" style="display:none"></div>
           </div>
         </div>
@@ -2883,7 +3106,8 @@
         <section class="method-section" aria-labelledby="m-lineage-h">
           <h2 id="m-lineage-h">Data lineage</h2>
           <p id="method-lineage-p">Connect to the API to load provenance.</p>
-          <pre class="method-pre" id="method-meta-pre" aria-label="API metadata JSON"></pre>
+          <div id="method-lineage-human" class="method-human-box"></div>
+          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-meta-pre" aria-label="API metadata JSON"></pre></details>
         </section>
 
         <section class="method-section" aria-labelledby="m-judge-h">
@@ -2895,31 +3119,36 @@
         <section class="method-section" aria-labelledby="m-national-h">
           <h2 id="m-national-h">National snapshot</h2>
           <p>Headline counts at the active scenario €/L (same as Scenarios when not in compare A/B).</p>
-          <pre class="method-pre" id="method-national-pre"></pre>
+          <div id="method-national-human" class="method-human-box"></div>
+          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-national-pre"></pre></details>
         </section>
 
         <section class="method-section" aria-labelledby="m-validation-h">
           <h2 id="m-validation-h">Internal validation (correlations)</h2>
           <p>Sanity checks on the live model — not official fuel poverty statistics.</p>
-          <pre class="method-pre" id="method-validation-pre"></pre>
+          <div id="method-validation-human" class="method-human-box"></div>
+          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-validation-pre"></pre></details>
         </section>
 
         <section class="method-section" aria-labelledby="m-dist-h">
           <h2 id="m-dist-h">Distribution (deciles)</h2>
           <p>Where fuel-income stress sits across counties at scenario €/L.</p>
-          <pre class="method-pre" id="method-distribution-pre"></pre>
+          <div id="method-distribution-human" class="method-human-box"></div>
+          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-distribution-pre"></pre></details>
         </section>
 
         <section class="method-section" aria-labelledby="m-breach-h">
           <h2 id="m-breach-h">Fault-line €/L (breach prices)</h2>
           <p>Per county: minimum €/L at which the model crosses the fuel-income threshold — sorted most resilient first.</p>
-          <pre class="method-pre" id="method-breach-pre" style="max-height:18rem"></pre>
+          <div id="method-breach-human" class="method-human-box"></div>
+          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-breach-pre" style="max-height:18rem"></pre></details>
         </section>
 
         <section class="method-section" aria-labelledby="m-regional-h">
           <h2 id="m-regional-h">Regional summary</h2>
           <p>Province roll-ups at scenario €/L.</p>
-          <pre class="method-pre" id="method-regional-pre"></pre>
+          <div id="method-regional-human" class="method-human-box"></div>
+          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-regional-pre"></pre></details>
         </section>
 
         <section class="method-section" aria-labelledby="m-export-h">
@@ -2934,19 +3163,24 @@
         <section class="method-section" aria-labelledby="m-narrative-h">
           <h2 id="m-narrative-h">Auto narrative (voiceover / Devpost)</h2>
           <p>Bullets from <code>GET /insights/narrative</code> — paste into your video script or summary.</p>
-          <pre class="method-pre" id="method-narrative-pre"></pre>
+          <div id="method-narrative-human" class="method-human-box"></div>
+          <p style="font-size:0.8rem;color:var(--ink3);margin:0.5rem 0 0.25rem"><strong>Elevator pitch</strong></p>
+          <p id="method-narrative-elevator" style="font-size:0.86rem;color:var(--ink2);line-height:1.5;margin:0"></p>
+          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-narrative-pre"></pre></details>
         </section>
 
         <section class="method-section" aria-labelledby="m-curve-json-h">
           <h2 id="m-curve-json-h">Scenario curve (API)</h2>
           <p>Same data as the dashboard chart: counties over threshold vs €/L.</p>
-          <pre class="method-pre" id="method-scenario-curve-pre" style="max-height:14rem"></pre>
+          <div id="method-curve-human" class="method-human-box"></div>
+          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-scenario-curve-pre" style="max-height:14rem"></pre></details>
         </section>
 
         <section class="method-section" aria-labelledby="m-rank-h">
           <h2 id="m-rank-h">Ranking stability</h2>
           <p>Do the most vulnerable counties stay in the top‑k when we tilt composite weights toward social vs fuel drivers?</p>
-          <pre class="method-pre" id="method-ranking-pre"></pre>
+          <div id="method-ranking-human" class="method-human-box"></div>
+          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-ranking-pre"></pre></details>
         </section>
 
         <section class="method-section" aria-labelledby="m-openapi-h">
@@ -2957,19 +3191,22 @@
         <section class="method-section" aria-labelledby="m-claims-h">
           <h2 id="m-claims-h">Registered claims (pass/fail)</h2>
           <p>Checkable statements evaluated on the live dataframe — useful for demos and write-ups.</p>
-          <pre class="method-pre" id="method-claims-pre"></pre>
+          <div id="method-claims-human" class="method-human-box"></div>
+          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-claims-pre"></pre></details>
         </section>
 
         <section class="method-section" aria-labelledby="m-sens-h">
           <h2 id="m-sens-h">Sensitivity (stress tests)</h2>
           <p>How many counties sit above the threshold when we nudge litres, weights, or the HDD multiplier.</p>
-          <pre class="method-pre" id="method-sensitivity-pre"></pre>
+          <div id="method-sensitivity-human" class="method-human-box"></div>
+          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-sensitivity-pre"></pre></details>
         </section>
 
         <section class="method-section" aria-labelledby="m-policy-h">
           <h2 id="m-policy-h">Policy counterfactual (illustrative)</h2>
           <p>Universal vs targeted grant outlay using modelled vulnerable household counts — not an official costings.</p>
-          <pre class="method-pre" id="method-policy-pre"></pre>
+          <div id="method-policy-human" class="method-human-box"></div>
+          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-policy-pre"></pre></details>
         </section>
 
         <section class="method-section" aria-labelledby="m-lab-h">
@@ -3021,6 +3258,65 @@
         </section>
 
         <footer class="site-footer--compact">Notebook block <code>warmer_homes_roi</code> · variable <code>warmer_homes_df</code> · optional <code>USE_ZERVE_VARIABLE</code></footer>
+      </div>
+    </div>
+
+    <div id="page-submit" class="page-view" role="region" aria-label="Demo and hackathon submission">
+      <div class="page-inner submit-page" style="max-width:44rem">
+        <header class="dash-top" style="margin-bottom:0">
+          <div class="dash-brand">
+            <h1>Demo &amp; submit</h1>
+            <p class="dash-tagline">ZerveHack checklist, copy-paste drafts, and why this isn’t “just a spreadsheet”</p>
+          </div>
+        </header>
+
+        <div class="submit-hero">
+          <h2>Win the workflow story</h2>
+          <p style="font-size:0.88rem;color:var(--ink2);line-height:1.5;margin:0">
+            Judges score <strong>end-to-end workflow</strong> heavily. Your video must show <strong>Zerve</strong> (notebook / dataframe), then <strong>deployed API</strong>, then this dashboard — not only the UI.
+            Requirements from <a href="https://zervehack.devpost.com" target="_blank" rel="noopener noreferrer">ZerveHack on Devpost</a>: public Zerve project, ≤300 word summary, ≤3 min video, social post tagging Zerve.
+          </p>
+        </div>
+
+        <section class="method-section" aria-labelledby="sub-pack-h">
+          <h2 id="sub-pack-h">Submission pack (from API)</h2>
+          <p class="prose-hint">Loaded from <code>GET /insights/submission-pack</code> at your scenario €/L. Edit before pasting to Devpost.</p>
+          <div class="submit-copy-row">
+            <button type="button" class="btn-drawer-counties" onclick="window.__fflReloadSubmissionPack()">Refresh pack</button>
+            <button type="button" class="btn-drawer-counties" onclick="window.__fflCopySubmitField('devpost')">Copy Devpost draft</button>
+            <button type="button" class="btn-drawer-counties" onclick="window.__fflCopySubmitField('social')">Copy social post</button>
+            <button type="button" class="btn-drawer-counties" onclick="window.__fflCopySubmitField('headline')">Copy key headline</button>
+          </div>
+          <p style="font-size:0.72rem;color:var(--ink3);margin:0.75rem 0 0.25rem;font-family:var(--mono);text-transform:uppercase;letter-spacing:0.06em">Devpost summary (≤300 words)</p>
+          <textarea id="submit-devpost-ta" class="submit-textarea" readonly aria-label="Devpost summary draft"></textarea>
+          <p class="submit-word-count" id="submit-word-count"></p>
+          <details class="method-raw" style="margin-top:0.75rem">
+            <summary>Full JSON (submission-pack)</summary>
+            <pre class="method-pre" id="submit-pack-json-pre"></pre>
+          </details>
+        </section>
+
+        <section class="method-section" aria-labelledby="sub-video-h">
+          <h2 id="sub-video-h">3-minute video shot list</h2>
+          <ol id="submit-video-ol" class="submit-shot-list"></ol>
+        </section>
+
+        <section class="method-section" aria-labelledby="sub-zerve-h">
+          <h2 id="sub-zerve-h">Why Zerve (not only Jupyter + deploy)</h2>
+          <ul id="submit-zerve-ul" class="method-human-box" style="list-style:disc"></ul>
+        </section>
+
+        <section class="method-section" aria-labelledby="sub-req-h">
+          <h2 id="sub-req-h">Devpost required checklist</h2>
+          <ul id="submit-req-ul" class="submit-checklist"></ul>
+        </section>
+
+        <section class="method-section" aria-labelledby="sub-rubric-h">
+          <h2 id="sub-rubric-h">Rubric talking points</h2>
+          <dl class="method-kv" id="submit-rubric-dl"></dl>
+        </section>
+
+        <footer class="site-footer--compact">OpenAPI: <a id="submit-openapi-a" href="#" target="_blank" rel="noopener noreferrer">/docs</a> · Briefing: <code>/export/briefing</code></footer>
       </div>
     </div>
 
@@ -3262,7 +3558,7 @@
   let aiChatMessages = [];
 
   const AI_SYSTEM =
-    'You are the in-app assistant for Fuel Fault Lines, answering as Google Gemini via the Generative Language API. You are an expert Irish energy policy analyst. The dashboard uses a county-level energy vulnerability model for Ireland built on Zerve AI.\n\nThe live API may expose /meta (lineage), /model/claims (pass/fail checks), and /model/sensitivity (stress tests). Exact counts change with data pulls and assumption sliders — prefer qualitative patterns unless the user supplied current numbers.\n\nIllustrative snapshot (often true but verify against the app): several counties are Critical tier; rural oil-heavy counties tend to show higher modelled fuel-income stress than Dublin; retrofit paybacks are often long at illustrative grant levels.\n\nData sources: SEAI-style profiles, CSO deprivation (or synthetic fallback), AA Ireland price snapshot.\n\nAnswer concisely. Use Irish county names. Note limitations: synthetic income bands from deprivation, not survey microdata; fuel use is a proxy. When asked to write documents, format them clearly for policymakers.';
+    'You are the in-app assistant for Fuel Fault Lines, answering as Google Gemini via the Generative Language API. You are an expert Irish energy policy analyst. The dashboard uses a county-level energy vulnerability model for Ireland built on Zerve AI.\n\nThe live API may expose /meta (lineage), /insights/submission-pack (Devpost draft and video checklist), /model/claims (pass/fail checks), and /model/sensitivity (stress tests). Exact counts change with data pulls and assumption sliders — prefer qualitative patterns unless the user supplied current numbers.\n\nIllustrative snapshot (often true but verify against the app): several counties are Critical tier; rural oil-heavy counties tend to show higher modelled fuel-income stress than Dublin; retrofit paybacks are often long at illustrative grant levels.\n\nData sources: SEAI-style profiles, CSO deprivation (or synthetic fallback), AA Ireland price snapshot.\n\nAnswer concisely. Use Irish county names. Note limitations: synthetic income bands from deprivation, not survey microdata; fuel use is a proxy. When asked to write documents, format them clearly for policymakers.';
 
   function getActivePrice() {
     return compareMode ? priceA : currentPrice;
@@ -3293,6 +3589,14 @@
   function num(x) {
     const n = typeof x === 'number' ? x : parseFloat(x);
     return Number.isFinite(n) ? n : NaN;
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
 
   function normalizeScenario(raw) {
@@ -4568,6 +4872,7 @@
     compare: 'Compare',
     counties: 'Counties',
     method: 'Method & lab',
+    submit: 'Demo & submit',
     ai: 'AI · Gemini'
   };
 
@@ -4589,6 +4894,9 @@
     }
     if (appPage === 'method') {
       refreshMethodPage();
+    }
+    if (appPage === 'submit') {
+      refreshSubmissionPage();
     }
     try {
       localStorage.setItem('ffl_page', appPage);
@@ -5027,6 +5335,459 @@
     }
   }
 
+  /** @type {object|null} */
+  let submissionPackCache = null;
+
+  function setHtml(id, html) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+  }
+
+  function formatNationalHuman(s) {
+    if (!s || typeof s !== 'object') return '<p>No data.</p>';
+    const pe = num(s.headline_price_eur_l);
+    const peStr = Number.isFinite(pe) ? pe.toFixed(2) : '—';
+    let h =
+      '<dl class="method-kv">' +
+      '<dt>Scenario €/L</dt><dd>€' +
+      peStr +
+      '</dd>' +
+      '<dt>Threshold</dt><dd>' +
+      s.poverty_threshold_pct +
+      '% fuel-income proxy</dd>' +
+      '<dt>Counties over line</dt><dd><strong>' +
+      s.counties_over_threshold +
+      '</strong> / ' +
+      s.total_counties +
+      '</dd>' +
+      '<dt>Critical tier</dt><dd>' +
+      s.critical_tier_counties +
+      ' counties</dd>' +
+      '<dt>Mean fuel share</dt><dd>' +
+      s.mean_fuel_share_pct +
+      '%</dd>' +
+      '<dt>Vulnerable HH (model)</dt><dd>' +
+      (s.vulnerable_households_modelled != null
+        ? Number(s.vulnerable_households_modelled).toLocaleString()
+        : '—') +
+      '</dd></dl>';
+    if (s.highest_fuel_share) {
+      h +=
+        '<p><strong>Steepest proxy:</strong> ' +
+        escapeHtml(s.highest_fuel_share.county) +
+        ' at ' +
+        s.highest_fuel_share.poverty_pct +
+        '%.</p>';
+    }
+    if (s.lowest_fuel_share) {
+      h +=
+        '<p><strong>Lowest proxy:</strong> ' +
+        escapeHtml(s.lowest_fuel_share.county) +
+        ' at ' +
+        s.lowest_fuel_share.poverty_pct +
+        '%.</p>';
+    }
+    return h;
+  }
+
+  function formatValidationHuman(v) {
+    if (!v || !Array.isArray(v.checks)) return '<p>No data.</p>';
+    let h = '<ul>';
+    for (let i = 0; i < v.checks.length; i++) {
+      const c = v.checks[i];
+      const ok = c.passes ? 'Pass' : 'Review';
+      const col = c.passes ? 'var(--low)' : 'var(--high)';
+      h +=
+        '<li><span style="color:' +
+        col +
+        ';font-weight:600">' +
+        ok +
+        '</span> — ' +
+        escapeHtml(c.description || c.id) +
+        ' <span style="color:var(--ink3);font-family:var(--mono);font-size:0.75rem">r=' +
+        (c.r != null ? c.r : '—') +
+        ', n=' +
+        (c.n != null ? c.n : '—') +
+        '</span></li>';
+    }
+    h += '</ul>';
+    if (v.note) h += '<p style="margin-top:0.5rem;font-size:0.8rem">' + escapeHtml(v.note) + '</p>';
+    return h;
+  }
+
+  function formatDistributionHuman(d) {
+    if (!d || !d.deciles) return '<p>No data.</p>';
+    const dec = d.deciles;
+    const keys = Object.keys(dec).sort();
+    let rows = '';
+    for (let i = 0; i < keys.length; i++) {
+      rows +=
+        '<tr><td style="padding:0.2rem 0.5rem 0.2rem 0;font-family:var(--mono);font-size:0.72rem">' +
+        keys[i] +
+        '</td><td style="padding:0.2rem 0">' +
+        dec[keys[i]] +
+        '%</td></tr>';
+    }
+    return (
+      '<p>Mean <strong>' +
+      d.mean +
+      '%</strong> · std <strong>' +
+      d.std +
+      '%</strong> · range <strong>' +
+      d.min +
+      '–' +
+      d.max +
+      '%</strong></p>' +
+      '<table style="font-size:0.84rem;border-collapse:collapse">' +
+      rows +
+      '</table>'
+    );
+  }
+
+  function formatBreachHuman(b) {
+    if (!b || !Array.isArray(b.counties)) return '<p>No data.</p>';
+    const list = b.counties;
+    const finite = list.filter(function (x) {
+      return x.breach_price_eur_l != null;
+    });
+    let h =
+      '<p>At reference €' +
+      (b.reference_price_eur_l != null ? Number(b.reference_price_eur_l).toFixed(2) : '?') +
+      '/L, <strong>' +
+      (b.counties_already_over_at_reference != null ? b.counties_already_over_at_reference : '—') +
+      '</strong> counties are already over the ' +
+      b.poverty_threshold_pct +
+      '% line.</p>';
+    if (finite.length > 1) {
+      const prices = finite.map(function (x) {
+        return x.breach_price_eur_l;
+      });
+      h +=
+        '<p>Breach €/L spans <strong>€' +
+        Math.min.apply(null, prices).toFixed(2) +
+        '–€' +
+        Math.max.apply(null, prices).toFixed(2) +
+        '</strong> across counties (first crossing of threshold).</p>';
+    }
+    h += '<p style="font-size:0.8rem;color:var(--ink3)">Most resilient (highest breach) first in raw JSON.</p>';
+    return h;
+  }
+
+  function formatRegionalHuman(r) {
+    if (!r || !Array.isArray(r.regions)) return '<p>No data.</p>';
+    let h = '<ul>';
+    for (let i = 0; i < r.regions.length; i++) {
+      const reg = r.regions[i];
+      h +=
+        '<li><strong>' +
+        escapeHtml(reg.province) +
+        '</strong> — mean index ' +
+        reg.mean_vulnerability +
+        ', mean fuel share ' +
+        reg.mean_fuel_share_pct +
+        '%, ' +
+        reg.counties_over_threshold +
+        '/' +
+        reg.counties +
+        ' counties over line, ' +
+        reg.critical_counties +
+        ' Critical.</li>';
+    }
+    h += '</ul>';
+    return h;
+  }
+
+  function formatClaimsHuman(j) {
+    if (!j || !Array.isArray(j.claims)) return '<p>No data.</p>';
+    let h = '<ul>';
+    for (let i = 0; i < j.claims.length; i++) {
+      const c = j.claims[i];
+      const ok = c.holds;
+      h +=
+        '<li><span style="color:' +
+        (ok ? 'var(--low)' : 'var(--critical)') +
+        ';font-weight:600">' +
+        (ok ? 'Holds' : 'Fails') +
+        '</span> — ' +
+        escapeHtml(c.statement || c.id) +
+        '</li>';
+    }
+    h += '</ul>';
+    return h;
+  }
+
+  function formatSensitivityHuman(j) {
+    if (!j || !j.baseline || !Array.isArray(j.variants)) return '<p>No data.</p>';
+    const b = j.baseline;
+    let h =
+      '<p>Baseline at €' +
+      b.price_eur_l +
+      '/L: <strong>' +
+      b.counties_over_threshold +
+      '</strong> counties over threshold.</p><ul>';
+    for (let i = 0; i < j.variants.length; i++) {
+      const v = j.variants[i];
+      h +=
+        '<li>' +
+        escapeHtml(v.label) +
+        ' → <strong>' +
+        v.counties_over_threshold +
+        '</strong> counties (Δ ' +
+        (v.delta_vs_base >= 0 ? '+' : '') +
+        v.delta_vs_base +
+        ')</li>';
+    }
+    h += '</ul>';
+    return h;
+  }
+
+  function formatPolicyHuman(p) {
+    if (!p || !p.targeted_critical) return '<p>No data.</p>';
+    const t = p.targeted_critical;
+    const u = p.universal_all_modelled_vulnerable;
+    return (
+      '<dl class="method-kv">' +
+      '<dt>Grant / home</dt><dd>€' +
+        (p.grant_eur_per_home != null ? Number(p.grant_eur_per_home).toLocaleString() : '—') +
+        '</dd>' +
+      '<dt>Targeted (Critical)</dt><dd>' +
+        t.households.toLocaleString() +
+        ' HH · outlay €' +
+        Number(t.state_grant_outlay_eur || 0).toLocaleString() +
+        '</dd>' +
+      '<dt>Universal (all modelled)</dt><dd>' +
+        u.households.toLocaleString() +
+        ' HH · outlay €' +
+        Number(u.state_grant_outlay_eur || 0).toLocaleString() +
+        '</dd></dl>' +
+      (p.note ? '<p style="margin-top:0.5rem;font-size:0.8rem">' + escapeHtml(p.note) + '</p>' : '')
+    );
+  }
+
+  function formatCurveHuman(c) {
+    if (!c || !Array.isArray(c.points) || c.points.length < 2) return '<p>No data.</p>';
+    const p0 = c.points[0];
+    const p1 = c.points[c.points.length - 1];
+    return (
+      '<p>From <strong>€' +
+      p0.price_eur_l +
+      '</strong> to <strong>€' +
+      p1.price_eur_l +
+      '</strong>/L, counties over the ' +
+      c.poverty_threshold_pct +
+      '% line move from <strong>' +
+      p0.counties_over_threshold +
+      '</strong> to <strong>' +
+      p1.counties_over_threshold +
+      '</strong> (mean share ' +
+      p0.mean_fuel_share_pct +
+      '% → ' +
+      p1.mean_fuel_share_pct +
+      '%).</p>'
+    );
+  }
+
+  function formatRankingHuman(r) {
+    if (!r || !Array.isArray(r.variants)) return '<p>No data.</p>';
+    const k = r.top_k || 10;
+    let h =
+      '<p>Baseline top <strong>' +
+      k +
+      '</strong>: ' +
+      (r.baseline_top_counties || [])
+        .slice(0, 5)
+        .map(function (x) {
+          return escapeHtml(x);
+        })
+        .join(', ') +
+      (r.baseline_top_counties && r.baseline_top_counties.length > 5 ? '…' : '') +
+      '</p><ul>';
+    for (let i = 0; i < r.variants.length; i++) {
+      const v = r.variants[i];
+      h +=
+        '<li>' +
+        escapeHtml(v.label) +
+        ' — overlap with baseline top-' +
+        k +
+        ': <strong>' +
+        v.overlap_with_baseline_top_k +
+        '/' +
+        k +
+        '</strong></li>';
+    }
+    h += '</ul>';
+    if (r.note) h += '<p style="font-size:0.78rem;color:var(--ink3)">' + escapeHtml(r.note) + '</p>';
+    return h;
+  }
+
+  function formatMetaLineageHuman() {
+    if (!metaCache) return '<p>Load the API to see lineage.</p>';
+    const dl = metaCache.data_lineage || {};
+    return (
+      '<dl class="method-kv">' +
+      '<dt>API</dt><dd>v' +
+      escapeHtml(String(metaCache.api_version || '?')) +
+      ' · <code>' +
+      escapeHtml(String(metaCache.git_rev || '?')) +
+      '</code></dd>' +
+      '<dt>SEAI</dt><dd>' +
+      escapeHtml(String(dl.seai || '—')) +
+      '</dd>' +
+      '<dt>CSO</dt><dd>' +
+      escapeHtml(String(dl.cso_deprivation || '—')) +
+      '</dd>' +
+      '<dt>Counties</dt><dd>' +
+      (metaCache.counties != null ? metaCache.counties : '—') +
+      '</dd></dl>' +
+      '<p style="margin-top:0.5rem;font-size:0.82rem">' +
+      escapeHtml(metaCache.limitations || '') +
+      '</p>'
+    );
+  }
+
+  async function refreshKeyFindingCard() {
+    const body = document.getElementById('key-finding-body');
+    if (!body) return;
+    const price = getActivePrice();
+    try {
+      const res = await fetch(API + '/insights/headline?price_eur_l=' + encodeURIComponent(price));
+      if (!res.ok) throw new Error('headline');
+      const j = await res.json();
+      const text = j.headline || '';
+      const bullets = j.supporting_bullets || [];
+      let html = '';
+      const parts = text.split(/\.\s+/).filter(Boolean);
+      for (let i = 0; i < parts.length; i++) {
+        let s = parts[i].trim();
+        if (s && !s.endsWith('.')) s += '.';
+        html += '<p style="margin:0 0 0.5rem">' + escapeHtml(s) + '</p>';
+      }
+      if (bullets.length) {
+        html += '<ul style="margin:0.35rem 0 0 1rem;font-size:0.84rem;color:var(--ink3)">';
+        for (let b = 0; b < Math.min(3, bullets.length); b++) {
+          html += '<li>' + escapeHtml(bullets[b]) + '</li>';
+        }
+        html += '</ul>';
+      }
+      body.innerHTML = html || escapeHtml(text);
+    } catch (e) {
+      body.textContent =
+        'Connect to the latest API for the headline insight (GET /insights/headline). Deploy the hub or use local FastAPI.';
+    }
+  }
+
+  async function refreshSubmissionPage() {
+    if (appPage !== 'submit') return;
+    const ta = document.getElementById('submit-devpost-ta');
+    const wc = document.getElementById('submit-word-count');
+    const pre = document.getElementById('submit-pack-json-pre');
+    const videoOl = document.getElementById('submit-video-ol');
+    const zUl = document.getElementById('submit-zerve-ul');
+    const reqUl = document.getElementById('submit-req-ul');
+    const rubDl = document.getElementById('submit-rubric-dl');
+    const oa = document.getElementById('submit-openapi-a');
+    if (oa) oa.href = API + '/docs';
+    const price = getActivePrice();
+    try {
+      const res = await fetch(API + '/insights/submission-pack?price_eur_l=' + encodeURIComponent(price));
+      if (!res.ok) throw new Error('pack');
+      const pack = await res.json();
+      submissionPackCache = pack;
+      if (ta) ta.value = pack.devpost_summary_draft || '';
+      if (wc) {
+        const n = pack.devpost_summary_word_count;
+        wc.textContent =
+          n != null
+            ? 'Word count: ' + n + ' / 300 (trim manually if needed)'
+            : '';
+      }
+      if (pre) pre.textContent = JSON.stringify(pack, null, 2);
+      if (videoOl) {
+        videoOl.innerHTML = '';
+        const steps = pack.zerve_video_checklist || [];
+        for (let i = 0; i < steps.length; i++) {
+          const li = document.createElement('li');
+          li.textContent = steps[i];
+          videoOl.appendChild(li);
+        }
+      }
+      if (zUl) {
+        zUl.innerHTML = '';
+        const wz = pack.why_zerve_not_spreadsheet || [];
+        for (let i = 0; i < wz.length; i++) {
+          const li = document.createElement('li');
+          li.textContent = wz[i];
+          zUl.appendChild(li);
+        }
+      }
+      if (reqUl) {
+        reqUl.innerHTML = '';
+        const req = pack.devpost_required_checklist || [];
+        for (let i = 0; i < req.length; i++) {
+          const li = document.createElement('li');
+          li.textContent = req[i];
+          reqUl.appendChild(li);
+        }
+      }
+      if (rubDl) {
+        rubDl.innerHTML = '';
+        const rp = pack.rubric_talking_points || {};
+        const keys = Object.keys(rp);
+        for (let i = 0; i < keys.length; i++) {
+          const dt = document.createElement('dt');
+          dt.textContent = keys[i].replace(/_/g, ' ');
+          const dd = document.createElement('dd');
+          dd.textContent = rp[keys[i]];
+          rubDl.appendChild(dt);
+          rubDl.appendChild(dd);
+        }
+      }
+    } catch (e) {
+      submissionPackCache = null;
+      if (ta) ta.value = 'Could not load submission pack. Deploy API with GET /insights/submission-pack.';
+      if (pre) pre.textContent = String(e && e.message ? e.message : e);
+    }
+  }
+
+  window.__fflReloadSubmissionPack = function () {
+    refreshSubmissionPage();
+  };
+
+  window.__fflCopySubmitField = async function (which) {
+    const pack = submissionPackCache;
+    let text = '';
+    if (which === 'devpost' && pack && pack.devpost_summary_draft) text = pack.devpost_summary_draft;
+    else if (which === 'social' && pack && pack.social_post_draft_x) text = pack.social_post_draft_x;
+    else if (which === 'headline' && pack && pack.headline_insight) text = pack.headline_insight;
+    if (!text) {
+      showAppNotice({
+        severity: 'warn',
+        title: 'Nothing to copy',
+        detail: 'Open Demo & submit and click Refresh pack first.',
+        code: null
+      });
+      return;
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        showAppNotice({
+          severity: 'info',
+          title: 'Copied',
+          detail: 'Paste into Devpost or your notes.',
+          code: null
+        });
+      }
+    } catch (e) {
+      showAppNotice({
+        severity: 'warn',
+        title: 'Copy failed',
+        detail: String(e && e.message ? e.message : e),
+        code: null
+      });
+    }
+  };
+
   async function refreshThesisBanner() {
     const el = document.getElementById('thesis-banner');
     if (!el) return;
@@ -5162,6 +5923,7 @@
       if (metaCache) preMeta.textContent = JSON.stringify(metaCache, null, 2);
       else preMeta.textContent = '(no /meta yet)';
     }
+    setHtml('method-lineage-human', formatMetaLineageHuman());
     if (lin && metaCache && metaCache.data_lineage) {
       lin.textContent =
         'SEAI: ' +
@@ -5192,25 +5954,49 @@
     if (preNat) {
       try {
         const r = await fetch(API + '/national/snapshot?price_eur_l=' + encodeURIComponent(price));
-        preNat.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+        if (r.ok) {
+          const j = await r.json();
+          preNat.textContent = JSON.stringify(j, null, 2);
+          setHtml('method-national-human', formatNationalHuman(j));
+        } else {
+          preNat.textContent = 'HTTP ' + r.status;
+          setHtml('method-national-human', '<p>Could not load snapshot.</p>');
+        }
       } catch (e) {
         preNat.textContent = String(e);
+        setHtml('method-national-human', '<p>Network error.</p>');
       }
     }
     if (preVal) {
       try {
         const r = await fetch(API + '/model/validation?price_eur_l=' + encodeURIComponent(price));
-        preVal.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+        if (r.ok) {
+          const j = await r.json();
+          preVal.textContent = JSON.stringify(j, null, 2);
+          setHtml('method-validation-human', formatValidationHuman(j));
+        } else {
+          preVal.textContent = 'HTTP ' + r.status;
+          setHtml('method-validation-human', '<p>Could not load validation.</p>');
+        }
       } catch (e) {
         preVal.textContent = String(e);
+        setHtml('method-validation-human', '<p>Network error.</p>');
       }
     }
     if (preDist) {
       try {
         const r = await fetch(API + '/model/distribution?price_eur_l=' + encodeURIComponent(price));
-        preDist.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+        if (r.ok) {
+          const j = await r.json();
+          preDist.textContent = JSON.stringify(j, null, 2);
+          setHtml('method-distribution-human', formatDistributionHuman(j));
+        } else {
+          preDist.textContent = 'HTTP ' + r.status;
+          setHtml('method-distribution-human', '<p>Could not load distribution.</p>');
+        }
       } catch (e) {
         preDist.textContent = String(e);
+        setHtml('method-distribution-human', '<p>Network error.</p>');
       }
     }
     if (preBr) {
@@ -5218,17 +6004,33 @@
         const r = await fetch(
           API + '/model/breach-prices?reference_price_eur_l=' + encodeURIComponent(price)
         );
-        preBr.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+        if (r.ok) {
+          const j = await r.json();
+          preBr.textContent = JSON.stringify(j, null, 2);
+          setHtml('method-breach-human', formatBreachHuman(j));
+        } else {
+          preBr.textContent = 'HTTP ' + r.status;
+          setHtml('method-breach-human', '<p>Could not load breach prices.</p>');
+        }
       } catch (e) {
         preBr.textContent = String(e);
+        setHtml('method-breach-human', '<p>Network error.</p>');
       }
     }
     if (preReg) {
       try {
         const r = await fetch(API + '/insights/regional?fuel_price=' + encodeURIComponent(price));
-        preReg.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+        if (r.ok) {
+          const j = await r.json();
+          preReg.textContent = JSON.stringify(j, null, 2);
+          setHtml('method-regional-human', formatRegionalHuman(j));
+        } else {
+          preReg.textContent = 'HTTP ' + r.status;
+          setHtml('method-regional-human', '<p>Could not load regions.</p>');
+        }
       } catch (e) {
         preReg.textContent = String(e);
+        setHtml('method-regional-human', '<p>Network error.</p>');
       }
     }
     if (preNar) {
@@ -5242,9 +6044,25 @@
             bullets.map(function (b, i) {
               return i + 1 + '. ' + b;
             }).join('\n') + (pitch ? '\n\nElevator: ' + pitch : '');
-        } else preNar.textContent = 'HTTP ' + r.status;
+          let nh = '<ol style="margin:0.35rem 0 0 1.1rem">';
+          for (let i = 0; i < bullets.length; i++) {
+            nh += '<li>' + escapeHtml(bullets[i]) + '</li>';
+          }
+          nh += '</ol>';
+          setHtml('method-narrative-human', nh);
+          const elEv = document.getElementById('method-narrative-elevator');
+          if (elEv) elEv.textContent = pitch || '';
+        } else {
+          preNar.textContent = 'HTTP ' + r.status;
+          setHtml('method-narrative-human', '<p>Could not load narrative.</p>');
+          const elEv = document.getElementById('method-narrative-elevator');
+          if (elEv) elEv.textContent = '';
+        }
       } catch (e) {
         preNar.textContent = String(e);
+        setHtml('method-narrative-human', '<p>Network error.</p>');
+        const elEv2 = document.getElementById('method-narrative-elevator');
+        if (elEv2) elEv2.textContent = '';
       }
     }
     if (preCurve) {
@@ -5259,41 +6077,81 @@
             encodeURIComponent(hi) +
             '&steps=24'
         );
-        preCurve.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+        if (r.ok) {
+          const j = await r.json();
+          preCurve.textContent = JSON.stringify(j, null, 2);
+          setHtml('method-curve-human', formatCurveHuman(j));
+        } else {
+          preCurve.textContent = 'HTTP ' + r.status;
+          setHtml('method-curve-human', '<p>Could not load curve.</p>');
+        }
       } catch (e) {
         preCurve.textContent = String(e);
+        setHtml('method-curve-human', '<p>Network error.</p>');
       }
     }
     if (preRank) {
       try {
         const r = await fetch(API + '/model/ranking-stability?top_k=10');
-        preRank.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+        if (r.ok) {
+          const j = await r.json();
+          preRank.textContent = JSON.stringify(j, null, 2);
+          setHtml('method-ranking-human', formatRankingHuman(j));
+        } else {
+          preRank.textContent = 'HTTP ' + r.status;
+          setHtml('method-ranking-human', '<p>Could not load ranking stability.</p>');
+        }
       } catch (e) {
         preRank.textContent = String(e);
+        setHtml('method-ranking-human', '<p>Network error.</p>');
       }
     }
     if (preC) {
       try {
         const r = await fetch(API + '/model/claims?price_eur_l=' + encodeURIComponent(price));
-        preC.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+        if (r.ok) {
+          const j = await r.json();
+          preC.textContent = JSON.stringify(j, null, 2);
+          setHtml('method-claims-human', formatClaimsHuman(j));
+        } else {
+          preC.textContent = 'HTTP ' + r.status;
+          setHtml('method-claims-human', '<p>Could not load claims.</p>');
+        }
       } catch (e) {
         preC.textContent = String(e);
+        setHtml('method-claims-human', '<p>Network error.</p>');
       }
     }
     if (preS) {
       try {
         const r = await fetch(API + '/model/sensitivity');
-        preS.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+        if (r.ok) {
+          const j = await r.json();
+          preS.textContent = JSON.stringify(j, null, 2);
+          setHtml('method-sensitivity-human', formatSensitivityHuman(j));
+        } else {
+          preS.textContent = 'HTTP ' + r.status;
+          setHtml('method-sensitivity-human', '<p>Could not load sensitivity.</p>');
+        }
       } catch (e) {
         preS.textContent = String(e);
+        setHtml('method-sensitivity-human', '<p>Network error.</p>');
       }
     }
     if (preP) {
       try {
         const r = await fetch(API + '/model/policy');
-        preP.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+        if (r.ok) {
+          const j = await r.json();
+          preP.textContent = JSON.stringify(j, null, 2);
+          setHtml('method-policy-human', formatPolicyHuman(j));
+        } else {
+          preP.textContent = 'HTTP ' + r.status;
+          setHtml('method-policy-human', '<p>Could not load policy.</p>');
+        }
       } catch (e) {
         preP.textContent = String(e);
+        setHtml('method-policy-human', '<p>Network error.</p>');
       }
     }
   }
@@ -5941,14 +6799,6 @@
       .join('');
   }
 
-  function escapeHtml(s) {
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
   function formatNum(n) {
     if (typeof n !== 'number' || Number.isNaN(n)) return '—';
     return Number.isInteger(n) ? String(n) : n.toFixed(1);
@@ -6202,6 +7052,8 @@
       updateDashboardCharts();
       fillCompareCountySelects();
       refreshThesisBanner();
+      refreshKeyFindingCard();
+      if (appPage === 'submit') refreshSubmissionPage();
       if (isInitial) {
         ensureHistoryStressRendered()
           .then(function () {

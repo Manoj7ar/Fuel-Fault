@@ -16,7 +16,7 @@ cd api && pip install -r requirements.txt && uvicorn main:app --host 0.0.0.0 --p
 node dev-server.mjs
 ```
 
-Open `http://127.0.0.1:5500/`. The dev server proxies `/api/*` to the deployed hub by default; for local FastAPI, set `window.__FFL_API_BASE__ = 'http://127.0.0.1:8000'` in the browser console before load, or use the API directly.
+Open `http://127.0.0.1:5500/`. The dev server proxies `/api/*` to the deployed hub by default; for local FastAPI, set `window.__FFL_API_BASE__ = 'http://127.0.0.1:8000'` in the browser console before load, or use the API directly. The tab icon is `favicon.svg` (teal stress line on slate — matches the in-app logo).
 
 ## AI chat (Google Gemini)
 
@@ -32,6 +32,8 @@ The **AI · Gemini** page in `index.html` calls the **Google Generative Language
 | `GET /county/{county}` | County snapshot at `fuel_price` |
 | `GET /national/snapshot` | Headline national stats at `price_eur_l` |
 | `GET /insights/narrative` | Auto bullets + elevator pitch for video / Devpost |
+| `GET /insights/headline` | One composite headline + supporting bullets for the dashboard |
+| `GET /insights/submission-pack` | Devpost ≤300-word draft, video checklist, social draft, rubric hooks, why-Zerve |
 | `GET /insights/regional` | Province roll-ups at `fuel_price` |
 | `GET /model/scenario-curve` | Counties over threshold vs €/L (`price_min`, `price_max`, `steps`) |
 | `GET /model/ranking-stability` | Top‑k overlap when tilting composite weights |

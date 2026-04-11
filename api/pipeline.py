@@ -1181,14 +1181,140 @@ def narrative_insights_payload(df: pd.DataFrame, params: ModelParams, price_eur_
     }
 
 
+def _word_trim(text: str, max_words: int = 300) -> str:
+    words = text.split()
+    if len(words) <= max_words:
+        return text
+    return " ".join(words[:max_words]).rstrip(".,;:") + "…"
+
+
+def headline_insight_payload(df: pd.DataFrame, params: ModelParams, price_eur_l: float = 2.14) -> dict[str, Any]:
+    """Single-sentence + short context for dashboard and judges."""
+    snap = national_snapshot_payload(df, params, price_eur_l)
+    breach = flip_points_payload(df, params, reference_price_eur_l=price_eur_l)
+    stab = ranking_stability_payload(df, params, top_k=10)
+    thr = params.poverty_threshold_pct
+    finite_b = [x["breach_price_eur_l"] for x in breach.get("counties", []) if x.get("breach_price_eur_l") is not None]
+
+    parts: list[str] = [
+        f"At €{price_eur_l:.2f}/L, {snap['counties_over_threshold']} of {snap['total_counties']} counties exceed the "
+        f"{thr:g}% modelled fuel-income line (mean proxy burden {snap['mean_fuel_share_pct']}%)."
+    ]
+    if len(finite_b) > 1:
+        parts.append(
+            f"The €/L where counties first cross that line spans €{min(finite_b):.2f}–€{max(finite_b):.2f} "
+            "— geographic price resilience is uneven, not uniform."
+        )
+    tilt_social = next((v for v in stab.get("variants", []) if "social" in v.get("label", "").lower()), None)
+    if tilt_social and stab.get("top_k"):
+        k = stab["top_k"]
+        ov = tilt_social.get("overlap_with_baseline_top_k", 0)
+        parts.append(
+            f"Under a social-heavy composite tilt, {ov}/{k} of the baseline highest-vulnerability counties remain in the top {k} "
+            "— the urgency ranking is partially robust to how we weight drivers."
+        )
+
+    headline = " ".join(parts)
+    return {
+        "price_eur_l": price_eur_l,
+        "headline": headline,
+        "supporting_bullets": narrative_insights_payload(df, params, price_eur_l).get("bullets", [])[:4],
+    }
+
+
+def submission_pack_payload(df: pd.DataFrame, params: ModelParams, price_eur_l: float = 2.14) -> dict[str, Any]:
+    """Devpost / video / social scaffolding aligned with ZerveHack requirements."""
+    meta = model_meta_dict(df, params)
+    narr = narrative_insights_payload(df, params, price_eur_l)
+    head = headline_insight_payload(df, params, price_eur_l)
+    snap = national_snapshot_payload(df, params, price_eur_l)
+
+    why_zerve = [
+        "Exploration stays in a notebook-first loop (Zerve): merge SEAI + CSO, score counties, iterate joins and columns without redeploying a separate analytics repo.",
+        "The same dataframe ships as a documented FastAPI hub (/docs) with scenario curves, breach €/L, validation, and exports — analysis and production share one path.",
+        "Assumption sliders and POST /model/params let judges stress-test the model live; a static PDF or one-off script would not.",
+    ]
+
+    zerve_video_checklist = [
+        "State the question (who gets squeezed when liquid fuel prices move, and where?).",
+        "Show Zerve: notebook or blocks that produce the county dataframe (e.g. warmer_homes_df / warmer_homes_roi).",
+        "Show deploy: FastAPI hub live (health + version in /health or /meta).",
+        "Demo the app: scenario €/L slider → Key finding card → scenario curve chart.",
+        "Open Method & lab or /docs — mention OpenAPI tags and one analytical endpoint (e.g. /model/breach-prices).",
+        "Optional: Gemini analyst with a key from Google AI Studio (client-side only).",
+        "Close with limitations: synthetic income bands; proxy not CSO official fuel poverty.",
+    ]
+
+    hackathon_required = [
+        "Public Zerve project — runs without errors (Devpost requirement).",
+        "Project summary — max 300 words (use draft below as a starting point).",
+        "Demo video — max 3 minutes (follow checklist above).",
+        "Social post — tag @Zerve_AI (X) or Zerve on LinkedIn per Devpost.",
+        "Deployed API/app — strongly encouraged for judging priority.",
+    ]
+
+    draft = f"""Fuel Fault Lines asks where Irish counties cross a modelled energy stress line when liquid fuel prices move, and whether vulnerability rankings hold up under different assumptions.
+
+We built an end-to-end pipeline in Zerve: county energy profiles (SEAI-style), deprivation (CSO FY068 when available), and a heating-demand-aware litres proxy combined with a FastAPI hub so the same model powers both exploration and a public API. The hub exposes scenario curves, per-county breach €/L, internal consistency checks, regional roll-ups, and markdown exports for briefings.
+
+At €{price_eur_l:.2f}/L, {snap['counties_over_threshold']} of {snap['total_counties']} counties exceed a {snap.get('poverty_threshold_pct', params.poverty_threshold_pct):g}% fuel-income proxy threshold, with mean burden {snap['mean_fuel_share_pct']}%. {head['headline']}
+
+The dashboard and /export/briefing turn these outputs into copy-ready narrative for policymakers and hackathon judges. Limitations are explicit: income is a synthetic band from deprivation, not survey microdata; fuel use is a proxy, not metered bills.
+
+Stack: Zerve notebook → optional zerve.variable injection → FastAPI (OpenAPI at /docs) → single-page dashboard; optional Google Gemini chat in-browser for Q&A. This submission demonstrates that question-driven iteration plus deployment without leaving the analytical environment is the fastest path from data to usable policy tooling."""
+
+    draft = _word_trim(draft, 300)
+    wc = len(draft.split())
+
+    social = (
+        "Built Fuel Fault Lines on @Zerve_AI — Irish county fuel stress, breach €/L, scenario API + dashboard. "
+        "Zerve notebook → FastAPI → live stress tests. #ZerveHack"
+    )
+
+    return {
+        "price_eur_l": price_eur_l,
+        "headline_insight": head["headline"],
+        "elevator_pitch": narr.get("elevator_pitch", ""),
+        "why_zerve_not_spreadsheet": why_zerve,
+        "zerve_video_checklist": zerve_video_checklist,
+        "devpost_required_checklist": hackathon_required,
+        "devpost_summary_draft": draft,
+        "devpost_summary_word_count": wc,
+        "social_post_draft_x": social,
+        "rubric_talking_points": {
+            "analytical_depth": "Scenario curve, breach prices, sensitivity, ranking stability, validation correlations — stress-tested assumptions, not a single chart.",
+            "end_to_end_workflow": "Zerve dataframe → FastAPI hub (/docs) → deployed app; demo script in /meta.",
+            "storytelling": "Key finding card, narrative endpoint, national briefing export, Method lab human summaries.",
+            "creativity": "Fault-line €/L + HDD proxy + optional Gemini analyst; Ireland-specific policy framing.",
+        },
+        "links": {
+            "zervehack_devpost": "https://zervehack.devpost.com",
+            "google_ai_studio_key": "https://aistudio.google.com/apikey",
+        },
+        "api_meta": {
+            "api_version": meta.get("api_version"),
+            "git_rev": meta.get("git_rev"),
+            "zerve_notebook_block": meta.get("zerve_notebook_block"),
+            "zerve_notebook_var": meta.get("zerve_notebook_var"),
+        },
+    }
+
+
 def build_national_briefing_markdown(df: pd.DataFrame, params: ModelParams, price_eur_l: float = 2.14) -> str:
     snap = national_snapshot_payload(df, params, price_eur_l)
     val = validation_payload(df, params, price_eur_l)
     meta = model_meta_dict(df, params)
+    head_line = headline_insight_payload(df, params, price_eur_l)["headline"]
     lines = [
         "# Fuel Fault Lines — national briefing (auto-generated)",
         "",
         f"**Scenario:** €{price_eur_l:.2f}/L · **Threshold:** {snap['poverty_threshold_pct']}% modelled fuel-income share",
+        "",
+        "## Key finding (one take for judges)",
+        "",
+        head_line,
+        "",
+        "*Full submission scaffolding: `GET /insights/submission-pack` (Devpost draft, video checklist, social).*",
         "",
         "## Headline numbers",
         "",
@@ -1262,16 +1388,18 @@ def model_meta_dict(df: pd.DataFrame, params: ModelParams) -> dict[str, Any]:
         "demo_script_for_judges": [
             "1. Zerve: question → notebook blocks → dataframe warmer_homes_df (block warmer_homes_roi).",
             "2. Deploy this FastAPI hub; optional USE_ZERVE_VARIABLE=1 to inject the notebook df.",
-            "3. Dashboard: read auto narrative + scenario curve (counties over line vs €/L).",
-            "4. Method & lab: validation, breach €/L table, ranking stability, GET /insights/narrative for voiceover bullets.",
-            "5. Scenarios + compare counties; export county or national markdown for Devpost.",
-            "6. Open /docs — full OpenAPI for integrators and judges who want the contract.",
+            "3. Dashboard: Key finding card + scenario curve + thesis banner (live €/L).",
+            "4. Demo & submit page: copy Devpost draft, video checklist, social post; link to ZerveHack on Devpost.",
+            "5. Method & lab: human-readable summaries + raw JSON; /insights/submission-pack for full pack.",
+            "6. Open /docs — OpenAPI contract (tagged).",
         ],
         "key_endpoints": [
             "/health",
             "/meta",
             "/docs",
             "/national/snapshot",
+            "/insights/headline",
+            "/insights/submission-pack",
             "/model/scenario-curve",
             "/model/validation",
             "/model/distribution",
