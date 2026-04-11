@@ -16,7 +16,7 @@ cd api && pip install -r requirements.txt && uvicorn main:app --host 0.0.0.0 --p
 node dev-server.mjs
 ```
 
-Open `http://127.0.0.1:5500/`. The dev server proxies `/api/*` to the deployed hub by default; for local FastAPI, set `window.__FFL_API_BASE__ = 'http://127.0.0.1:8000'` in the browser console before load, or use the API directly.
+Open `http://127.0.0.1:5500/`. The dev server proxies `/api/*` to the deployed hub by default; for local FastAPI, set `window.__FFL_API_BASE__ = 'http://127.0.0.1:8000'` in the browser console before load, or use the API directly. The tab icon is `favicon.svg` (teal stress line on slate — matches the in-app logo).
 
 ## AI chat (Google Gemini)
 
