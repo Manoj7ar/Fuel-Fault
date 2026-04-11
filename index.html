@@ -1784,8 +1784,12 @@
       min-height: 0;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
+      grid-template-rows: auto 1fr 1fr;
       gap: 0.65rem;
+    }
+    .dash-card--full-width {
+      grid-column: 1 / -1;
+      min-height: 200px;
     }
     @media (max-width: 900px) {
       .dashboard-grid {
@@ -2410,6 +2414,100 @@
       overflow: auto;
       padding: 0.65rem 0.75rem 1rem;
     }
+
+    .thesis-banner {
+      margin: 0 0 1rem;
+      padding: 0.85rem 1rem;
+      background: linear-gradient(120deg, rgba(13, 148, 136, 0.12), rgba(37, 99, 235, 0.08));
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-md);
+      font-size: 0.92rem;
+      color: var(--ink2);
+      line-height: 1.45;
+    }
+    .thesis-banner strong { color: var(--ink); }
+
+    .method-page .method-section {
+      margin-bottom: 1.35rem;
+      padding: 1rem 1.1rem;
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--rule);
+      box-shadow: var(--shadow-sm);
+    }
+    .method-page .method-section h2 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      color: var(--ink);
+    }
+    .method-page .method-section p,
+    .method-page .method-section li { font-size: 0.88rem; color: var(--ink2); line-height: 1.5; }
+    .method-page .method-section ul { margin: 0.35rem 0 0 1.1rem; }
+    .method-pre {
+      margin-top: 0.5rem;
+      padding: 0.65rem 0.75rem;
+      background: var(--surface-muted);
+      border-radius: var(--radius-sm);
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      overflow: auto;
+      max-height: 14rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .method-lab-grid {
+      display: grid;
+      gap: 0.65rem;
+      margin-top: 0.5rem;
+    }
+    @media (min-width: 640px) {
+      .method-lab-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .method-lab-grid label { display: block; font-size: 0.72rem; color: var(--ink3); margin-bottom: 0.2rem; }
+    .method-lab-grid input[type="number"] {
+      width: 100%;
+      padding: 0.35rem 0.45rem;
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+    }
+    .method-lab-actions { margin-top: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+    .method-lab-actions .btn-drawer-counties { margin: 0; }
+    .glossary-dl dt {
+      font-weight: 600;
+      font-size: 0.82rem;
+      margin-top: 0.5rem;
+      color: var(--ink);
+    }
+    .glossary-dl dd { margin: 0.15rem 0 0; font-size: 0.8rem; color: var(--ink2); }
+    .compare-two-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: flex-end; margin: 0.5rem 0; }
+    .compare-two-row select {
+      flex: 1;
+      min-width: 8rem;
+      padding: 0.4rem 0.5rem;
+      border-radius: 6px;
+      border: 1px solid var(--rule);
+      font-size: 0.82rem;
+    }
+    .takeaway-box {
+      margin-top: 0.65rem;
+      padding: 0.65rem 0.75rem;
+      background: var(--warn-fill);
+      border-radius: var(--radius-sm);
+      font-size: 0.84rem;
+      color: var(--ink2);
+    }
+    .modal-export-row { margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .modal-export-row button {
+      font-size: 0.78rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      border: 1px solid var(--rule);
+      background: var(--surface-muted);
+      cursor: pointer;
+    }
+    .modal-export-row button:hover { border-color: var(--accent); }
   </style>
 </head>
 <body>
@@ -2443,8 +2541,11 @@
       <button type="button" class="nav-item" data-page="counties" onclick="window.__fflSetPage('counties')">
         <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/><path d="M8 6v12"/></svg></span><span>Counties</span>
       </button>
+      <button type="button" class="nav-item" data-page="method" onclick="window.__fflSetPage('method')">
+        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h8M8 15h4"/></svg></span><span>Method &amp; lab</span>
+      </button>
       <button type="button" class="nav-item" data-page="ai" onclick="window.__fflSetPage('ai')">
-        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 0-7 7v3l-2 2h18l-2-2v-3a7 7 0 0 0-7-7z"/><path d="M9 18h6"/></svg></span><span>AI analyst</span>
+        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 0-7 7v3l-2 2h18l-2-2v-3a7 7 0 0 0-7-7z"/><path d="M9 18h6"/></svg></span><span>AI · Gemini</span>
       </button>
     </nav>
     <div class="sidebar-foot">Ireland · 26 counties · SEAI / CSO / AA</div>
@@ -2472,14 +2573,35 @@
           </div>
           <div class="stat-strip" id="stat-strip" aria-live="polite">
             <span class="stat-chip">Critical<strong id="stat-critical">—</strong></span>
-            <span class="stat-chip">&gt;10% line<strong id="stat-poverty">—</strong></span>
+            <span class="stat-chip"><span id="stat-poverty-label">&gt;10%</span> line<strong id="stat-poverty">—</strong></span>
             <span class="stat-chip">Vulnerable HH<strong id="stat-vuln-hh">—</strong></span>
             <span class="stat-chip">10yr vs retrofit<strong id="stat-overspend">—</strong></span>
             <span class="stat-chip">€/L<strong id="stat-price">€2.14</strong></span>
           </div>
         </header>
 
+        <p class="thesis-banner" id="thesis-banner" aria-live="polite">
+          <strong>Loading headline…</strong>
+        </p>
+
   <div class="dashboard-grid">
+    <section class="dash-card dash-card--full-width" aria-labelledby="card-curve-title">
+      <div class="dash-card-head">
+        <div class="dash-card-title-row">
+          <div class="dash-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 12l4-4 4 4 6-6" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          </div>
+          <div>
+            <h2 class="dash-card-title" id="card-curve-title">Scenario curve</h2>
+            <p class="dash-card-sub">Counties over fuel-income threshold vs €/L (live model)</p>
+          </div>
+        </div>
+        <span class="dash-pill-tag" id="curve-pill-range">€/L</span>
+      </div>
+      <div class="dash-chart-wrap" style="min-height:200px">
+        <canvas id="chart-scenario-curve" aria-label="Counties over threshold by fuel price"></canvas>
+      </div>
+    </section>
     <section class="dash-card dash-card--tl" aria-labelledby="card-tl-title">
       <div class="dash-card-head">
         <div class="dash-card-title-row">
@@ -2506,7 +2628,7 @@
           </div>
           <div>
             <h2 class="dash-card-title" id="card-tr-title">Stress trajectory</h2>
-            <p class="dash-card-sub">Counties over 10% fuel share of income</p>
+            <p class="dash-card-sub" id="card-tr-sub">Counties over fuel share threshold</p>
           </div>
         </div>
         <span class="dash-pill-tag" id="stress-pill-threshold">€2.14/L</span>
@@ -2571,7 +2693,7 @@
       <div class="page-inner">
         <div class="scenario-summary" id="scenario-summary"></div>
         <div class="crisis-alert" id="crisis-alert">
-          <strong id="crisis-count">0</strong> counties above the 10% income share line.
+          <strong id="crisis-count">0</strong> <span id="crisis-line-label">counties above the 10% income share line</span>.
           Households in those counties: <strong id="crisis-households">0</strong>.
         </div>
         <header class="dash-top" style="margin-bottom:0">
@@ -2733,18 +2855,182 @@
           <div class="page-actions">
             <button type="button" class="btn-drawer-counties" onclick="window.__fflOpenCountyDrawer()">Open county register</button>
           </div>
+          <div class="method-section" style="margin-top:1rem" aria-labelledby="compare-two-h">
+            <h2 id="compare-two-h" style="font-size:1rem;margin-bottom:0.35rem">Compare two counties</h2>
+            <p class="prose-hint" style="margin-bottom:0.5rem">Same €/L as your active scenario (Scenarios page).</p>
+            <div class="compare-two-row">
+              <select id="compare-county-a" aria-label="County A"></select>
+              <select id="compare-county-b" aria-label="County B"></select>
+              <button type="button" class="btn-drawer-counties" onclick="window.__fflRunCountyCompare()">Compare</button>
+            </div>
+            <pre class="method-pre" id="compare-two-out" style="max-height:12rem"></pre>
+            <div class="takeaway-box" id="compare-two-takeaway" style="display:none"></div>
+          </div>
         </div>
         <footer class="site-footer--compact">26 counties · same live dataset</footer>
       </div>
     </div>
 
-    <div id="page-ai" class="page-view" role="region" aria-label="AI analyst">
+    <div id="page-method" class="page-view" role="region" aria-label="Method and model lab">
+      <div class="page-inner method-page" style="max-width:46rem">
+        <header class="dash-top" style="margin-bottom:0">
+          <div class="dash-brand">
+            <h1>Method &amp; model lab</h1>
+            <p class="dash-tagline">Lineage, limitations, sensitivity, and session tuning (Zerve notebook → FastAPI)</p>
+          </div>
+        </header>
+
+        <section class="method-section" aria-labelledby="m-lineage-h">
+          <h2 id="m-lineage-h">Data lineage</h2>
+          <p id="method-lineage-p">Connect to the API to load provenance.</p>
+          <pre class="method-pre" id="method-meta-pre" aria-label="API metadata JSON"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-judge-h">
+          <h2 id="m-judge-h">Judge / demo script (from API)</h2>
+          <p>Steps embedded in <code>/meta</code> for video walkthroughs — copy into your Devpost or recording outline.</p>
+          <ol id="method-judge-ol" style="margin:0.5rem 0 0 1.1rem;font-size:0.88rem;color:var(--ink2);line-height:1.55"></ol>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-national-h">
+          <h2 id="m-national-h">National snapshot</h2>
+          <p>Headline counts at the active scenario €/L (same as Scenarios when not in compare A/B).</p>
+          <pre class="method-pre" id="method-national-pre"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-validation-h">
+          <h2 id="m-validation-h">Internal validation (correlations)</h2>
+          <p>Sanity checks on the live model — not official fuel poverty statistics.</p>
+          <pre class="method-pre" id="method-validation-pre"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-dist-h">
+          <h2 id="m-dist-h">Distribution (deciles)</h2>
+          <p>Where fuel-income stress sits across counties at scenario €/L.</p>
+          <pre class="method-pre" id="method-distribution-pre"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-breach-h">
+          <h2 id="m-breach-h">Fault-line €/L (breach prices)</h2>
+          <p>Per county: minimum €/L at which the model crosses the fuel-income threshold — sorted most resilient first.</p>
+          <pre class="method-pre" id="method-breach-pre" style="max-height:18rem"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-regional-h">
+          <h2 id="m-regional-h">Regional summary</h2>
+          <p>Province roll-ups at scenario €/L.</p>
+          <pre class="method-pre" id="method-regional-pre"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-export-h">
+          <h2 id="m-export-h">National markdown export</h2>
+          <p>One-page brief for write-ups: <code>GET /export/briefing</code></p>
+          <div class="method-lab-actions">
+            <button type="button" class="btn-drawer-counties" onclick="window.__fflCopyNationalBriefing()">Copy briefing markdown</button>
+            <button type="button" class="btn-drawer-counties" onclick="window.__fflOpenNationalBriefing()">Open in new tab</button>
+          </div>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-narrative-h">
+          <h2 id="m-narrative-h">Auto narrative (voiceover / Devpost)</h2>
+          <p>Bullets from <code>GET /insights/narrative</code> — paste into your video script or summary.</p>
+          <pre class="method-pre" id="method-narrative-pre"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-curve-json-h">
+          <h2 id="m-curve-json-h">Scenario curve (API)</h2>
+          <p>Same data as the dashboard chart: counties over threshold vs €/L.</p>
+          <pre class="method-pre" id="method-scenario-curve-pre" style="max-height:14rem"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-rank-h">
+          <h2 id="m-rank-h">Ranking stability</h2>
+          <p>Do the most vulnerable counties stay in the top‑k when we tilt composite weights toward social vs fuel drivers?</p>
+          <pre class="method-pre" id="method-ranking-pre"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-openapi-h">
+          <h2 id="m-openapi-h">OpenAPI contract</h2>
+          <p>Interactive docs for judges and integrators: <a id="method-openapi-link" href="#" target="_blank" rel="noopener noreferrer">Open /docs</a> (grouped tags: core, county, scenario, model, insights, export).</p>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-claims-h">
+          <h2 id="m-claims-h">Registered claims (pass/fail)</h2>
+          <p>Checkable statements evaluated on the live dataframe — useful for demos and write-ups.</p>
+          <pre class="method-pre" id="method-claims-pre"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-sens-h">
+          <h2 id="m-sens-h">Sensitivity (stress tests)</h2>
+          <p>How many counties sit above the threshold when we nudge litres, weights, or the HDD multiplier.</p>
+          <pre class="method-pre" id="method-sensitivity-pre"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-policy-h">
+          <h2 id="m-policy-h">Policy counterfactual (illustrative)</h2>
+          <p>Universal vs targeted grant outlay using modelled vulnerable household counts — not an official costings.</p>
+          <pre class="method-pre" id="method-policy-pre"></pre>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-lab-h">
+          <h2 id="m-lab-h">Session lab</h2>
+          <p>POST model parameters to the hub (local or deployed). Resets when the server restarts. Requires API support for <code>/model/params</code>.</p>
+          <div class="method-lab-grid">
+            <div>
+              <label for="lab-litres">Litres / household / year (proxy base)</label>
+              <input type="number" id="lab-litres" step="1" min="400" max="3000" value="1275">
+            </div>
+            <div>
+              <label for="lab-threshold">Fuel share threshold (% of income)</label>
+              <input type="number" id="lab-threshold" step="0.5" min="5" max="25" value="10">
+            </div>
+            <div>
+              <label for="lab-w-fuel">Weight · fuel dependency</label>
+              <input type="number" id="lab-w-fuel" step="0.05" min="0.1" max="0.6" value="0.30">
+            </div>
+            <div>
+              <label for="lab-w-social">Weight · social deprivation</label>
+              <input type="number" id="lab-w-social" step="0.05" min="0.1" max="0.6" value="0.30">
+            </div>
+          </div>
+          <label style="display:flex;align-items:center;gap:0.35rem;margin-top:0.5rem;font-size:0.82rem;color:var(--ink2)">
+            <input type="checkbox" id="lab-hdd" checked> Apply heating-demand (HDD) multiplier to litres proxy
+          </label>
+          <div class="method-lab-actions">
+            <button type="button" class="btn-drawer-counties" onclick="window.__fflApplyModelLab()">Apply &amp; reload model</button>
+            <span id="lab-status" style="font-size:0.78rem;color:var(--ink3)"></span>
+          </div>
+        </section>
+
+        <section class="method-section" aria-labelledby="m-gloss-h">
+          <h2 id="m-gloss-h">Glossary</h2>
+          <dl class="glossary-dl">
+            <dt>BER</dt>
+            <dd>Building Energy Rating (Ireland). Poor bands (D–G) feed building stress in the model.</dd>
+            <dt>ktoe</dt>
+            <dd>Kilo-tonnes of oil equivalent — national/county energy use from SEAI-style tables.</dd>
+            <dt>Fuel-income share</dt>
+            <dd>Modelled share of synthetic income spent on a liquid-fuel proxy (litres × €/L), not metered bills.</dd>
+            <dt>HDD multiplier</dt>
+            <dd>Heating-demand heuristic by county (inland/coastal). Scales the litres proxy only.</dd>
+            <dt>Cliff price</dt>
+            <dd>First pre-computed price ladder step where the county crosses the threshold.</dd>
+            <dt>Breach price</dt>
+            <dd>€/L solved numerically where modelled fuel share crosses the threshold (may differ slightly from cliff ladder).</dd>
+          </dl>
+        </section>
+
+        <footer class="site-footer--compact">Notebook block <code>warmer_homes_roi</code> · variable <code>warmer_homes_df</code> · optional <code>USE_ZERVE_VARIABLE</code></footer>
+      </div>
+    </div>
+
+    <div id="page-ai" class="page-view" role="region" aria-label="AI policy analyst powered by Google Gemini">
       <div class="page-inner" style="max-width:720px">
         <div class="ai-page">
           <div class="ai-page-head">
             <h2>AI policy analyst</h2>
-            <p class="sub">Gemini · optional API key stored in this browser only</p>
-            <p class="ai-key-notice-page">Add a key from Google AI Studio to send messages.</p>
+            <p class="sub"><strong>Google Gemini</strong> (Generative Language API) · chat is generated client-side; optional API key stays in this browser only</p>
+            <p class="ai-key-notice-page">Get a key from <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a> — we call Gemini directly from your browser, not through the Fuel Fault Lines API.</p>
             <div class="ai-page-key">
               <input type="password" id="ai-api-key" placeholder="Gemini API key…" autocomplete="off" aria-label="Google Gemini API key"
                      onblur="window.__fflSaveAiKey()">
@@ -2942,6 +3228,7 @@
   let tierBarChartInstance = null;
   let stressAreaChartInstance = null;
   let tierDonutChartInstance = null;
+  let scenarioCurveChartInstance = null;
   let radarChartInstance = null;
 
   let compareMode = false;
@@ -2966,13 +3253,16 @@
   let matricesViewMode = 'graph';
   let matricesCrosshairLabel = null;
   let radarModalInstance = null;
+  /** @type {object|null} */
+  let metaCache = null;
+  let povertyThresholdPct = 10;
   const LS_AI_KEY = 'ffl_gemini_key';
   const GEMINI_MODEL = 'gemini-2.5-flash';
   /** @type {{role:string, content:string}[]} */
   let aiChatMessages = [];
 
   const AI_SYSTEM =
-    'You are an expert Irish energy policy analyst. You have access to the Fuel Fault Lines dataset — a real-time energy vulnerability model covering all 26 Irish counties built on Zerve AI.\n\nKey facts from the model:\n- 6 counties are Critical risk: Longford (89.8), Donegal (75.5), Leitrim (75.2), Roscommon (73.5), Mayo (72.5), Monaghan (72.2)\n- 11 counties are already in energy poverty at €2.14/litre diesel\n- 490,130 vulnerable households across Ireland\n- €807,636,960 wasted over 10 years paying fuel allowance instead of retrofitting critical county homes\n- Average breakeven for Warmer Homes retrofit: 14.6 years\n- Donegal: 16,070 vulnerable households, cliff price €2.14\n- Longford: highest vulnerability score 89.8, cliff price €2.14\n- Dublin: lowest vulnerability score, cliff price >€3.50\n- Current diesel price: €2.14/litre (April 2026)\n- The Tánaiste called this the worst energy crisis ever (April 5 2026)\n- Data sources: SEAI, CSO Census 2022, AA Ireland, Warmer Homes Scheme\n\nAnswer questions concisely and with specific data. Be direct. Use Irish county names, real numbers from the dataset. When asked to write documents, write them properly formatted. You are advising Irish policymakers.';
+    'You are the in-app assistant for Fuel Fault Lines, answering as Google Gemini via the Generative Language API. You are an expert Irish energy policy analyst. The dashboard uses a county-level energy vulnerability model for Ireland built on Zerve AI.\n\nThe live API may expose /meta (lineage), /model/claims (pass/fail checks), and /model/sensitivity (stress tests). Exact counts change with data pulls and assumption sliders — prefer qualitative patterns unless the user supplied current numbers.\n\nIllustrative snapshot (often true but verify against the app): several counties are Critical tier; rural oil-heavy counties tend to show higher modelled fuel-income stress than Dublin; retrofit paybacks are often long at illustrative grant levels.\n\nData sources: SEAI-style profiles, CSO deprivation (or synthetic fallback), AA Ireland price snapshot.\n\nAnswer concisely. Use Irish county names. Note limitations: synthetic income bands from deprivation, not survey microdata; fuel use is a proxy. When asked to write documents, format them clearly for policymakers.';
 
   function getActivePrice() {
     return compareMode ? priceA : currentPrice;
@@ -3156,9 +3446,9 @@
       byCounty[c] = {
         poverty_pct_a: povertyPct(da),
         poverty_pct_b: povertyPct(db),
-        in_poverty_a: !!da.in_energy_poverty,
-        in_poverty_b: !!db.in_energy_poverty,
-        newly_at_risk: !da.in_energy_poverty && !!db.in_energy_poverty,
+        in_poverty_a: inEnergyPoverty(da),
+        in_poverty_b: inEnergyPoverty(db),
+        newly_at_risk: !inEnergyPoverty(da) && inEnergyPoverty(db),
         households_b: Number(db.est_vulnerable_households) || 0,
         households_a: Number(da.est_vulnerable_households) || 0
       };
@@ -3181,7 +3471,7 @@
       if (!r) return;
       const rowD = countyData[c];
       const aPov =
-        r.in_poverty_a != null ? !!r.in_poverty_a : rowD ? !!rowD.in_energy_poverty : false;
+        r.in_poverty_a != null ? !!r.in_poverty_a : rowD ? inEnergyPoverty(rowD) : false;
       const bPov = !!r.in_poverty_b;
       const newly = r.newly_at_risk || (!aPov && bPov);
       if (newly) {
@@ -3198,7 +3488,9 @@
       pb.toFixed(2) +
       ' puts an additional ' +
       nNew +
-      ' counties into energy poverty, affecting ' +
+      ' counties over the ' +
+      povertyThresholdPct +
+      '% fuel-income line, affecting ' +
       hh.toLocaleString() +
       ' households.';
     el.classList.add('show');
@@ -3237,6 +3529,7 @@
     const pov = povertyPct(d);
     const barCap = 25;
     const barW = Math.min(100, Math.max(0, (pov / barCap) * 100)).toFixed(1);
+    const thrPct = povertyThresholdPct;
     const cliff = d.cliff_price_eur;
     const cliffNum = typeof cliff === 'number' ? cliff : parseFloat(cliff);
     const cliffOk = typeof cliffNum === 'number' && !Number.isNaN(cliffNum);
@@ -3249,7 +3542,7 @@
       '<div class="poverty-bar">' +
       '<div class="row"><span>Fuel as % of income</span>' +
       '<span style="color:' +
-      (d.in_energy_poverty ? COLORS.critical : COLORS.low) +
+      (inEnergyPoverty(d) ? COLORS.critical : COLORS.low) +
       ';font-weight:600">' +
       pov.toFixed(1) +
       '%</span></div>' +
@@ -3258,11 +3551,13 @@
       barW +
       '%"></div>' +
       '<div class="bar-threshold" style="left:' +
-      ((10 / barCap) * 100) +
+      ((thrPct / barCap) * 100) +
       '%"></div></div>' +
       '<p class="bar-note">Scale 0–' +
       barCap +
-      '% · vertical = 10% · scenario €' +
+      '% · vertical = ' +
+      thrPct +
+      '% · scenario €' +
       pl +
       '/L</p></div>' +
       '<div class="metric-row"><span class="k">Cliff price</span>' +
@@ -3285,9 +3580,9 @@
       '</span></div>' +
       '<div class="metric-row"><span class="k">Energy poverty flag</span>' +
       '<span class="v ' +
-      (d.in_energy_poverty ? 'bad' : 'good') +
+      (inEnergyPoverty(d) ? 'bad' : 'good') +
       '">' +
-      (d.in_energy_poverty ? 'Yes' : 'No') +
+      (inEnergyPoverty(d) ? 'Yes' : 'No') +
       '</span></div>' +
       '<div class="note-panel retrofit-panel" style="margin-top:1rem">' +
       '<h3>Warmer Homes (illustrative)</h3>' +
@@ -3456,6 +3751,14 @@
       '<a href="' +
       escapeHtml(tw) +
       '" target="_blank" rel="noopener noreferrer">Share on X</a>' +
+      '</div>' +
+      '<div class="modal-export-row">' +
+      '<button type="button" onclick="window.__fflExportCountyBrief(\'' +
+      String(merged.county || county).replace(/'/g, "\\'") +
+      '\')">Copy markdown brief</button>' +
+      '<button type="button" onclick="window.__fflOpenExportCounty(\'' +
+      String(merged.county || county).replace(/'/g, "\\'") +
+      '\')">Open export URL</button>' +
       '</div></div>';
 
     destroyModalRadar();
@@ -3638,7 +3941,7 @@
       const dep = num(d.fuel_dependency_score);
       const litres = LITRES_PER_HH_PA * (0.5 + (Number.isFinite(dep) ? dep : 0) / 100);
       const pct = (litres * p) / inc * 100;
-      if (pct > 10) n++;
+      if (pct > povertyThresholdPct) n++;
     }
     return n;
   }
@@ -4222,7 +4525,11 @@
       scales.y = {
         stacked: isStacked,
         min: 0,
-        title: { display: true, text: 'Counties over 10%', font: { size: 10 } },
+        title: {
+          display: true,
+          text: 'Counties over ' + povertyThresholdPct + '%',
+          font: { size: 10 }
+        },
         grid: { color: 'rgba(0,0,0,0.06)' },
         ticks: { stepSize: 1, font: { size: 9 } }
       };
@@ -4260,7 +4567,8 @@
     scenarios: 'Scenarios',
     compare: 'Compare',
     counties: 'Counties',
-    ai: 'AI analyst'
+    method: 'Method & lab',
+    ai: 'AI · Gemini'
   };
 
   window.__fflSetPage = function (page) {
@@ -4278,6 +4586,9 @@
     if (titleEl) titleEl.textContent = PAGE_TITLES[appPage] || 'Dashboard';
     if (appPage === 'compare') {
       refreshMatricesChart();
+    }
+    if (appPage === 'method') {
+      refreshMethodPage();
     }
     try {
       localStorage.setItem('ffl_page', appPage);
@@ -4575,6 +4886,50 @@
     clearAppNotice();
   };
 
+  window.__fflOpenExportCounty = function (county) {
+    const price = getActivePrice();
+    const url =
+      API + '/export/county/' + encodeURIComponent(county) + '?fuel_price=' + encodeURIComponent(price);
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  window.__fflExportCountyBrief = async function (county) {
+    const price = getActivePrice();
+    const url =
+      API + '/export/county/' + encodeURIComponent(county) + '?fuel_price=' + encodeURIComponent(price);
+    try {
+      const res = await fetch(url);
+      if (!res.ok) {
+        showAppNotice({
+          severity: 'warn',
+          title: 'Export unavailable',
+          detail: 'GET /export/county failed (HTTP ' + res.status + ').',
+          code: null
+        });
+        return;
+      }
+      const text = await res.text();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        showAppNotice({
+          severity: 'info',
+          title: 'Copied',
+          detail: 'County brief markdown copied to clipboard.',
+          code: null
+        });
+      } else {
+        window.__fflOpenExportCounty(county);
+      }
+    } catch (e) {
+      showAppNotice({
+        severity: 'warn',
+        title: 'Copy failed',
+        detail: String(e && e.message ? e.message : e),
+        code: null
+      });
+    }
+  };
+
   function updateConnectionPill() {
     var pill = document.getElementById('pill-connection');
     if (!pill) return;
@@ -4624,6 +4979,432 @@
     return 0;
   }
 
+  function inEnergyPoverty(d) {
+    return povertyPct(d) > povertyThresholdPct - 1e-9;
+  }
+
+  function updateThresholdLabels() {
+    const th = povertyThresholdPct;
+    const lbl = document.getElementById('stat-poverty-label');
+    if (lbl) lbl.textContent = '>' + th + '%';
+    const cl = document.getElementById('crisis-line-label');
+    if (cl) {
+      cl.textContent =
+        'counties above the ' + th + '% modelled fuel-income share line';
+    }
+    const sub = document.getElementById('card-tr-sub');
+    if (sub) sub.textContent = 'Counties over ' + th + '% fuel share of income';
+  }
+
+  async function fetchApiMeta() {
+    try {
+      const res = await fetch(API + '/meta');
+      if (!res.ok) return null;
+      const j = await res.json();
+      return j && typeof j === 'object' ? j : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function applyMetaToUi(meta) {
+    if (!meta || !meta.params) return;
+    const p = meta.params;
+    if (typeof p.poverty_threshold_pct === 'number' && Number.isFinite(p.poverty_threshold_pct)) {
+      povertyThresholdPct = p.poverty_threshold_pct;
+    }
+    updateThresholdLabels();
+  }
+
+  function populateJudgeScriptOl() {
+    const ol = document.getElementById('method-judge-ol');
+    if (!ol || !metaCache || !Array.isArray(metaCache.demo_script_for_judges)) return;
+    ol.innerHTML = '';
+    for (let i = 0; i < metaCache.demo_script_for_judges.length; i++) {
+      const li = document.createElement('li');
+      li.textContent = metaCache.demo_script_for_judges[i];
+      ol.appendChild(li);
+    }
+  }
+
+  async function refreshThesisBanner() {
+    const el = document.getElementById('thesis-banner');
+    if (!el) return;
+    const price = getActivePrice();
+    try {
+      const res = await fetch(API + '/model/claims?price_eur_l=' + encodeURIComponent(price));
+      if (!res.ok) throw new Error('claims');
+      const j = await res.json();
+      const claims = j.claims || [];
+      const n = claims.length;
+      const passed = claims.filter(function (c) {
+        return c.holds;
+      }).length;
+      const priceLine =
+        'At <strong>€' +
+        price.toFixed(2) +
+        '/L</strong> against a <strong>' +
+        povertyThresholdPct +
+        '%</strong> fuel-income threshold, ';
+      let snapLine = '';
+      try {
+        const rs = await fetch(API + '/national/snapshot?price_eur_l=' + encodeURIComponent(price));
+        if (rs.ok) {
+          const s = await rs.json();
+          if (s && s.counties_over_threshold != null) {
+            snapLine =
+              '<br><span style="opacity:0.92">' +
+              '<strong>' +
+              s.counties_over_threshold +
+              '</strong> of <strong>' +
+              (s.total_counties != null ? s.total_counties : 26) +
+              '</strong> counties over the line · <strong>' +
+              (s.critical_tier_counties != null ? s.critical_tier_counties : '—') +
+              '</strong> Critical tier · mean fuel share <strong>' +
+              (s.mean_fuel_share_pct != null ? s.mean_fuel_share_pct : '—') +
+              '%</strong>.</span>';
+          }
+        }
+      } catch (eSnap) {}
+      el.innerHTML =
+        priceLine +
+        '<strong>' +
+        passed +
+        '/' +
+        n +
+        '</strong> registered model claims pass (see Method &amp; lab). ' +
+        snapLine +
+        ' <span style="opacity:0.88">Illustrative model — synthetic income bands, not survey microdata.</span>';
+    } catch (e) {
+      el.innerHTML =
+        'Model compares county-level SEAI energy profiles with CSO deprivation and a liquid-fuel proxy. ' +
+        'Open <strong>Method &amp; lab</strong> when the API exposes <code>/meta</code> and <code>/model/claims</code> for full lineage.';
+    }
+  }
+
+  function fillCompareCountySelects() {
+    const a = document.getElementById('compare-county-a');
+    const b = document.getElementById('compare-county-b');
+    if (!a || !b) return;
+    const opts = COUNTIES.slice();
+    function fill(sel, preferred) {
+      const cur = sel.value;
+      sel.innerHTML = '';
+      for (let i = 0; i < opts.length; i++) {
+        const o = document.createElement('option');
+        o.value = opts[i];
+        o.textContent = opts[i];
+        sel.appendChild(o);
+      }
+      if (opts.indexOf(cur) >= 0) sel.value = cur;
+      else if (preferred && opts.indexOf(preferred) >= 0) sel.value = preferred;
+    }
+    fill(a, 'Longford');
+    fill(b, 'Dublin');
+    if (a.value === b.value && opts.length > 1) b.value = opts[1];
+  }
+
+  window.__fflRunCountyCompare = async function () {
+    const sa = document.getElementById('compare-county-a');
+    const sb = document.getElementById('compare-county-b');
+    const out = document.getElementById('compare-two-out');
+    const tk = document.getElementById('compare-two-takeaway');
+    if (!sa || !sb || !out) return;
+    const ca = sa.value;
+    const cb = sb.value;
+    const price = getActivePrice();
+    try {
+      const res = await fetch(
+        API +
+          '/compare/counties?county_a=' +
+          encodeURIComponent(ca) +
+          '&county_b=' +
+          encodeURIComponent(cb) +
+          '&fuel_price=' +
+          encodeURIComponent(price)
+      );
+      if (!res.ok) {
+        out.textContent = 'Compare endpoint not available (HTTP ' + res.status + '). Deploy latest API.';
+        if (tk) tk.style.display = 'none';
+        return;
+      }
+      const j = await res.json();
+      out.textContent = JSON.stringify(j.delta_a_minus_b || j, null, 2);
+      if (tk && j.takeaway) {
+        tk.style.display = 'block';
+        tk.textContent = j.takeaway;
+      }
+    } catch (e) {
+      out.textContent = String(e && e.message ? e.message : e);
+      if (tk) tk.style.display = 'none';
+    }
+  };
+
+  async function refreshMethodPage() {
+    if (appPage !== 'method') return;
+    const preMeta = document.getElementById('method-meta-pre');
+    const preNat = document.getElementById('method-national-pre');
+    const preVal = document.getElementById('method-validation-pre');
+    const preDist = document.getElementById('method-distribution-pre');
+    const preBr = document.getElementById('method-breach-pre');
+    const preReg = document.getElementById('method-regional-pre');
+    const preNar = document.getElementById('method-narrative-pre');
+    const preCurve = document.getElementById('method-scenario-curve-pre');
+    const preRank = document.getElementById('method-ranking-pre');
+    const oaLink = document.getElementById('method-openapi-link');
+    const preC = document.getElementById('method-claims-pre');
+    const preS = document.getElementById('method-sensitivity-pre');
+    const preP = document.getElementById('method-policy-pre');
+    const lin = document.getElementById('method-lineage-p');
+    populateJudgeScriptOl();
+    if (oaLink) oaLink.href = API + '/docs';
+    if (preMeta) {
+      if (metaCache) preMeta.textContent = JSON.stringify(metaCache, null, 2);
+      else preMeta.textContent = '(no /meta yet)';
+    }
+    if (lin && metaCache && metaCache.data_lineage) {
+      lin.textContent =
+        'SEAI: ' +
+        metaCache.data_lineage.seai +
+        ' · CSO deprivation: ' +
+        metaCache.data_lineage.cso_deprivation +
+        '. ' +
+        (metaCache.limitations || '');
+    }
+    if (metaCache && metaCache.params) {
+      const p = metaCache.params;
+      const l1 = document.getElementById('lab-litres');
+      const l2 = document.getElementById('lab-threshold');
+      const w1 = document.getElementById('lab-w-fuel');
+      const w2 = document.getElementById('lab-w-social');
+      const hdd = document.getElementById('lab-hdd');
+      if (l1 && p.litres_per_hh_pa != null) l1.value = String(p.litres_per_hh_pa);
+      if (l2 && p.poverty_threshold_pct != null) l2.value = String(p.poverty_threshold_pct);
+      if (w1 && p.weights && p.weights.fuel_dependency_score != null) {
+        w1.value = String(p.weights.fuel_dependency_score);
+      }
+      if (w2 && p.weights && p.weights.social_deprivation_score != null) {
+        w2.value = String(p.weights.social_deprivation_score);
+      }
+      if (hdd && p.use_hdd_adjustment != null) hdd.checked = !!p.use_hdd_adjustment;
+    }
+    const price = getActivePrice();
+    if (preNat) {
+      try {
+        const r = await fetch(API + '/national/snapshot?price_eur_l=' + encodeURIComponent(price));
+        preNat.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+      } catch (e) {
+        preNat.textContent = String(e);
+      }
+    }
+    if (preVal) {
+      try {
+        const r = await fetch(API + '/model/validation?price_eur_l=' + encodeURIComponent(price));
+        preVal.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+      } catch (e) {
+        preVal.textContent = String(e);
+      }
+    }
+    if (preDist) {
+      try {
+        const r = await fetch(API + '/model/distribution?price_eur_l=' + encodeURIComponent(price));
+        preDist.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+      } catch (e) {
+        preDist.textContent = String(e);
+      }
+    }
+    if (preBr) {
+      try {
+        const r = await fetch(
+          API + '/model/breach-prices?reference_price_eur_l=' + encodeURIComponent(price)
+        );
+        preBr.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+      } catch (e) {
+        preBr.textContent = String(e);
+      }
+    }
+    if (preReg) {
+      try {
+        const r = await fetch(API + '/insights/regional?fuel_price=' + encodeURIComponent(price));
+        preReg.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+      } catch (e) {
+        preReg.textContent = String(e);
+      }
+    }
+    if (preNar) {
+      try {
+        const r = await fetch(API + '/insights/narrative?price_eur_l=' + encodeURIComponent(price));
+        if (r.ok) {
+          const j = await r.json();
+          const bullets = j.bullets || [];
+          const pitch = j.elevator_pitch || '';
+          preNar.textContent =
+            bullets.map(function (b, i) {
+              return i + 1 + '. ' + b;
+            }).join('\n') + (pitch ? '\n\nElevator: ' + pitch : '');
+        } else preNar.textContent = 'HTTP ' + r.status;
+      } catch (e) {
+        preNar.textContent = String(e);
+      }
+    }
+    if (preCurve) {
+      try {
+        const lo = Math.max(0.5, price - 0.85);
+        const hi = Math.min(8, price + 0.85);
+        const r = await fetch(
+          API +
+            '/model/scenario-curve?price_min=' +
+            encodeURIComponent(lo) +
+            '&price_max=' +
+            encodeURIComponent(hi) +
+            '&steps=24'
+        );
+        preCurve.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+      } catch (e) {
+        preCurve.textContent = String(e);
+      }
+    }
+    if (preRank) {
+      try {
+        const r = await fetch(API + '/model/ranking-stability?top_k=10');
+        preRank.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+      } catch (e) {
+        preRank.textContent = String(e);
+      }
+    }
+    if (preC) {
+      try {
+        const r = await fetch(API + '/model/claims?price_eur_l=' + encodeURIComponent(price));
+        preC.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+      } catch (e) {
+        preC.textContent = String(e);
+      }
+    }
+    if (preS) {
+      try {
+        const r = await fetch(API + '/model/sensitivity');
+        preS.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+      } catch (e) {
+        preS.textContent = String(e);
+      }
+    }
+    if (preP) {
+      try {
+        const r = await fetch(API + '/model/policy');
+        preP.textContent = r.ok ? JSON.stringify(await r.json(), null, 2) : 'HTTP ' + r.status;
+      } catch (e) {
+        preP.textContent = String(e);
+      }
+    }
+  }
+
+  window.__fflOpenNationalBriefing = function () {
+    const price = getActivePrice();
+    const url =
+      API + '/export/briefing?price_eur_l=' + encodeURIComponent(price);
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  window.__fflCopyNationalBriefing = async function () {
+    const price = getActivePrice();
+    const url =
+      API + '/export/briefing?price_eur_l=' + encodeURIComponent(price);
+    try {
+      const res = await fetch(url);
+      if (!res.ok) {
+        showAppNotice({
+          severity: 'warn',
+          title: 'Briefing unavailable',
+          detail: 'HTTP ' + res.status,
+          code: null
+        });
+        return;
+      }
+      const text = await res.text();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        showAppNotice({
+          severity: 'info',
+          title: 'Copied',
+          detail: 'National briefing markdown is on the clipboard.',
+          code: null
+        });
+      } else {
+        window.__fflOpenNationalBriefing();
+      }
+    } catch (e) {
+      showAppNotice({
+        severity: 'warn',
+        title: 'Copy failed',
+        detail: String(e && e.message ? e.message : e),
+        code: null
+      });
+    }
+  };
+
+  window.__fflApplyModelLab = async function () {
+    const st = document.getElementById('lab-status');
+    const litres = parseFloat((document.getElementById('lab-litres') || {}).value);
+    const thr = parseFloat((document.getElementById('lab-threshold') || {}).value);
+    const wf = parseFloat((document.getElementById('lab-w-fuel') || {}).value);
+    const ws = parseFloat((document.getElementById('lab-w-social') || {}).value);
+    const hddEl = document.getElementById('lab-hdd');
+    const useHdd = hddEl ? hddEl.checked : true;
+    if (wf + ws >= 0.98) {
+      if (st) st.textContent = 'Fuel + social weights must leave room for building & energy.';
+      return;
+    }
+    const rem = 1 - wf - ws;
+    const defB = 0.25 / (0.25 + 0.15);
+    const defE = 0.15 / (0.25 + 0.15);
+    const wb = Math.round(rem * defB * 100) / 100;
+    const we = Math.round((rem - wb) * 100) / 100;
+    const weights = {
+      fuel_dependency_score: wf,
+      social_deprivation_score: ws,
+      building_inefficiency_score: wb,
+      energy_intensity_score: we
+    };
+    const sum =
+      weights.fuel_dependency_score +
+      weights.social_deprivation_score +
+      weights.building_inefficiency_score +
+      weights.energy_intensity_score;
+    if (Math.abs(sum - 1) > 0.02) {
+      if (st) st.textContent = 'Weights did not normalize; check inputs.';
+      return;
+    }
+    if (st) st.textContent = 'Applying…';
+    try {
+      const res = await fetch(API + '/model/params', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          litres_per_hh_pa: litres,
+          poverty_threshold_pct: thr,
+          weights: weights,
+          use_hdd_adjustment: useHdd
+        })
+      });
+      const j = await res.json().catch(function () {
+        return {};
+      });
+      if (!res.ok) {
+        if (st) st.textContent = (j.detail && String(j.detail)) || 'HTTP ' + res.status;
+        return;
+      }
+      metaCache = j.meta || metaCache;
+      applyMetaToUi(metaCache);
+      if (st) st.textContent = 'OK — reloading counties…';
+      await runLoad(false);
+      await refreshThesisBanner();
+      await refreshMethodPage();
+      if (st) st.textContent = 'Done.';
+    } catch (e) {
+      if (st) st.textContent = 'Lab needs POST /model/params on the API.';
+    }
+  };
+
   function tierColor(d) {
     return COLORS[getTierClass(d)] || COLORS.low;
   }
@@ -4636,6 +5417,112 @@
   }
 
   const TIER_ORDER = ['Critical', 'High', 'Medium', 'Low'];
+
+  async function renderScenarioCurveChart() {
+    const canvas = document.getElementById('chart-scenario-curve');
+    const pill = document.getElementById('curve-pill-range');
+    if (!canvas || typeof Chart === 'undefined') return;
+    const price = getActivePrice();
+    const lo = Math.max(0.5, Math.min(price - 0.85, 3.2));
+    const hi = Math.min(8, Math.max(price + 0.85, lo + 0.5));
+    if (pill) pill.textContent = '€' + lo.toFixed(2) + '–€' + hi.toFixed(2) + '/L';
+    let pts = [];
+    try {
+      const res = await fetch(
+        API +
+          '/model/scenario-curve?price_min=' +
+          encodeURIComponent(lo) +
+          '&price_max=' +
+          encodeURIComponent(hi) +
+          '&steps=28'
+      );
+      if (res.ok) {
+        const j = await res.json();
+        pts = j.points || [];
+      }
+    } catch (eC) {}
+    if (!pts.length) return;
+
+    const labels = pts.map(function (p) {
+      return p.price_eur_l != null ? p.price_eur_l.toFixed(2) : '';
+    });
+    const counts = pts.map(function (p) {
+      return p.counties_over_threshold != null ? p.counties_over_threshold : 0;
+    });
+    const means = pts.map(function (p) {
+      return p.mean_fuel_share_pct != null ? p.mean_fuel_share_pct : null;
+    });
+
+    if (scenarioCurveChartInstance) {
+      scenarioCurveChartInstance.destroy();
+      scenarioCurveChartInstance = null;
+    }
+    const thrLine = povertyThresholdPct;
+    scenarioCurveChartInstance = new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Counties > ' + thrLine + '% line',
+            data: counts,
+            borderColor: '#0d9488',
+            backgroundColor: 'rgba(13, 148, 136, 0.12)',
+            fill: true,
+            tension: 0.25,
+            yAxisID: 'y',
+            pointRadius: 0,
+            borderWidth: 2
+          },
+          {
+            label: 'Mean fuel share %',
+            data: means,
+            borderColor: '#7c3aed',
+            backgroundColor: 'transparent',
+            fill: false,
+            tension: 0.25,
+            yAxisID: 'y1',
+            pointRadius: 0,
+            borderWidth: 1.5
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: { boxWidth: 10, font: { size: 10 }, color: '#334155' }
+          }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: '€/L', font: { size: 10 } },
+            ticks: { maxTicksLimit: 8, font: { size: 9 } },
+            grid: { color: 'rgba(0,0,0,0.06)' }
+          },
+          y: {
+            type: 'linear',
+            position: 'left',
+            min: 0,
+            max: 26,
+            title: { display: true, text: 'Counties', font: { size: 10 } },
+            ticks: { stepSize: 2, font: { size: 9 } },
+            grid: { color: 'rgba(0,0,0,0.06)' }
+          },
+          y1: {
+            type: 'linear',
+            position: 'right',
+            title: { display: true, text: 'Mean %', font: { size: 10 } },
+            grid: { drawOnChartArea: false },
+            ticks: { font: { size: 9 } }
+          }
+        }
+      }
+    });
+  }
 
   function updateDashboardCharts() {
     if (typeof Chart === 'undefined') return;
@@ -4881,12 +5768,13 @@
     }
 
     if (historyCache) renderStressAreaChart(historyCache);
+    renderScenarioCurveChart();
   }
 
   function updateStats() {
     const vals = COUNTIES.map((c) => countyData[c]).filter(Boolean);
     const critical = vals.filter((d) => d.risk_tier === 'Critical').length;
-    const inPoverty = vals.filter((d) => d.in_energy_poverty).length;
+    const inPoverty = vals.filter((d) => inEnergyPoverty(d)).length;
     const vulnHh = vals.reduce(function (s, d) {
       return s + (Number(d.est_vulnerable_households) || 0);
     }, 0);
@@ -4916,7 +5804,7 @@
 
     const alert = document.getElementById('crisis-alert');
     const households = vals
-      .filter((d) => d.in_energy_poverty)
+      .filter((d) => inEnergyPoverty(d))
       .reduce((s, d) => s + (Number(d.est_vulnerable_households) || 0), 0);
 
     if (inPoverty > 0 && alert) {
@@ -4982,7 +5870,7 @@
           const inB =
             sc && sc.in_poverty_b != null ? !!sc.in_poverty_b : false;
           const inA =
-            sc && sc.in_poverty_a != null ? !!sc.in_poverty_a : !!d.in_energy_poverty;
+            sc && sc.in_poverty_a != null ? !!sc.in_poverty_a : inEnergyPoverty(d);
           const newRisk =
             sc && (sc.newly_at_risk || (!inA && inB));
           const pbStr = pb != null && !Number.isNaN(pb) ? pb.toFixed(1) : '—';
@@ -5023,7 +5911,7 @@
         }
 
         const pov = povertyPct(d);
-        const pctClass = d.in_energy_poverty ? ' cr-pct--bad' : '';
+        const pctClass = inEnergyPoverty(d) ? ' cr-pct--bad' : '';
         return (
           '<button type="button" class="' +
           rowCls +
@@ -5312,6 +6200,8 @@
       updateStats();
       renderGrid();
       updateDashboardCharts();
+      fillCompareCountySelects();
+      refreshThesisBanner();
       if (isInitial) {
         ensureHistoryStressRendered()
           .then(function () {
@@ -5626,6 +6516,9 @@
   updateConnectionPill();
   (async function boot() {
     await fetchCountiesList();
+    metaCache = await fetchApiMeta();
+    applyMetaToUi(metaCache);
+    populateJudgeScriptOl();
     runLoad(true);
   })();
 })();
