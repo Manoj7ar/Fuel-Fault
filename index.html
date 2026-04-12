@@ -1170,6 +1170,112 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* Subtle data entrance (respect reduced motion below) */
+    @keyframes ffl-row-in {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes ffl-bubble-in {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.94);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+    @keyframes ffl-legend-in {
+      from { opacity: 0; transform: translateX(-4px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes ffl-stat-in {
+      from { opacity: 0.35; transform: translateY(3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .county-row:not(.error) {
+      opacity: 0;
+      animation: ffl-row-in 0.34s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      animation-delay: calc(var(--row-i, 0) * 12ms);
+    }
+    .county-row.error {
+      opacity: 0;
+      animation: ffl-row-in 0.28s ease forwards;
+      animation-delay: calc(var(--row-i, 0) * 8ms);
+    }
+
+    .cr-bar span {
+      transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .overview-legend-row {
+      opacity: 0;
+      animation: ffl-legend-in 0.38s ease forwards;
+      animation-delay: calc(var(--leg-i, 0) * 45ms);
+    }
+
+    .bubble-node {
+      opacity: 0;
+      animation: ffl-bubble-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      animation-delay: var(--bubble-delay, 0ms);
+    }
+
+    .donut-center-pill {
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+    }
+    @keyframes ffl-pill-pop {
+      0% { transform: translate(-50%, -50%) scale(0.94); }
+      65% { transform: translate(-50%, -50%) scale(1.05); }
+      100% { transform: translate(-50%, -50%) scale(1); }
+    }
+    .donut-center-pill.ffl-pill-flash {
+      animation: ffl-pill-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .stat-strip--anim:not(.dash-metrics-strip--empty) .stat-chip {
+      animation: ffl-stat-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+    .stat-strip--anim:not(.dash-metrics-strip--empty) .stat-chip:nth-child(1) { animation-delay: 0ms; }
+    .stat-strip--anim:not(.dash-metrics-strip--empty) .stat-chip:nth-child(2) { animation-delay: 45ms; }
+    .stat-strip--anim:not(.dash-metrics-strip--empty) .stat-chip:nth-child(3) { animation-delay: 90ms; }
+    .stat-strip--anim:not(.dash-metrics-strip--empty) .stat-chip:nth-child(4) { animation-delay: 135ms; }
+    .stat-strip--anim:not(.dash-metrics-strip--empty) .stat-chip:nth-child(5) { animation-delay: 180ms; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .county-row,
+      .county-row.error {
+        animation: none;
+        opacity: 1;
+      }
+      .overview-legend-row {
+        animation: none;
+        opacity: 1;
+      }
+      .stat-strip--anim .stat-chip {
+        animation: none;
+      }
+      .bubble-node {
+        animation: none;
+        opacity: 1;
+      }
+      .cr-bar span {
+        transition: none;
+      }
+      .donut-center-pill {
+        transition: none;
+      }
+      .donut-center-pill.ffl-pill-flash {
+        animation: none;
+      }
+    }
+
     .load-overlay {
       position: fixed;
       inset: 0;
@@ -2989,7 +3095,7 @@
             <h1>At a glance</h1>
             <p class="dash-tagline">Twenty-six counties · same model, one price point — numbers refresh when you move the slider on Scenarios.</p>
           </div>
-          <div class="dash-metrics-strip stat-strip" id="stat-strip" aria-live="polite">
+          <div class="dash-metrics-strip stat-strip stat-strip--anim" id="stat-strip" aria-live="polite">
             <span class="stat-chip">
               <strong id="stat-critical">—</strong>
               <span class="stat-chip-label">Critical tier</span>
@@ -3639,6 +3745,45 @@
       Chart.register(window['chartjs-plugin-annotation']);
     }
   } catch (regErr) {}
+
+  function __fflPrefersReducedMotion() {
+    return typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  /** Shared Chart.js motion: subtle number morph on updates, disabled when reduced-motion. */
+  function __fflChartMotionOverrides() {
+    if (__fflPrefersReducedMotion()) {
+      return {
+        animation: { duration: 0 },
+        animations: {
+          colors: { duration: 0 },
+          numbers: { duration: 0 }
+        },
+        transitions: {
+          active: { animation: { duration: 0 } },
+          show: { animation: { duration: 0 } },
+          hide: { animation: { duration: 0 } }
+        }
+      };
+    }
+    return {
+      animation: { duration: 720, easing: 'easeOutQuart' },
+      animations: {
+        colors: { type: 'color', duration: 480, easing: 'easeOutQuart' },
+        numbers: {
+          type: 'number',
+          properties: ['x', 'y', 'start', 'end', 'width', 'height', 'innerRadius', 'outerRadius', 'circumference'],
+          duration: 620,
+          easing: 'easeOutQuart'
+        }
+      },
+      transitions: {
+        active: { animation: { duration: 560, easing: 'easeOutQuart' } },
+        show: { animation: { duration: 380, easing: 'easeOutQuart' } },
+        hide: { animation: { duration: 220, easing: 'easeInQuad' } }
+      }
+    };
+  }
 
   var API_PUBLIC = (
     typeof window.__FFL_API_BASE__ === 'string' && window.__FFL_API_BASE__.trim()
@@ -4325,24 +4470,27 @@
             }
           ]
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            r: {
-              min: 0,
-              max: 100,
-              angleLines: { color: 'rgba(124, 58, 237, 0.12)' },
-              grid: { color: 'rgba(124, 58, 237, 0.08)' },
-              pointLabels: {
-                color: '#3f3a4d',
-                font: { family: CHART_FONT, size: 9 }
-              },
-              ticks: { display: false, stepSize: 25 }
-            }
+        options: Object.assign(
+          {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              r: {
+                min: 0,
+                max: 100,
+                angleLines: { color: 'rgba(124, 58, 237, 0.12)' },
+                grid: { color: 'rgba(124, 58, 237, 0.08)' },
+                pointLabels: {
+                  color: '#3f3a4d',
+                  font: { family: CHART_FONT, size: 9 }
+                },
+                ticks: { display: false, stepSize: 25 }
+              }
+            },
+            plugins: { legend: { display: false } }
           },
-          plugins: { legend: { display: false } }
-        }
+          __fflChartMotionOverrides()
+        )
       });
     }
 
@@ -4618,48 +4766,50 @@
           }
         ]
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: { duration: 700, easing: 'easeOutQuart' },
-        interaction: { mode: 'index', intersect: false },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: function (ctx) {
-                const v = ctx.raw;
-                if (v == null) return '';
-                return ctx.dataset.label + ': ' + v + ' counties';
+      options: Object.assign(
+        {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function (ctx) {
+                  const v = ctx.raw;
+                  if (v == null) return '';
+                  return ctx.dataset.label + ': ' + v + ' counties';
+                }
               }
+            },
+            annotation: Object.keys(ann).length ? { annotations: ann } : undefined
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(124, 58, 237, 0.06)', drawBorder: false },
+              ticks: {
+                color: '#6b6578',
+                maxRotation: 0,
+                maxTicksLimit: 6,
+                font: { size: 8, family: CHART_FONT }
+              },
+              border: { display: false }
+            },
+            y: {
+              min: 0,
+              max: yCeil,
+              grid: { color: 'rgba(124, 58, 237, 0.08)', drawBorder: false },
+              ticks: {
+                color: '#6b6578',
+                stepSize: 1,
+                font: { size: 9, family: CHART_FONT }
+              },
+              border: { display: false }
             }
-          },
-          annotation: Object.keys(ann).length ? { annotations: ann } : undefined
-        },
-        scales: {
-          x: {
-            grid: { color: 'rgba(124, 58, 237, 0.06)', drawBorder: false },
-            ticks: {
-              color: '#6b6578',
-              maxRotation: 0,
-              maxTicksLimit: 6,
-              font: { size: 8, family: CHART_FONT }
-            },
-            border: { display: false }
-          },
-          y: {
-            min: 0,
-            max: yCeil,
-            grid: { color: 'rgba(124, 58, 237, 0.08)', drawBorder: false },
-            ticks: {
-              color: '#6b6578',
-              stepSize: 1,
-              font: { size: 9, family: CHART_FONT }
-            },
-            border: { display: false }
           }
-        }
-      }
+        },
+        __fflChartMotionOverrides()
+      )
     });
   }
 
@@ -5085,14 +5235,16 @@
     matricesChartInstance = new Chart(canvas.getContext('2d'), {
       type: matricesChartType === 'bar' ? 'bar' : 'line',
       data: { labels: labels, datasets: datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: { duration: 520 },
-        interaction: { mode: 'index', intersect: false },
-        plugins: plugins,
-        scales: scales
-      }
+      options: Object.assign(
+        {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: plugins,
+          scales: scales
+        },
+        __fflChartMotionOverrides()
+      )
     });
 
     attachMatricesChartHover(matricesChartInstance);
@@ -6636,40 +6788,43 @@
           }
         ]
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        plugins: {
-          legend: {
-            position: 'top',
-            labels: { boxWidth: 10, font: { size: 10 }, color: '#334155' }
+      options: Object.assign(
+        {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: { boxWidth: 10, font: { size: 10 }, color: '#334155' }
+            }
+          },
+          scales: {
+            x: {
+              title: { display: true, text: '€/L', font: { size: 10 } },
+              ticks: { maxTicksLimit: 8, font: { size: 9 } },
+              grid: { color: 'rgba(0,0,0,0.06)' }
+            },
+            y: {
+              type: 'linear',
+              position: 'left',
+              min: 0,
+              max: 26,
+              title: { display: true, text: 'Counties', font: { size: 10 } },
+              ticks: { stepSize: 2, font: { size: 9 } },
+              grid: { color: 'rgba(0,0,0,0.06)' }
+            },
+            y1: {
+              type: 'linear',
+              position: 'right',
+              title: { display: true, text: 'Mean %', font: { size: 10 } },
+              grid: { drawOnChartArea: false },
+              ticks: { font: { size: 9 } }
+            }
           }
         },
-        scales: {
-          x: {
-            title: { display: true, text: '€/L', font: { size: 10 } },
-            ticks: { maxTicksLimit: 8, font: { size: 9 } },
-            grid: { color: 'rgba(0,0,0,0.06)' }
-          },
-          y: {
-            type: 'linear',
-            position: 'left',
-            min: 0,
-            max: 26,
-            title: { display: true, text: 'Counties', font: { size: 10 } },
-            ticks: { stepSize: 2, font: { size: 9 } },
-            grid: { color: 'rgba(0,0,0,0.06)' }
-          },
-          y1: {
-            type: 'linear',
-            position: 'right',
-            title: { display: true, text: 'Mean %', font: { size: 10 } },
-            grid: { drawOnChartArea: false },
-            ticks: { font: { size: 9 } }
-          }
-        }
-      }
+        __fflChartMotionOverrides()
+      )
     });
   }
 
@@ -6737,36 +6892,38 @@
               }
             ]
           },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: { duration: 650, easing: 'easeOutQuart' },
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                callbacks: {
-                  afterLabel: function (ctx) {
-                    const t = tierLabels[ctx.dataIndex];
-                    return counts[t] ? t + ' · n=' + counts[t] : '';
+          options: Object.assign(
+            {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  callbacks: {
+                    afterLabel: function (ctx) {
+                      const t = tierLabels[ctx.dataIndex];
+                      return counts[t] ? t + ' · n=' + counts[t] : '';
+                    }
                   }
+                }
+              },
+              scales: {
+                x: {
+                  grid: { display: false },
+                  ticks: { color: '#3f3a4d', font: { family: CHART_FONT, size: 10, weight: '600' } },
+                  border: { display: false }
+                },
+                y: {
+                  min: 0,
+                  max: 100,
+                  grid: { color: 'rgba(124, 58, 237, 0.08)' },
+                  ticks: { color: '#6b6578', font: { family: CHART_FONT, size: 9 } },
+                  border: { display: false }
                 }
               }
             },
-            scales: {
-              x: {
-                grid: { display: false },
-                ticks: { color: '#3f3a4d', font: { family: CHART_FONT, size: 10, weight: '600' } },
-                border: { display: false }
-              },
-              y: {
-                min: 0,
-                max: 100,
-                grid: { color: 'rgba(124, 58, 237, 0.08)' },
-                ticks: { color: '#6b6578', font: { family: CHART_FONT, size: 9 } },
-                border: { display: false }
-              }
-            }
-          }
+            __fflChartMotionOverrides()
+          )
         });
       }
     }
@@ -6787,7 +6944,9 @@
           const fake = { risk_tier: t };
           const col = COLORS[getTierClass(fake)];
           return (
-            '<div class="overview-legend-row"><i style="background:' +
+            '<div class="overview-legend-row" style="--leg-i:' +
+            idx +
+            '"><i style="background:' +
             col +
             '"></i><span>' +
             escapeHtml(t) +
@@ -6808,7 +6967,20 @@
         tierLabels[largestIdx] + ' · ' + donutCounts[largestIdx] + ' counties';
     }
     const donutPill = document.getElementById('donut-center-pill');
-    if (donutPill) donutPill.textContent = String(donutCounts[largestIdx] || 0);
+    if (donutPill) {
+      const nextPill = String(donutCounts[largestIdx] || 0);
+      if (donutPill.textContent !== nextPill) {
+        donutPill.textContent = nextPill;
+        if (!__fflPrefersReducedMotion()) {
+          donutPill.classList.remove('ffl-pill-flash');
+          void donutPill.offsetWidth;
+          donutPill.classList.add('ffl-pill-flash');
+          setTimeout(function () {
+            donutPill.classList.remove('ffl-pill-flash');
+          }, 520);
+        }
+      }
+    }
 
     if (donutCanvas) {
       const donutColors = tierLabels.map(function (t) {
@@ -6820,6 +6992,12 @@
         tierDonutChartInstance.data.datasets[0].backgroundColor = donutColors;
         tierDonutChartInstance.update('active');
       } else {
+        var donutMotion = __fflChartMotionOverrides();
+        if (!__fflPrefersReducedMotion()) {
+          donutMotion.animation = Object.assign({}, donutMotion.animation || {}, {
+            animateRotate: true
+          });
+        }
         tierDonutChartInstance = new Chart(donutCanvas.getContext('2d'), {
           type: 'doughnut',
           data: {
@@ -6836,25 +7014,27 @@
               }
             ]
           },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '62%',
-            animation: { animateRotate: true, duration: 900 },
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                callbacks: {
-                  label: function (ctx) {
-                    const n = ctx.raw;
-                    const pct =
-                      totalCounties > 0 ? ((n / totalCounties) * 100).toFixed(0) : '0';
-                    return ctx.label + ': ' + n + ' (' + pct + '%)';
+          options: Object.assign(
+            {
+              responsive: true,
+              maintainAspectRatio: false,
+              cutout: '62%',
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  callbacks: {
+                    label: function (ctx) {
+                      const n = ctx.raw;
+                      const pct =
+                        totalCounties > 0 ? ((n / totalCounties) * 100).toFixed(0) : '0';
+                      return ctx.label + ': ' + n + ' (' + pct + '%)';
+                    }
                   }
                 }
               }
-            }
-          }
+            },
+            donutMotion
+          )
         });
       }
     }
@@ -6901,6 +7081,7 @@
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'bubble-node';
+        btn.style.setProperty('--bubble-delay', idx * 42 + 'ms');
         btn.style.left = x + '%';
         btn.style.top = y + '%';
         btn.style.width = w + 'px';
@@ -6950,6 +7131,11 @@
     const strip = document.getElementById('stat-strip');
     if (strip) {
       strip.classList.toggle('dash-metrics-strip--empty', vals.length === 0);
+      if (vals.length > 0 && !__fflPrefersReducedMotion()) {
+        strip.classList.remove('stat-strip--anim');
+        void strip.offsetWidth;
+        strip.classList.add('stat-strip--anim');
+      }
     }
 
     const elC = document.getElementById('stat-critical');
@@ -7009,14 +7195,17 @@
     const cmp = compareMode && scenarioCompared && scenarioByCounty;
 
     grid.innerHTML = sorted
-      .map(function (county) {
+      .map(function (county, rowIdx) {
         const d = countyData[county];
+        const rowSt = ' style="--row-i:' + rowIdx + '"';
         if (d == null) {
           const errCls = cmp ? ' county-row compare error' : ' county-row error';
           return (
             '<button type="button" class="' +
             errCls.trim() +
-            '" title="Retry"' +
+            '"' +
+            rowSt +
+            ' title="Retry"' +
             ' onclick="window.__fflRetryCounty(\'' +
             county.replace(/'/g, "\\'") +
             '\')">' +
@@ -7052,7 +7241,9 @@
           return (
             '<button type="button" class="' +
             rowCls +
-            '" onclick="window.__fflSelectCounty(\'' +
+            '"' +
+            rowSt +
+            ' onclick="window.__fflSelectCounty(\'' +
             county.replace(/'/g, "\\'") +
             '\')">' +
             '<span class="cr-name">' +
@@ -7087,7 +7278,9 @@
         return (
           '<button type="button" class="' +
           rowCls +
-          '" onclick="window.__fflSelectCounty(\'' +
+          '"' +
+          rowSt +
+          ' onclick="window.__fflSelectCounty(\'' +
           county.replace(/'/g, "\\'") +
           '\')">' +
           '<span class="cr-name">' +
@@ -7160,24 +7353,27 @@
           pointRadius: 3
         }]
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          r: {
-            min: 0,
-            max: 100,
-            angleLines: { color: 'rgba(124, 58, 237, 0.12)' },
-            grid: { color: 'rgba(124, 58, 237, 0.08)' },
-            pointLabels: {
-              color: '#3f3a4d',
-              font: { family: CHART_FONT, size: 9 }
-            },
-            ticks: { display: false, stepSize: 25 }
-          }
+      options: Object.assign(
+        {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              min: 0,
+              max: 100,
+              angleLines: { color: 'rgba(124, 58, 237, 0.12)' },
+              grid: { color: 'rgba(124, 58, 237, 0.08)' },
+              pointLabels: {
+                color: '#3f3a4d',
+                font: { family: CHART_FONT, size: 9 }
+              },
+              ticks: { display: false, stepSize: 25 }
+            }
+          },
+          plugins: { legend: { display: false } }
         },
-        plugins: { legend: { display: false } }
-      }
+        __fflChartMotionOverrides()
+      )
     });
   }
 
