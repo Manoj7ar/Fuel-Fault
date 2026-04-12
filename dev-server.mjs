@@ -14,7 +14,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
-const UPSTREAM_HOST = process.env.UPSTREAM_HOST || 'fuel.hub.zerve.cloud';
+const UPSTREAM_HOST = process.env.UPSTREAM_HOST || 'fuel-ireland.hub.zerve.cloud';
 const PORT = Number(process.env.PORT) || 5500;
 const LISTEN_HOST = process.env.HOST || '0.0.0.0';
 

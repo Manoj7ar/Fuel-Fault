@@ -3496,7 +3496,7 @@
   var API_PUBLIC = (
     typeof window.__FFL_API_BASE__ === 'string' && window.__FFL_API_BASE__.trim()
       ? window.__FFL_API_BASE__.trim()
-      : 'https://fuel.hub.zerve.cloud'
+      : 'https://fuel-ireland.hub.zerve.cloud'
   )
     .replace(/\/+$/, '')
     .replace(/\/api$/i, '')
@@ -3571,7 +3571,9 @@
 
   async function fetchCountiesList() {
     try {
-      const res = await fetch(API + '/counties');
+      const res = await fetch(
+        API + '/counties?fuel_price=' + encodeURIComponent(currentPrice)
+      );
       if (!res.ok) return false;
       let j;
       try {
@@ -3623,6 +3625,8 @@
   let sidebarCollapsed = false;
   let lastLoadOkCount = 0;
   let lastLoadTotal = 0;
+  /** Set from GET /counties?fuel_price= batch response; cleared when county rows are repaired individually. */
+  let countiesAggregates = null;
   let loadFinishedOnce = false;
   let matricesActiveView = 'tier-stress';
   let matricesChartType = 'line';
@@ -5149,18 +5153,64 @@
   }
 
   async function loadAllCounties(price) {
-    const results = await Promise.all(
-      COUNTIES.map((c) =>
-        fetchCounty(c, price).then(
-          (d) => ({ ok: true, county: c, data: d }),
-          (err) => ({ ok: false, county: c, data: null, err: err })
-        )
-      )
-    );
-    countyData = {};
-    results.forEach((r) => {
-      countyData[r.county] = r.ok ? r.data : null;
-    });
+    let res;
+    try {
+      res = await fetch(API + '/counties?fuel_price=' + encodeURIComponent(price));
+    } catch (eNet) {
+      const err = new Error(eNet && eNet.message ? String(eNet.message) : 'Network error');
+      err.name = eNet && eNet.name ? eNet.name : 'TypeError';
+      throw err;
+    }
+    if (!res.ok) {
+      const err = new Error(res.statusText || 'HTTP ' + res.status);
+      err.status = res.status;
+      throw err;
+    }
+    let raw;
+    try {
+      raw = await res.json();
+    } catch (eJson) {
+      const err = new Error('Invalid JSON from API');
+      err.status = res.status;
+      throw err;
+    }
+    const arr = raw && typeof raw === 'object' && Array.isArray(raw.counties) ? raw.counties : null;
+    if (!arr || !arr.length) {
+      const err = new Error('Invalid counties batch payload');
+      err.status = res.status;
+      throw err;
+    }
+    const listFromPayload = normalizeCountiesPayload(raw);
+    if (listFromPayload && listFromPayload.length) COUNTIES = listFromPayload;
+
+    const nextCountyData = {};
+    const results = [];
+    for (let i = 0; i < arr.length; i++) {
+      const data = normalizeCountyPayload(arr[i]);
+      const name = data && typeof data.county === 'string' ? data.county : '';
+      if (!name) {
+        results.push({
+          ok: false,
+          county: '',
+          data: null,
+          err: new Error('Invalid county payload')
+        });
+        continue;
+      }
+      nextCountyData[name] = data;
+      results.push({ ok: true, county: name, data: data });
+    }
+    countyData = nextCountyData;
+    countiesAggregates = {
+      counties_in_energy_poverty:
+        raw && typeof raw.counties_in_energy_poverty === 'number'
+          ? raw.counties_in_energy_poverty
+          : null,
+      total_vulnerable_households:
+        raw && typeof raw.total_vulnerable_households === 'number'
+          ? raw.total_vulnerable_households
+          : null
+    };
     return results;
   }
 
@@ -5194,7 +5244,7 @@
           severity: 'error',
           title: 'API not found',
           detail:
-            'Expected hub routes at the root (/county/…, /history). If you use dev-server.mjs, open http://127.0.0.1:5500/. You can set window.__FFL_API_BASE__ before load.',
+            'Expected hub routes at the root (/counties, /county/…, /history). If you use dev-server.mjs, open http://127.0.0.1:5500/. You can set window.__FFL_API_BASE__ before load.',
           code: 'HTTP_404'
         };
       }
@@ -6723,10 +6773,25 @@
   function updateStats() {
     const vals = COUNTIES.map((c) => countyData[c]).filter(Boolean);
     const critical = vals.filter((d) => d.risk_tier === 'Critical').length;
-    const inPoverty = vals.filter((d) => inEnergyPoverty(d)).length;
-    const vulnHh = vals.reduce(function (s, d) {
-      return s + (Number(d.est_vulnerable_households) || 0);
-    }, 0);
+    const agg = countiesAggregates;
+    const useAggPov =
+      agg &&
+      vals.length > 0 &&
+      typeof agg.counties_in_energy_poverty === 'number' &&
+      Number.isFinite(agg.counties_in_energy_poverty);
+    const inPoverty = useAggPov
+      ? agg.counties_in_energy_poverty
+      : vals.filter((d) => inEnergyPoverty(d)).length;
+    const useAggVuln =
+      agg &&
+      vals.length > 0 &&
+      typeof agg.total_vulnerable_households === 'number' &&
+      Number.isFinite(agg.total_vulnerable_households);
+    const vulnHh = useAggVuln
+      ? agg.total_vulnerable_households
+      : vals.reduce(function (s, d) {
+          return s + (Number(d.est_vulnerable_households) || 0);
+        }, 0);
     const overspend = vals.reduce(function (s, d) {
       const r = Number(d.retrofit_roi_saving_10yr);
       return s + (Number.isFinite(r) && r < 0 ? Math.abs(r) : 0);
@@ -6757,9 +6822,12 @@
     }
 
     const alert = document.getElementById('crisis-alert');
-    const households = vals
-      .filter((d) => inEnergyPoverty(d))
-      .reduce((s, d) => s + (Number(d.est_vulnerable_households) || 0), 0);
+    const households =
+      useAggPov && useAggVuln
+        ? vulnHh
+        : vals
+            .filter((d) => inEnergyPoverty(d))
+            .reduce((s, d) => s + (Number(d.est_vulnerable_households) || 0), 0);
 
     if (inPoverty > 0 && alert) {
       alert.classList.add('show');
@@ -7018,6 +7086,7 @@
           code: null
         });
       }
+      countiesAggregates = null;
       updateStats();
       renderGrid();
       updateDashboardCharts();
@@ -7029,6 +7098,7 @@
       if (selectedCounty === county) renderDetail(d);
     } catch (e) {
       countyData[county] = null;
+      countiesAggregates = null;
       renderGrid();
       updateDashboardCharts();
       lastLoadOkCount = COUNTIES.filter(function (c) {
