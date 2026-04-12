@@ -51,6 +51,20 @@
       --mono: "IBM Plex Mono", ui-monospace, monospace;
     }
 
+    /* Minimal UI icons: stroke-only, black or white via currentColor */
+    svg.min-icon {
+      display: block;
+      flex-shrink: 0;
+    }
+    svg.min-icon,
+    svg.min-icon path,
+    svg.min-icon circle,
+    svg.min-icon line,
+    svg.min-icon polyline,
+    svg.min-icon rect {
+      fill: none;
+    }
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     html { font-size: 15px; }
@@ -125,7 +139,7 @@
       border-radius: var(--radius-sm);
       background: #0f172a;
       flex-shrink: 0;
-      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(13, 148, 136, 0.35);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -143,13 +157,28 @@
       border: 1px solid var(--sidebar-border);
       border-radius: var(--radius-sm);
       background: var(--sidebar-hover);
-      color: #94a3b8;
+      color: #e2e8f0;
       cursor: pointer;
       font-size: 0.8rem;
       line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
       transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
     }
-    .sidebar-toggle:hover { background: #334155; color: #f1f5f9; border-color: #475569; }
+    .sidebar-toggle:hover { background: #334155; color: #fff; border-color: #475569; }
+    .sidebar-toggle svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .sidebar-toggle svg path {
+      fill: none;
+    }
     .sidebar-title-text {
       font-family: var(--display);
       font-weight: 700;
@@ -215,6 +244,13 @@
       stroke-width: 1.65;
       stroke-linecap: round;
       stroke-linejoin: round;
+    }
+    .nav-ico svg circle:not(.nav-ico-dot) {
+      fill: none;
+    }
+    .nav-ico svg circle.nav-ico-dot {
+      fill: currentColor;
+      stroke: none;
     }
     .sidebar-foot {
       padding: 0.75rem;
@@ -1387,15 +1423,29 @@
       border: none;
     }
     .modal-close {
-      font-size: 1.5rem;
-      line-height: 1;
+      font-size: 0;
+      line-height: 0;
       border: none;
       background: none;
       cursor: pointer;
       color: var(--ink3);
-      padding: 0.15rem;
+      padding: 0.25rem;
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
-    .modal-close:hover { color: var(--ink); }
+    .modal-close:hover { color: var(--ink); background: var(--surface-muted); }
+    .modal-close svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+    .modal-close svg path {
+      fill: none;
+    }
     .modal-body {
       overflow-y: auto;
       padding: 1rem 1.1rem 1.5rem;
@@ -1992,18 +2042,21 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(145deg, rgba(13, 148, 136, 0.12), rgba(13, 148, 136, 0.06));
-      border: 1px solid rgba(13, 148, 136, 0.12);
+      background: var(--surface-muted);
+      border: 1px solid var(--rule);
       flex-shrink: 0;
     }
     .dash-card-icon svg {
       width: 18px;
       height: 18px;
-      stroke: var(--accent-deep);
+      stroke: var(--ink);
       fill: none;
       stroke-width: 1.65;
       stroke-linecap: round;
       stroke-linejoin: round;
+    }
+    .dash-card-icon svg circle {
+      fill: none;
     }
     .dash-card-title {
       font-family: var(--display);
@@ -2239,17 +2292,34 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 0.5rem;
       font-family: var(--display);
       font-weight: 700;
       font-size: 0.72rem;
       letter-spacing: 0.12em;
+    }
+    .matrices-nav-top-ico {
+      opacity: 0.55;
+      flex-shrink: 0;
+    }
+    .matrices-nav-top-ico svg {
+      width: 16px;
+      height: 16px;
+      stroke: #e2e8f0;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    .matrices-nav-top-ico svg path {
+      fill: none;
     }
     .matrices-nav-search {
       margin: 0.5rem 0.65rem;
       padding: 0.4rem 0.5rem 0.4rem 1.85rem;
       border-radius: 8px;
       border: 1px solid rgba(255, 255, 255, 0.12);
-      background: #12151a url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") 0.45rem center no-repeat;
+      background: #12151a url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23e2e8f0' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") 0.45rem center no-repeat;
       color: #e8eaef;
       font-size: 0.68rem;
     }
@@ -2566,15 +2636,29 @@
       height: 2.25rem;
       border-radius: var(--radius-sm);
       cursor: pointer;
-      font-size: 1.2rem;
-      line-height: 1;
+      font-size: 0;
+      line-height: 0;
       color: var(--ink2);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
       transition: background 0.15s ease, border-color 0.15s ease;
     }
     .county-drawer-close:hover {
       background: var(--rule-light);
       border-color: #cbd5e1;
       color: var(--ink);
+    }
+    .county-drawer-close svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+    .county-drawer-close svg path {
+      fill: none;
     }
     .county-drawer-body {
       flex: 1;
@@ -2848,23 +2932,15 @@
   <aside class="app-sidebar" id="app-sidebar" aria-label="Main navigation">
     <div class="sidebar-brand">
       <div class="sidebar-logo" aria-hidden="true">
-        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <defs>
-            <linearGradient id="ffl-logo-ln" x1="0%" y1="100%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#14b8a6"/>
-              <stop offset="100%" stop-color="#5eead4"/>
-            </linearGradient>
-            <linearGradient id="ffl-logo-dot" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#60a5fa"/>
-              <stop offset="100%" stop-color="#3b82f6"/>
-            </linearGradient>
-          </defs>
-          <path fill="none" stroke="url(#ffl-logo-ln)" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" d="M5 23 10 13l5 4 5-10 7 8"/>
-          <circle cx="27" cy="15" r="2.5" fill="url(#ffl-logo-dot)"/>
-          <path stroke="#64748b" stroke-width="1.25" stroke-linecap="round" d="M6 26h20" opacity="0.85"/>
+        <svg class="min-icon" viewBox="0 0 32 32" width="22" height="22" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path stroke="#f8fafc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 23 10 13l5 4 5-10 7 8"/>
+          <circle cx="27" cy="15" r="2" fill="#f8fafc"/>
+          <path stroke="#94a3b8" stroke-width="1.25" stroke-linecap="round" d="M6 26h20"/>
         </svg>
       </div>
-      <button type="button" class="sidebar-toggle" id="sidebar-toggle" onclick="window.__fflToggleSidebar()" title="Collapse sidebar" aria-expanded="true">«</button>
+      <button type="button" class="sidebar-toggle" id="sidebar-toggle" onclick="window.__fflToggleSidebar()" title="Collapse sidebar" aria-expanded="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path id="sidebar-chevron-path" d="M15 6l-6 6 6 6"/></svg>
+      </button>
       <span class="sidebar-title-text">Fuel fault lines<small>Energy vulnerability</small></span>
     </div>
     <nav class="sidebar-nav" aria-label="Pages">
@@ -2887,7 +2963,7 @@
         <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span><span>Demo &amp; submit</span>
       </button>
       <button type="button" class="nav-item" data-page="ai" onclick="window.__fflSetPage('ai')">
-        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4h11a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-5l-3 3v-3H8a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3z"/><circle cx="10" cy="11" r="1"/><circle cx="14" cy="11" r="1"/><path d="M10 14c.8.6 1.8.9 3 .9s2.2-.3 3-.9"/></svg></span><span>AI · Gemini</span>
+        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4h11a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-5l-3 3v-3H8a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3z"/><circle class="nav-ico-dot" cx="10" cy="11" r="1.15"/><circle class="nav-ico-dot" cx="14" cy="11" r="1.15"/><path d="M10 14c.8.6 1.8.9 3 .9s2.2-.3 3-.9"/></svg></span><span>AI · Gemini</span>
       </button>
     </nav>
     <div class="sidebar-foot">Ireland · 26 counties · SEAI / CSO / AA</div>
@@ -3125,7 +3201,9 @@
       <nav class="matrices-nav" aria-label="Datasets">
         <div class="matrices-nav-top">
           <span>MATRICES</span>
-          <span style="opacity:0.5;font-size:0.65rem">≡</span>
+          <span class="matrices-nav-top-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h14"/></svg>
+          </span>
         </div>
         <input type="search" class="matrices-nav-search" id="matrices-dataset-search" placeholder="Search datasets…" autocomplete="off"
                oninput="window.__fflFilterMatricesNav(this.value)">
@@ -3505,7 +3583,9 @@
         <h2>Counties</h2>
         <p class="dash-card-sub" style="margin-top:0.25rem">Tap a row for details</p>
       </div>
-      <button type="button" class="county-drawer-close" onclick="window.__fflCloseCountyDrawer()" aria-label="Close">&times;</button>
+      <button type="button" class="county-drawer-close" onclick="window.__fflCloseCountyDrawer()" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
     </div>
     <div class="county-drawer-body">
       <div class="county-register" id="county-register">
@@ -3538,7 +3618,9 @@
         <div class="modal-tier" id="modal-tier-badge"></div>
         <p class="sub" id="modal-province" style="margin-top:0.35rem;font-family:var(--mono);font-size:0.62rem;color:var(--ink3);text-transform:uppercase;letter-spacing:0.06em"></p>
       </div>
-      <button type="button" class="modal-close" id="modal-close-btn" aria-label="Close">&times;</button>
+      <button type="button" class="modal-close" id="modal-close-btn" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
     </div>
     <div class="modal-body" id="modal-body"></div>
   </div>
@@ -5061,7 +5143,10 @@
     sidebarCollapsed = !sidebarCollapsed;
     sb.classList.toggle('collapsed', sidebarCollapsed);
     if (tg) {
-      tg.textContent = sidebarCollapsed ? '»' : '«';
+      var ch = document.getElementById('sidebar-chevron-path');
+      if (ch) {
+        ch.setAttribute('d', sidebarCollapsed ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6');
+      }
       tg.setAttribute('aria-expanded', sidebarCollapsed ? 'false' : 'true');
       tg.setAttribute('title', sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar');
     }
