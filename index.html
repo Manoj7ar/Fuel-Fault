@@ -348,6 +348,7 @@
       font-weight: 650;
       color: var(--ink);
       letter-spacing: -0.03em;
+      transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .main-topbar-meta {
       display: flex;
@@ -372,7 +373,7 @@
       max-height: 0;
       overflow: hidden;
       opacity: 0;
-      transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.2s ease;
+      transition: max-height 0.38s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease, padding 0.32s ease;
     }
     .app-notice-wrap.visible {
       max-height: 200px;
@@ -390,6 +391,17 @@
       font-size: 0.8rem;
       line-height: 1.45;
       box-shadow: var(--shadow-sm);
+      animation: ffl-notice-in 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes ffl-notice-in {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     .app-notice--error {
       border-color: #fecaca;
@@ -452,15 +464,32 @@
     }
     .app-notice-dismiss:hover { opacity: 1; }
 
+    .app-page-views {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+      display: block;
+    }
     .page-view {
       display: none;
-      flex: 1;
       flex-direction: column;
       min-height: 0;
       overflow: auto;
       padding: 1.1rem 1.5rem 1.35rem;
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transform: translateY(6px);
+      pointer-events: none;
+      transition: opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1), transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    .page-view.active { display: flex; }
+    .page-view.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+      z-index: 1;
+    }
 
     .page-inner {
       flex: 1;
@@ -919,18 +948,32 @@
     }
 
     .crisis-alert {
-      display: none;
+      display: block;
       font-size: 0.8125rem;
-      padding: 0.95rem 1.1rem;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      margin-bottom: 0;
+      padding: 0 1.1rem;
       border-radius: var(--radius-md);
-      border: 1px solid rgba(251, 191, 36, 0.45);
+      border: 1px solid transparent;
       background: var(--warn-fill);
-      margin-bottom: 1rem;
       line-height: 1.5;
       color: var(--ink2);
-      box-shadow: 0 1px 2px rgba(245, 158, 11, 0.08);
+      box-shadow: none;
+      visibility: hidden;
+      transition: max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease, padding 0.35s ease, margin 0.35s ease, border-color 0.25s ease, box-shadow 0.25s ease, visibility 0.35s step-end;
     }
-    .crisis-alert.show { display: block; }
+    .crisis-alert.show {
+      max-height: 12rem;
+      opacity: 1;
+      margin-bottom: 1rem;
+      padding: 0.95rem 1.1rem;
+      border-color: rgba(251, 191, 36, 0.45);
+      box-shadow: 0 1px 2px rgba(245, 158, 11, 0.08);
+      visibility: visible;
+      transition: max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease, padding 0.35s ease, margin 0.35s ease, border-color 0.25s ease, box-shadow 0.25s ease, visibility 0s step-start;
+    }
 
     .table-label {
       font-family: var(--mono);
@@ -1357,6 +1400,19 @@
       visibility: hidden;
       pointer-events: none;
     }
+    .load-overlay:not(.hidden) .load-overlay-card {
+      animation: ffl-overlay-card 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes ffl-overlay-card {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
     .load-overlay-card {
       background: var(--surface);
       border-radius: var(--radius-lg);
@@ -1492,17 +1548,30 @@
     .compare-row label { font-family: var(--mono); font-size: 0.58rem; color: var(--ink3); display: block; margin-bottom: 0.25rem; }
     .single-slider-wrap.hidden { display: none; }
     .scenario-summary {
-      display: none;
+      display: block;
       font-size: 0.8rem;
-      padding: 0.85rem 1rem;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      margin-bottom: 0;
+      padding: 0 1rem;
       border-radius: var(--radius-md);
-      border: 1px solid rgba(251, 191, 36, 0.45);
+      border: 1px solid transparent;
       background: var(--warn-fill);
-      margin-bottom: 1rem;
       line-height: 1.45;
       color: var(--ink2);
+      visibility: hidden;
+      transition: max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease, padding 0.35s ease, margin 0.35s ease, border-color 0.25s ease, visibility 0.4s step-end;
     }
-    .scenario-summary.show { display: block; }
+    .scenario-summary.show {
+      max-height: 24rem;
+      opacity: 1;
+      margin-bottom: 1rem;
+      padding: 0.85rem 1rem;
+      border-color: rgba(251, 191, 36, 0.45);
+      visibility: visible;
+      transition: max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease, padding 0.35s ease, margin 0.35s ease, border-color 0.25s ease, visibility 0s step-start;
+    }
     .county-head.compare {
       grid-template-columns: minmax(4.5rem, 1.1fr) 2.6rem 2.5rem 2.5rem 3.8rem 1fr;
     }
@@ -1537,18 +1606,30 @@
 
     /* —— Modal —— */
     .modal-backdrop {
-      display: none;
+      display: flex;
       position: fixed;
       inset: 0;
       z-index: 3000;
-      background: rgba(20, 18, 28, 0.45);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(20, 18, 28, 0);
+      backdrop-filter: blur(0);
+      -webkit-backdrop-filter: blur(0);
       align-items: center;
       justify-content: center;
       padding: 1rem;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.32s step-end, background 0.35s ease, backdrop-filter 0.35s ease;
     }
-    .modal-backdrop.open { display: flex; }
+    .modal-backdrop.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      background: rgba(20, 18, 28, 0.45);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s step-start, background 0.35s ease, backdrop-filter 0.35s ease;
+    }
     .modal-dialog {
       background: var(--surface);
       border: 1px solid var(--rule);
@@ -1560,6 +1641,13 @@
       display: flex;
       flex-direction: column;
       width: 100%;
+      transform: scale(0.96) translateY(12px);
+      opacity: 0;
+      transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease;
+    }
+    .modal-backdrop.open .modal-dialog {
+      transform: scale(1) translateY(0);
+      opacity: 1;
     }
     .modal-head {
       display: flex;
@@ -1901,7 +1989,7 @@
     .ai-input-row button:disabled { opacity: 0.45; cursor: not-allowed; }
 
     /* —— Dashboard pages —— */
-    .crisis-alert,
+    .crisis-alert.show,
     .scenario-summary.show {
       margin-bottom: 0.5rem;
     }
@@ -2181,7 +2269,25 @@
       border: 1px solid rgba(226, 232, 240, 0.95);
       box-shadow: var(--shadow-card);
       padding: 1.1rem 1.2rem 1.15rem;
-      transition: border-color 0.2s ease, box-shadow 0.22s ease;
+      transition: border-color 0.22s ease, box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    #page-dashboard.active .dashboard-grid .dash-card {
+      animation: ffl-dash-card-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+    #page-dashboard.active .dashboard-grid .dash-card:nth-child(1) { animation-delay: 0.04s; }
+    #page-dashboard.active .dashboard-grid .dash-card:nth-child(2) { animation-delay: 0.1s; }
+    #page-dashboard.active .dashboard-grid .dash-card:nth-child(3) { animation-delay: 0.16s; }
+    #page-dashboard.active .dashboard-grid .dash-card:nth-child(4) { animation-delay: 0.22s; }
+    #page-dashboard.active .dashboard-grid .dash-card:nth-child(5) { animation-delay: 0.28s; }
+    @keyframes ffl-dash-card-in {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     .dash-card:hover {
       border-color: rgba(13, 148, 136, 0.22);
@@ -2755,15 +2861,27 @@
 
     /* County drawer */
     .county-drawer-backdrop {
-      display: none;
+      display: block;
       position: fixed;
       inset: 0;
       z-index: 2400;
+      background: rgba(15, 23, 42, 0);
+      backdrop-filter: blur(0);
+      -webkit-backdrop-filter: blur(0);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.3s step-end, background 0.32s ease, backdrop-filter 0.32s ease;
+    }
+    .county-drawer-backdrop.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
       background: rgba(15, 23, 42, 0.22);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
+      transition: opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s step-start, background 0.32s ease, backdrop-filter 0.32s ease;
     }
-    .county-drawer-backdrop.open { display: block; }
     .county-drawer-panel {
       position: absolute;
       top: 0;
@@ -2776,12 +2894,36 @@
       display: flex;
       flex-direction: column;
       transform: translateX(100%);
-      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
       border-left: 1px solid var(--rule-light);
     }
     .county-drawer-backdrop.open .county-drawer-panel { transform: translateX(0); }
     @media (prefers-reduced-motion: reduce) {
       .county-drawer-panel { transition: none; }
+      .county-drawer-backdrop {
+        transition: none;
+      }
+      .modal-backdrop,
+      .modal-dialog {
+        transition: none !important;
+      }
+      .modal-dialog {
+        transform: none !important;
+        opacity: 1 !important;
+      }
+      .page-view {
+        transition: none !important;
+        transform: none !important;
+      }
+      .app-notice {
+        animation: none;
+      }
+      .load-overlay:not(.hidden) .load-overlay-card {
+        animation: none;
+      }
+      #page-dashboard.active .dashboard-grid .dash-card {
+        animation: none;
+      }
     }
     .county-drawer-head {
       padding: 1rem 1rem 0.75rem;
@@ -2843,6 +2985,10 @@
       color: var(--ink2);
       line-height: 1.55;
       box-shadow: var(--shadow-sm);
+      transition: opacity 0.35s ease, box-shadow 0.3s ease, border-color 0.25s ease;
+    }
+    .thesis-banner.ffl-content-dim {
+      opacity: 0.55;
     }
     .thesis-banner strong { color: var(--ink); }
 
@@ -2854,6 +3000,10 @@
       border-radius: var(--radius-md);
       box-shadow: var(--shadow-sm);
       border-left: 4px solid var(--accent);
+      transition: opacity 0.35s ease, box-shadow 0.3s ease, border-color 0.25s ease;
+    }
+    .key-finding-card.ffl-content-dim {
+      opacity: 0.55;
     }
     .key-finding-card .kf-label {
       font-family: var(--mono);
@@ -3149,6 +3299,7 @@
 
     <div class="app-notice-wrap" id="app-notice-wrap" aria-live="assertive" aria-atomic="true"></div>
 
+    <div class="app-page-views" id="app-page-views">
     <div id="page-dashboard" class="page-view active" role="region" aria-labelledby="page-title">
       <div class="page-inner page-inner--dashboard">
         <header class="dash-top" style="margin-bottom:0">
@@ -3740,6 +3891,8 @@
       </div>
     </div>
 
+    </div>
+
   </div>
 </div>
 
@@ -3811,6 +3964,15 @@
     return typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
+  function __fflPulseInsightBlocks(on) {
+    if (__fflPrefersReducedMotion()) return;
+    var ids = ['thesis-banner', 'key-finding-card'];
+    for (var i = 0; i < ids.length; i++) {
+      var el = document.getElementById(ids[i]);
+      if (el) el.classList.toggle('ffl-content-dim', !!on);
+    }
+  }
+
   /** Shared Chart.js motion: subtle number morph on updates, disabled when reduced-motion. */
   function __fflChartMotionOverrides() {
     if (__fflPrefersReducedMotion()) {
@@ -3828,20 +3990,20 @@
       };
     }
     return {
-      animation: { duration: 720, easing: 'easeOutQuart' },
+      animation: { duration: 780, easing: 'easeOutCubic' },
       animations: {
-        colors: { type: 'color', duration: 480, easing: 'easeOutQuart' },
+        colors: { type: 'color', duration: 520, easing: 'easeOutCubic' },
         numbers: {
           type: 'number',
           properties: ['x', 'y', 'start', 'end', 'width', 'height', 'innerRadius', 'outerRadius', 'circumference'],
-          duration: 620,
-          easing: 'easeOutQuart'
+          duration: 680,
+          easing: 'easeOutCubic'
         }
       },
       transitions: {
-        active: { animation: { duration: 560, easing: 'easeOutQuart' } },
-        show: { animation: { duration: 380, easing: 'easeOutQuart' } },
-        hide: { animation: { duration: 220, easing: 'easeInQuad' } }
+        active: { animation: { duration: 600, easing: 'easeOutCubic' } },
+        show: { animation: { duration: 420, easing: 'easeOutCubic' } },
+        hide: { animation: { duration: 260, easing: 'easeInQuad' } }
       }
     };
   }
@@ -5348,6 +5510,11 @@
     try {
       localStorage.setItem('ffl_page', appPage);
     } catch (eP) {}
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        __fflResizeChartsAfterSidebar();
+      });
+    });
   };
 
   function __fflResizeChartsAfterSidebar() {
@@ -6187,6 +6354,7 @@
   async function refreshKeyFindingCard() {
     const body = document.getElementById('key-finding-body');
     if (!body) return;
+    __fflPulseInsightBlocks(true);
     const price = getActivePrice();
     try {
       const res = await fetch(API + '/insights/headline?price_eur_l=' + encodeURIComponent(price));
@@ -6212,6 +6380,8 @@
     } catch (e) {
       body.textContent =
         'Connect to the latest API for the headline insight (GET /insights/headline). Deploy the hub or use local FastAPI.';
+    } finally {
+      __fflPulseInsightBlocks(false);
     }
   }
 
@@ -6330,6 +6500,7 @@
   async function refreshThesisBanner() {
     const el = document.getElementById('thesis-banner');
     if (!el) return;
+    __fflPulseInsightBlocks(true);
     const price = getActivePrice();
     try {
       const res = await fetch(API + '/model/claims?price_eur_l=' + encodeURIComponent(price));
@@ -6379,6 +6550,8 @@
       el.innerHTML =
         'Model compares county-level SEAI energy profiles with CSO deprivation and a liquid-fuel proxy. ' +
         'Open <strong>Method &amp; lab</strong> when the API exposes <code>/meta</code> and <code>/model/claims</code> for full lineage.';
+    } finally {
+      __fflPulseInsightBlocks(false);
     }
   }
 
