@@ -174,15 +174,6 @@ Get a key: [Google AI Studio](https://aistudio.google.com/apikey). Default model
 
 ---
 
-## Hackathon checklist (quick)
-
-- [ ] **Live demo URL** — Zerve hub + static UI, or `dev-server.mjs` + default upstream.
-- [ ] **Video** — 2 min: scenario slider → county modal → Method claims → Demo & submit pack → optional Gemini.
-- [ ] **Devpost** — use **`/insights/submission-pack`** text where available; link this repo and **`/docs`**.
-- [ ] **Social** — tag **@Zerve** / hackathon hashtag from official Devpost rules.
-
----
-
 ## Links
 
 | Resource | URL |
