@@ -49,6 +49,14 @@
       --display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
       --sans: "Inter", system-ui, sans-serif;
       --mono: "IBM Plex Mono", ui-monospace, monospace;
+      --glass-blur: 18px;
+      --glass-saturate: 1.35;
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-bg-strong: rgba(255, 255, 255, 0.86);
+      --glass-border: rgba(226, 232, 240, 0.9);
+      --glass-highlight: rgba(255, 255, 255, 0.55);
+      --glass-shadow: 0 4px 28px rgba(15, 23, 42, 0.06), 0 1px 0 var(--glass-highlight) inset;
+      --shadow-modal: 0 12px 48px rgba(15, 23, 42, 0.14), 0 1px 0 rgba(255, 255, 255, 0.75) inset;
     }
 
     /* Minimal UI icons: stroke-only, black or white via currentColor */
@@ -94,6 +102,128 @@
     button:focus:not(:focus-visible),
     a:focus:not(:focus-visible) {
       outline: none;
+    }
+
+    /* Shared button primitive */
+    .ffl-btn {
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: 0.74rem;
+      line-height: 1.2;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      text-decoration: none;
+      transition: transform 0.12s ease, box-shadow 0.18s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
+    }
+    .ffl-btn:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+    .ffl-btn:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+    }
+    .ffl-btn--primary {
+      padding: 0.5rem 1rem;
+      background: linear-gradient(165deg, var(--accent) 0%, var(--accent-deep) 100%);
+      color: #fff;
+      border-color: rgba(13, 148, 136, 0.35);
+      box-shadow: 0 1px 4px rgba(13, 148, 136, 0.22);
+    }
+    .ffl-btn--primary:hover:not(:disabled) {
+      filter: brightness(1.05);
+      box-shadow: 0 2px 10px rgba(13, 148, 136, 0.28);
+    }
+    .ffl-btn--secondary {
+      padding: 0.48rem 0.92rem;
+      background: var(--glass-bg-strong);
+      color: var(--ink2);
+      border-color: var(--rule);
+    }
+    .ffl-btn--secondary:hover:not(:disabled) {
+      border-color: rgba(13, 148, 136, 0.45);
+      background: var(--accent-soft);
+      color: var(--accent-deep);
+      box-shadow: 0 1px 4px rgba(13, 148, 136, 0.1);
+    }
+    .ffl-btn--ghost {
+      padding: 0.45rem 0.78rem;
+      background: transparent;
+      color: var(--ink2);
+      border-color: var(--rule);
+    }
+    .ffl-btn--ghost:hover:not(:disabled) {
+      background: var(--surface-muted);
+      color: var(--ink);
+    }
+    .ffl-btn--danger {
+      padding: 0.48rem 0.85rem;
+      background: var(--err-fill);
+      color: var(--critical);
+      border-color: #fecaca;
+    }
+    .ffl-btn--danger:hover:not(:disabled) {
+      background: #fee2e2;
+      border-color: #fca5a5;
+    }
+    .ffl-btn--icon {
+      padding: 0.25rem;
+      width: 2.35rem;
+      height: 2.35rem;
+      font-size: 0;
+      line-height: 0;
+      background: transparent;
+      color: var(--ink3);
+      border: none;
+      border-radius: var(--radius-sm);
+    }
+    .ffl-btn--icon:hover:not(:disabled) {
+      color: var(--ink);
+      background: var(--surface-muted);
+    }
+    .ffl-btn--sidebar {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      font-size: 0;
+      line-height: 0;
+      border: 1px solid var(--sidebar-border);
+      border-radius: var(--radius-sm);
+      background: var(--sidebar-hover);
+      color: #e2e8f0;
+    }
+    .ffl-btn--sidebar:hover:not(:disabled) {
+      background: #334155;
+      color: #fff;
+      border-color: #475569;
+    }
+    .ffl-btn--notice {
+      padding: 0.32rem 0.58rem;
+      font-size: 0.72rem;
+      font-weight: 500;
+      background: transparent;
+      color: inherit;
+      border: 1px solid currentColor;
+      border-radius: var(--radius-sm);
+      opacity: 0.88;
+      align-self: flex-start;
+    }
+    .ffl-btn--notice:hover:not(:disabled) {
+      opacity: 1;
+    }
+    .ffl-btn--sm {
+      font-size: 0.68rem;
+      padding: 0.4rem 0.72rem;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ffl-btn:active:not(:disabled) {
+        transform: none;
+      }
     }
 
     /* App shell + sidebar (minimal SaaS) */
@@ -151,24 +281,6 @@
       height: 22px;
       display: block;
     }
-    .sidebar-toggle {
-      flex-shrink: 0;
-      width: 32px;
-      height: 32px;
-      border: 1px solid var(--sidebar-border);
-      border-radius: var(--radius-sm);
-      background: var(--sidebar-hover);
-      color: #e2e8f0;
-      cursor: pointer;
-      font-size: 0.8rem;
-      line-height: 1;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
-    }
-    .sidebar-toggle:hover { background: #334155; color: #fff; border-color: #475569; }
     .sidebar-toggle svg {
       width: 16px;
       height: 16px;
@@ -213,10 +325,34 @@
     .sidebar-nav {
       flex: 1;
       overflow-y: auto;
-      padding: 0.5rem 0.4rem;
+      padding: 0.35rem 0.4rem 0.5rem;
       display: flex;
       flex-direction: column;
-      gap: 0.15rem;
+      gap: 0.12rem;
+    }
+    .sidebar-nav-section {
+      font-family: var(--mono);
+      font-size: 0.5rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #64748b;
+      padding: 0.55rem 0.65rem 0.28rem;
+      margin-top: 0.15rem;
+      pointer-events: none;
+      transition: opacity 0.25s ease, max-height 0.35s cubic-bezier(0.22, 1, 0.36, 1), padding 0.35s ease, margin 0.35s ease;
+    }
+    .sidebar-nav-section:first-child {
+      margin-top: 0;
+      padding-top: 0.2rem;
+    }
+    .app-sidebar.collapsed .sidebar-nav-section {
+      max-height: 0;
+      opacity: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      margin: 0;
+      overflow: hidden;
     }
     .nav-item {
       display: flex;
@@ -256,9 +392,9 @@
     }
     .nav-item:hover { background: var(--sidebar-hover); color: #f1f5f9; }
     .nav-item.active {
-      background: rgba(13, 148, 136, 0.15);
+      background: linear-gradient(90deg, rgba(13, 148, 136, 0.22) 0%, rgba(30, 41, 59, 0.65) 100%);
       color: #f8fafc;
-      box-shadow: inset 3px 0 0 var(--accent);
+      box-shadow: inset 3px 0 0 var(--accent), 0 1px 0 rgba(255, 255, 255, 0.04);
     }
     .nav-ico {
       width: 1.25rem;
@@ -274,7 +410,7 @@
       height: 18px;
       stroke: currentColor;
       fill: none;
-      stroke-width: 1.65;
+      stroke-width: 1.75;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
@@ -336,11 +472,11 @@
       justify-content: space-between;
       gap: 1rem;
       padding: 0.85rem 1.5rem;
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(14px) saturate(1.2);
-      -webkit-backdrop-filter: blur(14px) saturate(1.2);
-      border-bottom: 1px solid rgba(226, 232, 240, 0.85);
-      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.75) inset;
+      background: var(--glass-bg-strong);
+      backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+      border-bottom: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
     }
     .main-topbar h1 {
       font-family: var(--display);
@@ -376,21 +512,25 @@
       transition: max-height 0.38s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease, padding 0.32s ease;
     }
     .app-notice-wrap.visible {
-      max-height: 200px;
+      max-height: min(44vh, 26rem);
       opacity: 1;
       padding: 0.55rem 1.5rem 0;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
     .app-notice {
       display: flex;
       align-items: flex-start;
       gap: 0.65rem;
-      padding: 0.65rem 0.85rem;
+      padding: 0.7rem 0.95rem;
       border-radius: var(--radius-md);
-      border: 1px solid var(--rule);
-      background: var(--surface);
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg-strong);
+      backdrop-filter: blur(12px) saturate(1.2);
+      -webkit-backdrop-filter: blur(12px) saturate(1.2);
       font-size: 0.8rem;
       line-height: 1.45;
-      box-shadow: var(--shadow-sm);
+      box-shadow: var(--glass-shadow);
       animation: ffl-notice-in 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
     @keyframes ffl-notice-in {
@@ -420,18 +560,34 @@
     }
     .app-notice-ico {
       flex-shrink: 0;
-      width: 1.35rem;
-      height: 1.35rem;
-      border-radius: 6px;
+      width: 2rem;
+      height: 2rem;
+      border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.75rem;
-      font-weight: 700;
     }
-    .app-notice--error .app-notice-ico { background: #fecaca; color: #991b1b; }
-    .app-notice--warn .app-notice-ico { background: #fef08a; color: #854d0e; }
-    .app-notice--info .app-notice-ico { background: #bfdbfe; color: #1e40af; }
+    .app-notice-ico svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      display: block;
+    }
+    .app-notice-ico svg path {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .app-notice--error .app-notice-ico { background: rgba(254, 202, 202, 0.85); color: #991b1b; }
+    .app-notice--warn .app-notice-ico { background: rgba(254, 240, 138, 0.9); color: #854d0e; }
+    .app-notice--info .app-notice-ico { background: rgba(191, 219, 254, 0.9); color: #1e40af; }
+    .app-notice-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.55rem;
+    }
     .app-notice-body { min-width: 0; flex: 1; }
     .app-notice-title {
       font-weight: 600;
@@ -448,30 +604,87 @@
       font-family: var(--mono);
       font-size: 0.62rem;
       opacity: 0.75;
+      word-break: break-word;
     }
-    .app-notice-dismiss {
+
+    .ffl-inline-alert {
+      display: flex;
+      gap: 0.65rem;
+      align-items: flex-start;
+      margin-top: 0.75rem;
+      padding: 0.75rem 0.85rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--rule-light);
+      background: var(--glass-bg);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: var(--shadow-sm);
+    }
+    .ffl-inline-alert--error {
+      border-color: #fecaca;
+      background: rgba(254, 242, 242, 0.92);
+    }
+    .ffl-inline-alert--warn {
+      border-color: #fde047;
+      background: rgba(254, 252, 232, 0.92);
+    }
+    .ffl-inline-alert__ico {
       flex-shrink: 0;
-      padding: 0.3rem 0.55rem;
-      font-size: 0.72rem;
-      font-weight: 500;
-      border: 1px solid currentColor;
+      width: 2rem;
+      height: 2rem;
       border-radius: var(--radius-sm);
-      background: transparent;
-      color: inherit;
-      cursor: pointer;
-      opacity: 0.85;
-      align-self: flex-start;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--critical);
+      background: rgba(254, 202, 202, 0.65);
     }
-    .app-notice-dismiss:hover { opacity: 1; }
+    .ffl-inline-alert--warn .ffl-inline-alert__ico {
+      color: #854d0e;
+      background: rgba(254, 240, 138, 0.75);
+    }
+    .ffl-inline-svg {
+      display: block;
+    }
+    .ffl-inline-svg path {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .ffl-inline-alert__title {
+      font-weight: 650;
+      font-size: 0.82rem;
+      color: var(--ink);
+      margin: 0 0 0.25rem;
+    }
+    .ffl-inline-alert__msg {
+      margin: 0;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: var(--ink2);
+    }
 
     .app-page-views {
       flex: 1;
       min-height: 0;
       position: relative;
       display: block;
+      view-transition-name: ffl-app-pages;
+    }
+    @keyframes ffl-page-inner-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     .page-view {
-      display: none;
+      display: flex;
       flex-direction: column;
       min-height: 0;
       overflow: auto;
@@ -479,16 +692,20 @@
       position: absolute;
       inset: 0;
       opacity: 0;
-      transform: translateY(6px);
+      transform: translateY(12px);
       pointer-events: none;
-      transition: opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1), transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 0;
+      transition: opacity 0.34s cubic-bezier(0.22, 1, 0.36, 1), transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .page-view.active {
-      display: flex;
       opacity: 1;
       transform: translateY(0);
       pointer-events: auto;
-      z-index: 1;
+      z-index: 2;
+      transition: opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.05s, transform 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.05s;
+    }
+    .page-view.active > .page-inner {
+      animation: ffl-page-inner-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
     .page-inner {
@@ -503,10 +720,12 @@
     }
 
     .page-panel {
-      background: var(--surface);
-      border: 1px solid rgba(226, 232, 240, 0.95);
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+      border: 1px solid var(--glass-border);
       border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-card);
+      box-shadow: var(--glass-shadow);
       padding: 1.25rem 1.4rem;
     }
     .page-panel--tight { padding: 1rem 1.15rem; }
@@ -568,21 +787,8 @@
       font-family: var(--mono);
       font-size: 0.72rem;
     }
-    .ai-page-key button {
-      padding: 0.48rem 0.9rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid rgba(13, 148, 136, 0.35);
-      background: linear-gradient(165deg, var(--accent) 0%, var(--accent-deep) 100%);
-      color: #fff;
+    .ai-page-key .ffl-btn--primary {
       font-size: 0.75rem;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 1px 3px rgba(13, 148, 136, 0.25);
-      transition: filter 0.15s ease, box-shadow 0.15s ease;
-    }
-    .ai-page-key button:hover {
-      filter: brightness(1.05);
-      box-shadow: 0 2px 8px rgba(13, 148, 136, 0.3);
     }
     .ai-key-notice-page {
       font-size: 0.68rem;
@@ -662,19 +868,13 @@
       border-color: rgba(13, 148, 136, 0.4);
       box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
     }
-    .ai-input-row-page button {
+    .ai-input-row-page .ffl-btn--primary {
       padding: 0.55rem 1rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid rgba(13, 148, 136, 0.3);
-      background: linear-gradient(165deg, var(--accent) 0%, var(--accent-deep) 100%);
-      color: #fff;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 1px 3px rgba(13, 148, 136, 0.22);
-      transition: filter 0.15s ease;
+      min-height: 2.4rem;
     }
-    .ai-input-row-page button:hover:not(:disabled) { filter: brightness(1.06); }
-    .ai-input-row-page button:disabled { opacity: 0.45; cursor: not-allowed; }
+    .ai-input-row-page .ffl-btn:disabled {
+      opacity: 0.45;
+    }
 
     /* Masthead */
     .masthead {
@@ -1176,17 +1376,19 @@
       font-size: 0.78rem;
       margin-bottom: 0.3rem;
     }
+    .poverty-bar__value--bad { color: var(--critical); font-weight: 600; }
+    .poverty-bar__value--ok { color: var(--low); font-weight: 600; }
     .bar-track {
       height: 8px;
       border-radius: 999px;
-      background: rgba(124, 58, 237, 0.12);
+      background: rgba(15, 23, 42, 0.08);
       position: relative;
     }
     .bar-fill {
       height: 100%;
       border-radius: 999px;
-      background: linear-gradient(90deg, #c4b5fd, #7c3aed);
-      opacity: 0.85;
+      background: linear-gradient(90deg, rgba(13, 148, 136, 0.45), var(--accent-deep));
+      opacity: 0.92;
       transition: width 0.35s ease;
     }
     .bar-threshold {
@@ -1219,6 +1421,108 @@
     .metric-row .v.bad { color: var(--critical); }
     .metric-row .v.warn { color: var(--high); }
     .metric-row .v.good { color: var(--low); }
+
+    .metric-spec {
+      margin: 0.65rem 0 0;
+      padding: 0.5rem 0.75rem 0.55rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--rule-light);
+      background: rgba(248, 250, 252, 0.82);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .metric-spec--flush {
+      margin-top: 0;
+    }
+    .metric-spec__row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.35rem 0.85rem;
+      align-items: baseline;
+      padding: 0.38rem 0;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+    }
+    .metric-spec__row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .metric-spec dt {
+      margin: 0;
+      font-size: 0.72rem;
+      color: var(--ink3);
+      font-weight: 500;
+    }
+    .metric-spec dd {
+      margin: 0;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      color: var(--ink);
+    }
+    .metric-spec dd.val-bad { color: var(--critical); }
+    .metric-spec dd.val-warn { color: var(--high); }
+    .metric-spec dd.val-good { color: var(--low); }
+
+    .retrofit-details {
+      margin-top: 1rem;
+      border: 1px solid var(--rule-light);
+      border-radius: var(--radius-md);
+      background: rgba(248, 250, 252, 0.72);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: var(--shadow-sm);
+    }
+    .retrofit-details summary {
+      cursor: pointer;
+      padding: 0.7rem 0.9rem;
+      font-family: var(--display);
+      font-weight: 650;
+      font-size: 0.84rem;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .retrofit-details summary::-webkit-details-marker {
+      display: none;
+    }
+    .retrofit-details summary::after {
+      content: "";
+      width: 0.45rem;
+      height: 0.45rem;
+      border-right: 2px solid var(--ink3);
+      border-bottom: 2px solid var(--ink3);
+      transform: rotate(45deg);
+      transition: transform 0.22s ease;
+      flex-shrink: 0;
+    }
+    .retrofit-details[open] summary::after {
+      transform: rotate(-135deg);
+      margin-top: 0.2rem;
+    }
+    .retrofit-details__hint {
+      font-weight: 500;
+      font-size: 0.65rem;
+      color: var(--ink3);
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .retrofit-details[open] summary {
+      border-bottom: 1px solid var(--rule-light);
+    }
+    .retrofit-details .metric-spec {
+      margin: 0;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
 
     .retrofit-panel {
       border-style: dashed;
@@ -1414,10 +1718,12 @@
       }
     }
     .load-overlay-card {
-      background: var(--surface);
+      background: var(--glass-bg-strong);
+      backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
       border-radius: var(--radius-lg);
-      border: 1px solid rgba(226, 232, 240, 0.95);
-      box-shadow: var(--shadow-md), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-modal);
       padding: 2rem 2.1rem 1.95rem;
       max-width: 22rem;
       text-align: center;
@@ -1631,10 +1937,12 @@
       transition: opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s step-start, background 0.35s ease, backdrop-filter 0.35s ease;
     }
     .modal-dialog {
-      background: var(--surface);
-      border: 1px solid var(--rule);
+      background: var(--glass-bg-strong);
+      backdrop-filter: blur(20px) saturate(var(--glass-saturate));
+      -webkit-backdrop-filter: blur(20px) saturate(var(--glass-saturate));
+      border: 1px solid var(--glass-border);
       border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-md);
+      box-shadow: var(--shadow-modal);
       max-width: min(720px, 100% - 2rem);
       max-height: 90dvh;
       overflow: hidden;
@@ -1655,8 +1963,10 @@
       align-items: flex-start;
       gap: 1rem;
       padding: 1.15rem 1.25rem;
-      border-bottom: 1px solid var(--rule);
-      background: linear-gradient(180deg, var(--surface-muted) 0%, var(--surface) 100%);
+      border-bottom: 1px solid var(--glass-border);
+      background: rgba(248, 250, 252, 0.75);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
     .modal-title-block h2 {
       font-family: var(--display);
@@ -1677,20 +1987,6 @@
       color: var(--pill-fg);
       border: none;
     }
-    .modal-close {
-      font-size: 0;
-      line-height: 0;
-      border: none;
-      background: none;
-      cursor: pointer;
-      color: var(--ink3);
-      padding: 0.25rem;
-      border-radius: var(--radius-sm);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .modal-close:hover { color: var(--ink); background: var(--surface-muted); }
     .modal-close svg {
       width: 18px;
       height: 18px;
@@ -1705,34 +2001,57 @@
       overflow-y: auto;
       padding: 1rem 1.1rem 1.5rem;
     }
-    .modal-stat-row {
+    .modal-error-wrap {
+      padding: 0.35rem 0 0.5rem;
+    }
+    .modal-error-wrap .ffl-inline-alert {
+      margin-top: 0;
+    }
+    .modal-body-inner {
+      min-width: 0;
+    }
+    .modal-kpi-strip {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: 1.4fr 1fr 1fr;
       gap: 0.5rem;
-      margin: 1rem 0;
+      margin: 0 0 1rem;
     }
     @media (max-width: 520px) {
-      .modal-stat-row { grid-template-columns: 1fr; }
+      .modal-kpi-strip {
+        grid-template-columns: 1fr;
+      }
     }
-    .modal-stat {
+    .modal-kpi {
       border: 1px solid var(--rule-light);
-      padding: 0.75rem 0.85rem;
-      text-align: center;
+      padding: 0.65rem 0.75rem;
       border-radius: var(--radius-sm);
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.55);
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      min-width: 0;
     }
-    .modal-stat .lbl {
+    .modal-kpi--primary {
+      border-color: rgba(13, 148, 136, 0.28);
+      background: rgba(13, 148, 136, 0.07);
+    }
+    .modal-kpi__lbl {
       font-family: var(--mono);
-      font-size: 0.52rem;
+      font-size: 0.5rem;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.09em;
       color: var(--ink3);
     }
-    .modal-stat .val {
-      font-size: 1.15rem;
+    .modal-kpi__val {
+      font-family: var(--display);
+      font-size: 1.2rem;
       font-weight: 700;
       font-variant-numeric: tabular-nums;
-      margin-top: 0.2rem;
+      color: var(--ink);
+      line-height: 1.15;
+    }
+    .modal-kpi--primary .modal-kpi__val {
+      font-size: 1.55rem;
     }
     .modal-score-big {
       font-family: var(--display);
@@ -1741,15 +2060,36 @@
       line-height: 1;
       font-variant-numeric: tabular-nums;
       margin: 0.5rem 0 1rem;
+      color: var(--ink);
     }
-    .td-box, .narrative-box {
-      border: 1px solid var(--rule-light);
+    .tier-tone-critical .modal-score-big { color: var(--critical); }
+    .tier-tone-high .modal-score-big { color: var(--high); }
+    .tier-tone-medium .modal-score-big { color: var(--medium); }
+    .tier-tone-low .modal-score-big { color: var(--low); }
+    .tier-tone-critical .score-block .num,
+    .tier-tone-critical .score-block .tier-label { color: var(--critical); }
+    .tier-tone-high .score-block .num,
+    .tier-tone-high .score-block .tier-label { color: var(--high); }
+    .tier-tone-medium .score-block .num,
+    .tier-tone-medium .score-block .tier-label { color: var(--medium); }
+    .tier-tone-low .score-block .num,
+    .tier-tone-low .score-block .tier-label { color: var(--low); }
+
+    .callout-panel {
+      border: 1px solid var(--glass-border);
       padding: 0.95rem 1.05rem;
       margin-top: 1rem;
       border-radius: var(--radius-md);
-      background: rgba(248, 245, 255, 0.65);
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px) saturate(1.15);
+      -webkit-backdrop-filter: blur(10px) saturate(1.15);
+      box-shadow: var(--shadow-sm);
+      border-left: 3px solid var(--accent);
     }
-    .td-box h4, .narrative-box h4 {
+    .callout-panel--td {
+      border-left-color: #475569;
+    }
+    .callout-panel h4 {
       font-family: var(--mono);
       font-size: 0.58rem;
       text-transform: uppercase;
@@ -1757,29 +2097,66 @@
       margin-bottom: 0.5rem;
       color: var(--ink2);
     }
+    .callout-panel .td-line {
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: var(--ink2);
+    }
+    .callout-panel .td-muted {
+      font-size: 0.78rem;
+      color: var(--ink3);
+      margin-top: 0.35rem;
+    }
+    .callout-panel .td-email {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      margin-top: 0.4rem;
+    }
+    .callout-panel .td-email a {
+      color: var(--accent-deep);
+    }
     .td-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.65rem; }
-    .td-actions a, .td-actions button {
+    .td-actions a,
+    .td-actions button {
       font-family: var(--mono);
       font-size: 0.62rem;
-      padding: 0.5rem 0.85rem;
-      border: 1px solid var(--rule-light);
-      background: rgba(255, 255, 255, 0.9);
+      padding: 0.48rem 0.85rem;
+      border: 1px solid var(--rule);
+      background: var(--glass-bg-strong);
       border-radius: 999px;
       cursor: pointer;
       text-decoration: none;
       color: var(--ink);
+      transition: transform 0.12s ease, border-color 0.15s ease, background 0.15s ease;
     }
-    .td-actions a.primary, .td-actions button.primary {
+    .td-actions a:active,
+    .td-actions button:active {
+      transform: scale(0.97);
+    }
+    .td-actions a.primary,
+    .td-actions button.primary {
       background: var(--pill-bg);
       color: var(--pill-fg);
       border-color: transparent;
     }
-    .narrative-box p {
+    .td-actions a.is-disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .callout-panel p {
       font-size: 0.88rem;
       line-height: 1.55;
       color: var(--ink2);
     }
-    .narrative-box p + p { margin-top: 0.65rem; }
+    .callout-panel p + p {
+      margin-top: 0.65rem;
+    }
+    .modal-export-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 0.75rem;
+    }
 
     /* —— History collapsible —— */
     .history-block { margin-top: 1.5rem; border-top: 1px solid var(--rule-light); padding-top: 1.1rem; }
@@ -1799,13 +2176,32 @@
       align-items: center;
       box-shadow: var(--shadow-sm);
     }
-    .history-toggle::after { content: "+"; font-family: var(--mono); }
-    .history-toggle.expanded::after { content: "−"; }
+    .history-toggle::after {
+      content: "";
+      width: 0.4rem;
+      height: 0.4rem;
+      border-right: 2px solid var(--ink3);
+      border-bottom: 2px solid var(--ink3);
+      transform: rotate(45deg);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      flex-shrink: 0;
+    }
+    .history-toggle.expanded::after {
+      transform: rotate(-135deg);
+      margin-top: 0.2rem;
+    }
     .history-panel {
-      display: none;
+      margin-top: 0;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+    }
+    .history-panel.open {
+      max-height: 1200px;
+      opacity: 1;
       margin-top: 0.75rem;
     }
-    .history-panel.open { display: block; }
     .history-chart-shell {
       background: rgba(255, 255, 255, 0.88);
       border: 1px solid var(--rule-light);
@@ -2094,9 +2490,11 @@
       align-items: stretch;
       padding: 0.45rem 0.55rem;
       border-radius: var(--radius-md);
-      background: linear-gradient(165deg, rgba(255, 255, 255, 0.98) 0%, var(--surface-muted) 100%);
-      border: 1px solid rgba(226, 232, 240, 0.95);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px) saturate(var(--glass-saturate));
+      -webkit-backdrop-filter: blur(12px) saturate(var(--glass-saturate));
+      border: 1px solid var(--glass-border);
+      box-shadow: inset 0 1px 0 var(--glass-highlight), 0 1px 12px rgba(15, 23, 42, 0.04);
     }
     .stat-chip {
       display: inline-flex;
@@ -2144,31 +2542,17 @@
       gap: 0.5rem 0.75rem;
       padding: 1rem 1.05rem 1.05rem;
       border-radius: var(--radius-lg);
-      background: var(--surface);
-      border: 1px solid rgba(226, 232, 240, 0.95);
-      box-shadow: var(--shadow-card);
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
     }
     .dash-controls .price-mode-bar { margin: 0; }
     .dash-controls .assumption { margin: 0; padding: 0; border: none; box-shadow: none; background: transparent; flex: 1 1 12rem; min-width: 0; }
     .dash-controls .single-slider-wrap, .dash-controls .compare-sliders { width: 100%; }
     .btn-drawer-counties {
-      font-family: var(--sans);
-      font-size: 0.74rem;
-      font-weight: 600;
-      padding: 0.48rem 0.9rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--rule);
-      background: var(--surface);
-      color: var(--ink2);
-      cursor: pointer;
       white-space: nowrap;
-      transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
-    }
-    .btn-drawer-counties:hover {
-      border-color: rgba(13, 148, 136, 0.45);
-      background: var(--accent-soft);
-      color: var(--accent-deep);
-      box-shadow: 0 1px 3px rgba(13, 148, 136, 0.12);
     }
 
     /* Dashboard: content-sized grid — scroll the page, don't stretch rows into empty space */
@@ -2264,10 +2648,12 @@
       min-height: 0;
       display: flex;
       flex-direction: column;
-      background: var(--surface);
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
       border-radius: var(--radius-lg);
-      border: 1px solid rgba(226, 232, 240, 0.95);
-      box-shadow: var(--shadow-card);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
       padding: 1.1rem 1.2rem 1.15rem;
       transition: border-color 0.22s ease, box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
     }
@@ -2324,7 +2710,7 @@
       height: 18px;
       stroke: var(--ink);
       fill: none;
-      stroke-width: 1.65;
+      stroke-width: 1.75;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
@@ -2915,6 +3301,9 @@
         transition: none !important;
         transform: none !important;
       }
+      .page-view.active > .page-inner {
+        animation: none !important;
+      }
       .app-notice {
         animation: none;
       }
@@ -2923,6 +3312,10 @@
       }
       #page-dashboard.active .dashboard-grid .dash-card {
         animation: none;
+      }
+      .history-panel,
+      .history-panel.open {
+        transition: none !important;
       }
     }
     .county-drawer-head {
@@ -2938,23 +3331,15 @@
       font-size: 1.05rem;
       font-weight: 700;
     }
-    .county-drawer-close {
-      border: 1px solid var(--rule);
-      background: var(--surface-muted);
+    .county-drawer-close.ffl-btn--icon {
       width: 2.25rem;
       height: 2.25rem;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      font-size: 0;
-      line-height: 0;
+      border: 1px solid var(--rule);
+      background: var(--surface-muted);
       color: var(--ink2);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      transition: background 0.15s ease, border-color 0.15s ease;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
     }
-    .county-drawer-close:hover {
+    .county-drawer-close.ffl-btn--icon:hover:not(:disabled) {
       background: var(--rule-light);
       border-color: #cbd5e1;
       color: var(--ink);
@@ -2978,13 +3363,15 @@
     .thesis-banner {
       margin: 0 0 1rem;
       padding: 1rem 1.15rem 1.05rem;
-      background: linear-gradient(118deg, rgba(13, 148, 136, 0.1) 0%, rgba(255, 255, 255, 0.92) 48%, rgba(37, 99, 235, 0.06) 100%);
-      border: 1px solid rgba(226, 232, 240, 0.9);
+      background: linear-gradient(118deg, rgba(13, 148, 136, 0.12) 0%, var(--glass-bg-strong) 50%, rgba(37, 99, 235, 0.07) 100%);
+      backdrop-filter: blur(14px) saturate(var(--glass-saturate));
+      -webkit-backdrop-filter: blur(14px) saturate(var(--glass-saturate));
+      border: 1px solid var(--glass-border);
       border-radius: var(--radius-md);
       font-size: 0.9rem;
       color: var(--ink2);
       line-height: 1.55;
-      box-shadow: var(--shadow-sm);
+      box-shadow: var(--glass-shadow);
       transition: opacity 0.35s ease, box-shadow 0.3s ease, border-color 0.25s ease;
     }
     .thesis-banner.ffl-content-dim {
@@ -2995,10 +3382,12 @@
     .key-finding-card {
       margin: 0 0 1rem;
       padding: 1.05rem 1.2rem 1.1rem;
-      background: var(--surface);
-      border: 1px solid rgba(226, 232, 240, 0.95);
+      background: var(--glass-bg-strong);
+      backdrop-filter: blur(14px) saturate(var(--glass-saturate));
+      -webkit-backdrop-filter: blur(14px) saturate(var(--glass-saturate));
+      border: 1px solid var(--glass-border);
       border-radius: var(--radius-md);
-      box-shadow: var(--shadow-sm);
+      box-shadow: var(--glass-shadow);
       border-left: 4px solid var(--accent);
       transition: opacity 0.35s ease, box-shadow 0.3s ease, border-color 0.25s ease;
     }
@@ -3023,10 +3412,12 @@
     .method-page .method-section {
       margin-bottom: 1.25rem;
       padding: 1.1rem 1.2rem;
-      background: var(--surface);
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
       border-radius: var(--radius-md);
-      border: 1px solid rgba(226, 232, 240, 0.95);
-      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
     }
     .method-page .method-section h2 {
       font-size: 1rem;
@@ -3250,17 +3641,18 @@
     <div class="sidebar-brand">
       <div class="sidebar-logo" aria-hidden="true">
         <svg class="min-icon" viewBox="0 0 32 32" width="22" height="22" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path stroke="#f8fafc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 23 10 13l5 4 5-10 7 8"/>
-          <circle cx="27" cy="15" r="2" fill="#f8fafc"/>
-          <path stroke="#94a3b8" stroke-width="1.25" stroke-linecap="round" d="M6 26h20"/>
+          <path stroke="#5eead4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 22c3.5-6 7-9 12-9s6.5 4 10 9"/>
+          <circle cx="25" cy="11" r="2" fill="#f8fafc"/>
+          <path stroke="#64748b" stroke-width="1.2" stroke-linecap="round" d="M5 27h22"/>
         </svg>
       </div>
-      <button type="button" class="sidebar-toggle" id="sidebar-toggle" onclick="window.__fflToggleSidebar()" title="Collapse sidebar" aria-expanded="true">
+      <button type="button" class="sidebar-toggle ffl-btn ffl-btn--sidebar" id="sidebar-toggle" onclick="window.__fflToggleSidebar()" title="Collapse sidebar" aria-expanded="true">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path id="sidebar-chevron-path" d="M15 6l-6 6 6 6"/></svg>
       </button>
       <span class="sidebar-title-text">Fuel fault lines<small>Energy vulnerability</small></span>
     </div>
     <nav class="sidebar-nav" aria-label="Pages">
+      <div class="sidebar-nav-section" aria-hidden="true">Explore</div>
       <button type="button" class="nav-item active" data-page="dashboard" onclick="window.__fflSetPage('dashboard')">
         <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg></span><span class="nav-item-label">Dashboard</span>
       </button>
@@ -3273,6 +3665,7 @@
       <button type="button" class="nav-item" data-page="counties" onclick="window.__fflSetPage('counties')">
         <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-8-6.5-8-11a8 8 0 1116 0c0 4.5-8 11-8 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span class="nav-item-label">Counties</span>
       </button>
+      <div class="sidebar-nav-section" aria-hidden="true">Workspace</div>
       <button type="button" class="nav-item" data-page="method" onclick="window.__fflSetPage('method')">
         <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v15H6.5A2.5 2.5 0 0 1 4 14.5v-10A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 10h6M9 14h4M8 22h8l-1-4H9l-1 4z"/></svg></span><span class="nav-item-label">Method &amp; lab</span>
       </button>
@@ -3616,7 +4009,7 @@
         <div class="page-panel" style="max-width:40rem">
           <p class="prose-hint">Open the sliding panel to browse every county. Tap a row for scores, fuel share of income, retrofit context, and TD actions. Set diesel price on <strong>Scenarios</strong> first if you need a different €/L.</p>
           <div class="page-actions">
-            <button type="button" class="btn-drawer-counties" onclick="window.__fflOpenCountyDrawer()">Open county register</button>
+            <button type="button" class="btn-drawer-counties ffl-btn ffl-btn--secondary" onclick="window.__fflOpenCountyDrawer()">Open county register</button>
           </div>
           <div class="method-section" style="margin-top:1rem" aria-labelledby="compare-two-h">
             <h2 id="compare-two-h" style="font-size:1rem;margin-bottom:0.35rem">Compare two counties</h2>
@@ -3624,7 +4017,7 @@
             <div class="compare-two-row">
               <select id="compare-county-a" aria-label="County A"></select>
               <select id="compare-county-b" aria-label="County B"></select>
-              <button type="button" class="btn-drawer-counties" onclick="window.__fflRunCountyCompare()">Compare</button>
+              <button type="button" class="btn-drawer-counties ffl-btn ffl-btn--secondary" onclick="window.__fflRunCountyCompare()">Compare</button>
             </div>
             <details class="method-raw" style="margin-top:0.5rem">
               <summary>Raw JSON (delta)</summary>
@@ -3698,8 +4091,8 @@
           <h2 id="m-export-h">National markdown export</h2>
           <p>One-page brief for write-ups: <code>GET /export/briefing</code></p>
           <div class="method-lab-actions">
-            <button type="button" class="btn-drawer-counties" onclick="window.__fflCopyNationalBriefing()">Copy briefing markdown</button>
-            <button type="button" class="btn-drawer-counties" onclick="window.__fflOpenNationalBriefing()">Open in new tab</button>
+            <button type="button" class="btn-drawer-counties ffl-btn ffl-btn--secondary" onclick="window.__fflCopyNationalBriefing()">Copy briefing markdown</button>
+            <button type="button" class="btn-drawer-counties ffl-btn ffl-btn--secondary" onclick="window.__fflOpenNationalBriefing()">Open in new tab</button>
           </div>
         </section>
 
@@ -3777,7 +4170,7 @@
             <input type="checkbox" id="lab-hdd" checked> Apply heating-demand (HDD) multiplier to litres proxy
           </label>
           <div class="method-lab-actions">
-            <button type="button" class="btn-drawer-counties" onclick="window.__fflApplyModelLab()">Apply &amp; reload model</button>
+            <button type="button" class="btn-drawer-counties ffl-btn ffl-btn--secondary" onclick="window.__fflApplyModelLab()">Apply &amp; reload model</button>
             <span id="lab-status" style="font-size:0.78rem;color:var(--ink3)"></span>
           </div>
         </section>
@@ -3825,10 +4218,10 @@
           <h2 id="sub-pack-h">Submission pack (from API)</h2>
           <p class="prose-hint">Loaded from <code>GET /insights/submission-pack</code> at your scenario €/L. Edit before pasting to Devpost.</p>
           <div class="submit-copy-row">
-            <button type="button" class="btn-drawer-counties" onclick="window.__fflReloadSubmissionPack()">Refresh pack</button>
-            <button type="button" class="btn-drawer-counties" onclick="window.__fflCopySubmitField('devpost')">Copy Devpost draft</button>
-            <button type="button" class="btn-drawer-counties" onclick="window.__fflCopySubmitField('social')">Copy social post</button>
-            <button type="button" class="btn-drawer-counties" onclick="window.__fflCopySubmitField('headline')">Copy key headline</button>
+            <button type="button" class="btn-drawer-counties ffl-btn ffl-btn--secondary" onclick="window.__fflReloadSubmissionPack()">Refresh pack</button>
+            <button type="button" class="btn-drawer-counties ffl-btn ffl-btn--secondary" onclick="window.__fflCopySubmitField('devpost')">Copy Devpost draft</button>
+            <button type="button" class="btn-drawer-counties ffl-btn ffl-btn--secondary" onclick="window.__fflCopySubmitField('social')">Copy social post</button>
+            <button type="button" class="btn-drawer-counties ffl-btn ffl-btn--secondary" onclick="window.__fflCopySubmitField('headline')">Copy key headline</button>
           </div>
           <p style="font-size:0.72rem;color:var(--ink3);margin:0.75rem 0 0.25rem;font-family:var(--mono);text-transform:uppercase;letter-spacing:0.06em">Devpost summary (≤300 words)</p>
           <textarea id="submit-devpost-ta" class="submit-textarea" readonly aria-label="Devpost summary draft"></textarea>
@@ -3873,7 +4266,7 @@
             <div class="ai-page-key">
               <input type="password" id="ai-api-key" placeholder="Gemini API key…" autocomplete="off" aria-label="Google Gemini API key"
                      onblur="window.__fflSaveAiKey()">
-              <button type="button" onclick="window.__fflSaveAiKey()">Save key</button>
+              <button type="button" class="ffl-btn ffl-btn--primary" onclick="window.__fflSaveAiKey()">Save key</button>
             </div>
           </div>
           <div class="ai-chips-page" id="ai-chips">
@@ -3885,7 +4278,7 @@
           <div class="ai-thread-page" id="ai-thread"></div>
           <div class="ai-input-row-page">
             <input type="text" id="ai-input" placeholder="Message…" maxlength="2000" aria-label="Message to analyst">
-            <button type="button" id="ai-send" onclick="window.__fflAiSend()">Send</button>
+            <button type="button" id="ai-send" class="ffl-btn ffl-btn--primary" onclick="window.__fflAiSend()">Send</button>
           </div>
         </div>
       </div>
@@ -3903,7 +4296,7 @@
         <h2>Counties</h2>
         <p class="dash-card-sub" style="margin-top:0.25rem">Tap a row for details</p>
       </div>
-      <button type="button" class="county-drawer-close" onclick="window.__fflCloseCountyDrawer()" aria-label="Close">
+      <button type="button" class="county-drawer-close ffl-btn ffl-btn--icon" onclick="window.__fflCloseCountyDrawer()" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </div>
@@ -3938,7 +4331,7 @@
         <div class="modal-tier" id="modal-tier-badge"></div>
         <p class="sub" id="modal-province" style="margin-top:0.35rem;font-family:var(--mono);font-size:0.62rem;color:var(--ink3);text-transform:uppercase;letter-spacing:0.06em"></p>
       </div>
-      <button type="button" class="modal-close" id="modal-close-btn" aria-label="Close">
+      <button type="button" class="modal-close ffl-btn ffl-btn--icon" id="modal-close-btn" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </div>
@@ -4201,6 +4594,31 @@
       .replace(/"/g, '&quot;');
   }
 
+  var FFL_SVG_TRI_ALERT =
+    '<svg class="ffl-inline-svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h18.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>';
+  var FFL_SVG_INFO =
+    '<svg class="ffl-inline-svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none"/><path d="M12 16v-4M12 8h.01"/></svg>';
+
+  var __fflLastNoticePlain = '';
+
+  function fflInlineAlert(kind, title, msg) {
+    var k = kind === 'warn' ? 'warn' : 'error';
+    return (
+      '<div class="ffl-inline-alert ffl-inline-alert--' +
+      k +
+      '" role="alert">' +
+      '<span class="ffl-inline-alert__ico" aria-hidden="true">' +
+      FFL_SVG_TRI_ALERT +
+      '</span><div class="ffl-inline-alert__body">' +
+      '<p class="ffl-inline-alert__title">' +
+      escapeHtml(title) +
+      '</p>' +
+      '<p class="ffl-inline-alert__msg">' +
+      escapeHtml(msg) +
+      '</p></div></div>'
+    );
+  }
+
   function normalizeScenario(raw) {
     if (!raw || typeof raw !== 'object') return null;
     const byCounty = {};
@@ -4444,12 +4862,15 @@
     const roi = d.retrofit_roi_saving_10yr;
     const roiGood = typeof roi === 'number' && roi > 0;
     const pl = priceLabel != null ? priceLabel : getActivePrice().toFixed(2);
+    const fuelCls = inEnergyPoverty(d) ? 'poverty-bar__value--bad' : 'poverty-bar__value--ok';
+    const cliffDdCls = cliffWarn ? 'val-bad' : 'val-warn';
+    const povFlagCls = inEnergyPoverty(d) ? 'val-bad' : 'val-good';
     return (
       '<div class="poverty-bar">' +
       '<div class="row"><span>Fuel as % of income</span>' +
-      '<span style="color:' +
-      (inEnergyPoverty(d) ? COLORS.critical : COLORS.low) +
-      ';font-weight:600">' +
+      '<span class="' +
+      fuelCls +
+      '">' +
       pov.toFixed(1) +
       '%</span></div>' +
       '<div class="bar-track">' +
@@ -4466,46 +4887,40 @@
       '% · scenario €' +
       pl +
       '/L</p></div>' +
-      '<div class="metric-row"><span class="k">Cliff price</span>' +
-      '<span class="v ' +
-      (cliffWarn ? 'bad' : 'warn') +
+      '<dl class="metric-spec metric-spec--flush">' +
+      '<div class="metric-spec__row"><dt>Cliff price</dt><dd class="' +
+      cliffDdCls +
       '">€' +
       cliffStr +
-      '/L</span></div>' +
-      '<div class="metric-row"><span class="k">Est. annual income</span>' +
-      '<span class="v">€' +
+      '/L</dd></div>' +
+      '<div class="metric-spec__row"><dt>Est. annual income</dt><dd>€' +
       Math.round(Number(d.estimated_annual_income) || 0).toLocaleString() +
-      '</span></div>' +
-      '<div class="metric-row"><span class="k">Annual heating bill</span>' +
-      '<span class="v warn">€' +
+      '</dd></div>' +
+      '<div class="metric-spec__row"><dt>Annual heating bill</dt><dd class="val-warn">€' +
       Math.round(Number(d.annual_oil_bill_eur) || 0).toLocaleString() +
-      '</span></div>' +
-      '<div class="metric-row"><span class="k">Vulnerable households</span>' +
-      '<span class="v">' +
+      '</dd></div>' +
+      '<div class="metric-spec__row"><dt>Vulnerable households</dt><dd>' +
       (Number(d.est_vulnerable_households) || 0).toLocaleString() +
-      '</span></div>' +
-      '<div class="metric-row"><span class="k">Energy poverty flag</span>' +
-      '<span class="v ' +
-      (inEnergyPoverty(d) ? 'bad' : 'good') +
+      '</dd></div>' +
+      '<div class="metric-spec__row"><dt>Energy poverty flag</dt><dd class="' +
+      povFlagCls +
       '">' +
       (inEnergyPoverty(d) ? 'Yes' : 'No') +
-      '</span></div>' +
-      '<div class="note-panel retrofit-panel" style="margin-top:1rem">' +
-      '<h3>Warmer Homes (illustrative)</h3>' +
-      '<div class="metric-row"><span class="k">Annual saving post-retrofit</span>' +
-      '<span class="v good">€' +
+      '</dd></div></dl>' +
+      '<details class="retrofit-details">' +
+      '<summary>Warmer Homes <span class="retrofit-details__hint">illustrative</span></summary>' +
+      '<dl class="metric-spec metric-spec--flush">' +
+      '<div class="metric-spec__row"><dt>Annual saving post-retrofit</dt><dd class="val-good">€' +
       Math.round(Number(d.annual_saving_post_retrofit) || 0).toLocaleString() +
-      '</span></div>' +
-      '<div class="metric-row"><span class="k">Breakeven</span>' +
-      '<span class="v warn">' +
+      '</dd></div>' +
+      '<div class="metric-spec__row"><dt>Breakeven</dt><dd class="val-warn">' +
       (d.breakeven_years != null ? String(d.breakeven_years) : '—') +
-      ' yr</span></div>' +
-      '<div class="metric-row"><span class="k">10yr position vs allowance</span>' +
-      '<span class="v ' +
-      (roiGood ? 'good' : 'warn') +
+      ' yr</dd></div>' +
+      '<div class="metric-spec__row"><dt>10yr position vs allowance</dt><dd class="' +
+      (roiGood ? 'val-good' : 'val-warn') +
       '">€' +
       Math.round(Math.abs(Number(roi) || 0)).toLocaleString() +
-      '</span></div></div>'
+      '</dd></div></dl></details>'
     );
   }
 
@@ -4615,54 +5030,63 @@
 
     const body = document.getElementById('modal-body');
     body.innerHTML =
-      '<div class="modal-score-big" id="modal-score-num" style="color:' +
-      scoreColor +
-      '">0</div>' +
-      '<div class="modal-stat-row">' +
-      '<div class="modal-stat"><div class="lbl">Vulnerable households</div><div class="val">' +
+      '<div class="modal-body-inner tier-tone-' +
+      tier +
+      '">' +
+      '<div class="modal-score-big" id="modal-score-num">0</div>' +
+      '<div class="modal-kpi-strip">' +
+      '<div class="modal-kpi modal-kpi--primary">' +
+      '<span class="modal-kpi__lbl">Vulnerable households</span>' +
+      '<span class="modal-kpi__val">' +
       hh.toLocaleString() +
-      '</div></div>' +
-      '<div class="modal-stat"><div class="lbl">Children at risk</div><div class="val">' +
+      '</span></div>' +
+      '<div class="modal-kpi">' +
+      '<span class="modal-kpi__lbl">Children at risk</span>' +
+      '<span class="modal-kpi__val">' +
       (ch != null ? Number(ch).toLocaleString() : '—') +
-      '</div></div>' +
-      '<div class="modal-stat"><div class="lbl">Elderly at risk</div><div class="val">' +
+      '</span></div>' +
+      '<div class="modal-kpi">' +
+      '<span class="modal-kpi__lbl">Elderly at risk</span>' +
+      '<span class="modal-kpi__val">' +
       (eld != null ? Number(eld).toLocaleString() : '—') +
-      '</div></div></div>' +
+      '</span></div></div>' +
       '<p class="drivers-label">Component scores (0–100)</p>' +
       '<div class="chart-radar-wrap"><canvas id="radar-canvas-host-modal"></canvas></div>' +
       buildCountyMetricsHtml(merged, getActivePrice().toFixed(2)) +
-      '<div class="narrative-box"><h4>What this means</h4>' +
+      '<div class="callout-panel"><h4>What this means</h4>' +
       nar +
       '</div>' +
-      '<div class="td-box"><h4>Your TD</h4>' +
+      '<div class="callout-panel callout-panel--td"><h4>Your TD</h4>' +
       (tdName
-        ? '<p style="font-size:0.85rem">' +
+        ? '<p class="td-line">' +
           escapeHtml(String(tdName)) +
           (tdParty ? ' · ' + escapeHtml(String(tdParty)) : '') +
           '</p>'
-        : '<p style="font-size:0.78rem;color:var(--ink3)">TD contact not available for this county in the API response.</p>') +
+        : '<p class="td-muted">TD contact not available for this county in the API response.</p>') +
       (tdEmail
-        ? '<p style="font-family:var(--mono);font-size:0.68rem;margin-top:0.35rem"><a href="mailto:' +
+        ? '<p class="td-email"><a href="mailto:' +
           escapeHtml(tdEmail) +
           '">' +
           escapeHtml(tdEmail) +
           '</a></p>'
         : '') +
       '<div class="td-actions">' +
-      '<a class="primary" href="' +
+      '<a class="ffl-btn ffl-btn--primary ffl-btn--sm' +
+      (mailHref === '#' ? ' is-disabled' : '') +
+      '" href="' +
       escapeHtml(mailHref) +
       '"' +
-      (mailHref === '#' ? ' onclick="return false" style="opacity:0.5;pointer-events:none"' : '') +
+      (mailHref === '#' ? ' onclick="return false"' : '') +
       '>Email your TD</a>' +
-      '<a href="' +
+      '<a class="ffl-btn ffl-btn--secondary ffl-btn--sm" href="' +
       escapeHtml(tw) +
       '" target="_blank" rel="noopener noreferrer">Share on X</a>' +
-      '</div>' +
+      '</div></div>' +
       '<div class="modal-export-row">' +
-      '<button type="button" onclick="window.__fflExportCountyBrief(\'' +
+      '<button type="button" class="ffl-btn ffl-btn--secondary ffl-btn--sm" onclick="window.__fflExportCountyBrief(\'' +
       String(merged.county || county).replace(/'/g, "\\'") +
       '\')">Copy markdown brief</button>' +
-      '<button type="button" onclick="window.__fflOpenExportCounty(\'' +
+      '<button type="button" class="ffl-btn ffl-btn--secondary ffl-btn--sm" onclick="window.__fflOpenExportCounty(\'' +
       String(merged.county || county).replace(/'/g, "\\'") +
       '\')">Open export URL</button>' +
       '</div></div>';
@@ -5485,36 +5909,57 @@
     ai: 'AI · Gemini'
   };
 
+  function __fflSyncPageAria() {
+    document.querySelectorAll('.page-view').forEach(function (el) {
+      var on = el.classList.contains('active');
+      el.setAttribute('aria-hidden', on ? 'false' : 'true');
+      if (on) el.removeAttribute('inert');
+      else el.setAttribute('inert', '');
+    });
+  }
+
   window.__fflSetPage = function (page) {
     appPage = page || 'dashboard';
     if (!PAGE_TITLES[appPage]) appPage = 'dashboard';
-    document.querySelectorAll('.nav-item[data-page]').forEach(function (btn) {
-      btn.classList.toggle('active', btn.getAttribute('data-page') === appPage);
-    });
-    document.querySelectorAll('.page-view').forEach(function (el) {
-      el.classList.remove('active');
-    });
-    var panel = document.getElementById('page-' + appPage);
-    if (panel) panel.classList.add('active');
-    var titleEl = document.getElementById('page-title');
-    if (titleEl) titleEl.textContent = PAGE_TITLES[appPage] || 'Dashboard';
-    if (appPage === 'compare') {
-      refreshMatricesChart();
-    }
-    if (appPage === 'method') {
-      refreshMethodPage();
-    }
-    if (appPage === 'submit') {
-      refreshSubmissionPage();
-    }
-    try {
-      localStorage.setItem('ffl_page', appPage);
-    } catch (eP) {}
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        __fflResizeChartsAfterSidebar();
+
+    function applyPageDom() {
+      document.querySelectorAll('.nav-item[data-page]').forEach(function (btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-page') === appPage);
       });
-    });
+      document.querySelectorAll('.page-view').forEach(function (el) {
+        el.classList.remove('active');
+      });
+      var panel = document.getElementById('page-' + appPage);
+      if (panel) panel.classList.add('active');
+      var titleEl = document.getElementById('page-title');
+      if (titleEl) titleEl.textContent = PAGE_TITLES[appPage] || 'Dashboard';
+      __fflSyncPageAria();
+      if (appPage === 'compare') {
+        refreshMatricesChart();
+      }
+      if (appPage === 'method') {
+        refreshMethodPage();
+      }
+      if (appPage === 'submit') {
+        refreshSubmissionPage();
+      }
+      try {
+        localStorage.setItem('ffl_page', appPage);
+      } catch (eP) {}
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          __fflResizeChartsAfterSidebar();
+        });
+      });
+    }
+
+    if (typeof document.startViewTransition === 'function') {
+      document.startViewTransition(function () {
+        applyPageDom();
+      });
+    } else {
+      applyPageDom();
+    }
   };
 
   function __fflResizeChartsAfterSidebar() {
@@ -5574,7 +6019,18 @@
       tg.setAttribute('aria-expanded', sidebarCollapsed ? 'false' : 'true');
       tg.setAttribute('title', sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar');
     }
+    __fflSyncNavTooltips();
   };
+
+  function __fflSyncNavTooltips() {
+    var sb = document.getElementById('app-sidebar');
+    var collapsed = sb && sb.classList.contains('collapsed');
+    document.querySelectorAll('.nav-item[data-page]').forEach(function (btn) {
+      var lab = btn.querySelector('.nav-item-label');
+      var text = lab ? String(lab.textContent || '').trim() : '';
+      btn.setAttribute('title', collapsed && text ? text : '');
+    });
+  }
 
   window.__fflMatricesViewMode = function (mode) {
     matricesViewMode = mode === 'table' ? 'table' : 'graph';
@@ -5863,13 +6319,28 @@
     var detail = opts.detail || '';
     var code = opts.code || '';
     var dismissible = opts.dismissible !== false;
-    var ico = sev === 'error' ? '!' : sev === 'warn' ? '!' : 'i';
+    var icoInner = sev === 'info' ? FFL_SVG_INFO : FFL_SVG_TRI_ALERT;
+    __fflLastNoticePlain =
+      title + (detail ? '\n\n' + detail : '') + (code ? '\n\n' + code : '');
+    var canRetry =
+      code === 'NETWORK' || (typeof code === 'string' && code.indexOf('HTTP_') === 0);
+    var actions = '';
+    if (canRetry) {
+      actions +=
+        '<div class="app-notice-actions">' +
+        '<button type="button" class="ffl-btn ffl-btn--secondary ffl-btn--sm" onclick="window.__fflNoticeRetry()">Retry load</button>' +
+        '<button type="button" class="ffl-btn ffl-btn--ghost ffl-btn--sm" onclick="window.__fflNoticeCopyDetail()">Copy details</button></div>';
+    } else if (detail || code) {
+      actions +=
+        '<div class="app-notice-actions">' +
+        '<button type="button" class="ffl-btn ffl-btn--ghost ffl-btn--sm" onclick="window.__fflNoticeCopyDetail()">Copy details</button></div>';
+    }
     wrap.innerHTML =
       '<div class="app-notice app-notice--' +
       sev +
       '" role="alert">' +
       '<span class="app-notice-ico" aria-hidden="true">' +
-      ico +
+      icoInner +
       '</span>' +
       '<div class="app-notice-body">' +
       '<p class="app-notice-title">' +
@@ -5881,9 +6352,10 @@
       (code
         ? '<p class="app-notice-code">' + escapeHtml(code) + '</p>'
         : '') +
+      actions +
       '</div>' +
       (dismissible
-        ? '<button type="button" class="app-notice-dismiss" onclick="window.__fflDismissNotice()">Dismiss</button>'
+        ? '<button type="button" class="ffl-btn ffl-btn--notice app-notice-dismiss" onclick="window.__fflDismissNotice()">Dismiss</button>'
         : '') +
       '</div>';
     wrap.classList.add('visible');
@@ -5898,6 +6370,28 @@
 
   window.__fflDismissNotice = function () {
     clearAppNotice();
+  };
+
+  window.__fflNoticeCopyDetail = function () {
+    var t = __fflLastNoticePlain || '';
+    if (!t) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(t).catch(function () {
+        showAppNotice({
+          severity: 'warn',
+          title: 'Copy failed',
+          detail: 'Clipboard permission was denied or unavailable.',
+          code: null
+        });
+      });
+    }
+  };
+
+  window.__fflNoticeRetry = function () {
+    clearAppNotice();
+    try {
+      runLoad(false);
+    } catch (eR) {}
   };
 
   window.__fflOpenExportCounty = function (county) {
@@ -6453,8 +6947,15 @@
       }
     } catch (e) {
       submissionPackCache = null;
-      if (ta) ta.value = 'Could not load submission pack. Deploy API with GET /insights/submission-pack.';
+      if (ta) ta.value = '';
       if (pre) pre.textContent = String(e && e.message ? e.message : e);
+      showAppNotice({
+        severity: 'error',
+        title: 'Submission pack unavailable',
+        detail:
+          'Could not load GET /insights/submission-pack. Deploy the FastAPI hub or check the dev-server /api proxy.',
+        code: 'PACK'
+      });
     }
   }
 
@@ -6672,11 +7173,21 @@
           setHtml('method-national-human', formatNationalHuman(j));
         } else {
           preNat.textContent = 'HTTP ' + r.status;
-          setHtml('method-national-human', '<p>Could not load snapshot.</p>');
+          setHtml(
+            'method-national-human',
+            fflInlineAlert('error', 'National snapshot', 'The API returned an error or empty body.')
+          );
         }
       } catch (e) {
         preNat.textContent = String(e);
-        setHtml('method-national-human', '<p>Network error.</p>');
+        setHtml(
+          'method-national-human',
+          fflInlineAlert(
+            'error',
+            'National snapshot',
+            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
+          )
+        );
       }
     }
     if (preVal) {
@@ -6688,11 +7199,21 @@
           setHtml('method-validation-human', formatValidationHuman(j));
         } else {
           preVal.textContent = 'HTTP ' + r.status;
-          setHtml('method-validation-human', '<p>Could not load validation.</p>');
+          setHtml(
+            'method-validation-human',
+            fflInlineAlert('error', 'Model validation', 'The API returned an error or empty body.')
+          );
         }
       } catch (e) {
         preVal.textContent = String(e);
-        setHtml('method-validation-human', '<p>Network error.</p>');
+        setHtml(
+          'method-validation-human',
+          fflInlineAlert(
+            'error',
+            'Model validation',
+            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
+          )
+        );
       }
     }
     if (preDist) {
@@ -6704,11 +7225,21 @@
           setHtml('method-distribution-human', formatDistributionHuman(j));
         } else {
           preDist.textContent = 'HTTP ' + r.status;
-          setHtml('method-distribution-human', '<p>Could not load distribution.</p>');
+          setHtml(
+            'method-distribution-human',
+            fflInlineAlert('error', 'Score distribution', 'The API returned an error or empty body.')
+          );
         }
       } catch (e) {
         preDist.textContent = String(e);
-        setHtml('method-distribution-human', '<p>Network error.</p>');
+        setHtml(
+          'method-distribution-human',
+          fflInlineAlert(
+            'error',
+            'Score distribution',
+            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
+          )
+        );
       }
     }
     if (preBr) {
@@ -6722,11 +7253,21 @@
           setHtml('method-breach-human', formatBreachHuman(j));
         } else {
           preBr.textContent = 'HTTP ' + r.status;
-          setHtml('method-breach-human', '<p>Could not load breach prices.</p>');
+          setHtml(
+            'method-breach-human',
+            fflInlineAlert('error', 'Breach prices', 'The API returned an error or empty body.')
+          );
         }
       } catch (e) {
         preBr.textContent = String(e);
-        setHtml('method-breach-human', '<p>Network error.</p>');
+        setHtml(
+          'method-breach-human',
+          fflInlineAlert(
+            'error',
+            'Breach prices',
+            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
+          )
+        );
       }
     }
     if (preReg) {
@@ -6738,11 +7279,21 @@
           setHtml('method-regional-human', formatRegionalHuman(j));
         } else {
           preReg.textContent = 'HTTP ' + r.status;
-          setHtml('method-regional-human', '<p>Could not load regions.</p>');
+          setHtml(
+            'method-regional-human',
+            fflInlineAlert('error', 'Regional insights', 'The API returned an error or empty body.')
+          );
         }
       } catch (e) {
         preReg.textContent = String(e);
-        setHtml('method-regional-human', '<p>Network error.</p>');
+        setHtml(
+          'method-regional-human',
+          fflInlineAlert(
+            'error',
+            'Regional insights',
+            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
+          )
+        );
       }
     }
     if (preNar) {
@@ -6766,13 +7317,23 @@
           if (elEv) elEv.textContent = pitch || '';
         } else {
           preNar.textContent = 'HTTP ' + r.status;
-          setHtml('method-narrative-human', '<p>Could not load narrative.</p>');
+          setHtml(
+            'method-narrative-human',
+            fflInlineAlert('error', 'Narrative pack', 'The API returned an error or empty body.')
+          );
           const elEv = document.getElementById('method-narrative-elevator');
           if (elEv) elEv.textContent = '';
         }
       } catch (e) {
         preNar.textContent = String(e);
-        setHtml('method-narrative-human', '<p>Network error.</p>');
+        setHtml(
+          'method-narrative-human',
+          fflInlineAlert(
+            'error',
+            'Narrative pack',
+            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
+          )
+        );
         const elEv2 = document.getElementById('method-narrative-elevator');
         if (elEv2) elEv2.textContent = '';
       }
@@ -6795,11 +7356,21 @@
           setHtml('method-curve-human', formatCurveHuman(j));
         } else {
           preCurve.textContent = 'HTTP ' + r.status;
-          setHtml('method-curve-human', '<p>Could not load curve.</p>');
+          setHtml(
+            'method-curve-human',
+            fflInlineAlert('error', 'Scenario curve', 'The API returned an error or empty body.')
+          );
         }
       } catch (e) {
         preCurve.textContent = String(e);
-        setHtml('method-curve-human', '<p>Network error.</p>');
+        setHtml(
+          'method-curve-human',
+          fflInlineAlert(
+            'error',
+            'Scenario curve',
+            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
+          )
+        );
       }
     }
     if (preRank) {
@@ -6811,11 +7382,21 @@
           setHtml('method-ranking-human', formatRankingHuman(j));
         } else {
           preRank.textContent = 'HTTP ' + r.status;
-          setHtml('method-ranking-human', '<p>Could not load ranking stability.</p>');
+          setHtml(
+            'method-ranking-human',
+            fflInlineAlert('error', 'Ranking stability', 'The API returned an error or empty body.')
+          );
         }
       } catch (e) {
         preRank.textContent = String(e);
-        setHtml('method-ranking-human', '<p>Network error.</p>');
+        setHtml(
+          'method-ranking-human',
+          fflInlineAlert(
+            'error',
+            'Ranking stability',
+            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
+          )
+        );
       }
     }
     if (preC) {
@@ -6827,11 +7408,21 @@
           setHtml('method-claims-human', formatClaimsHuman(j));
         } else {
           preC.textContent = 'HTTP ' + r.status;
-          setHtml('method-claims-human', '<p>Could not load claims.</p>');
+          setHtml(
+            'method-claims-human',
+            fflInlineAlert('error', 'Registered claims', 'The API returned an error or empty body.')
+          );
         }
       } catch (e) {
         preC.textContent = String(e);
-        setHtml('method-claims-human', '<p>Network error.</p>');
+        setHtml(
+          'method-claims-human',
+          fflInlineAlert(
+            'error',
+            'Registered claims',
+            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
+          )
+        );
       }
     }
     if (preS) {
@@ -6843,11 +7434,21 @@
           setHtml('method-sensitivity-human', formatSensitivityHuman(j));
         } else {
           preS.textContent = 'HTTP ' + r.status;
-          setHtml('method-sensitivity-human', '<p>Could not load sensitivity.</p>');
+          setHtml(
+            'method-sensitivity-human',
+            fflInlineAlert('error', 'Sensitivity analysis', 'The API returned an error or empty body.')
+          );
         }
       } catch (e) {
         preS.textContent = String(e);
-        setHtml('method-sensitivity-human', '<p>Network error.</p>');
+        setHtml(
+          'method-sensitivity-human',
+          fflInlineAlert(
+            'error',
+            'Sensitivity analysis',
+            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
+          )
+        );
       }
     }
     if (preP) {
@@ -6859,11 +7460,21 @@
           setHtml('method-policy-human', formatPolicyHuman(j));
         } else {
           preP.textContent = 'HTTP ' + r.status;
-          setHtml('method-policy-human', '<p>Could not load policy.</p>');
+          setHtml(
+            'method-policy-human',
+            fflInlineAlert('error', 'Policy hooks', 'The API returned an error or empty body.')
+          );
         }
       } catch (e) {
         preP.textContent = String(e);
-        setHtml('method-policy-human', '<p>Network error.</p>');
+        setHtml(
+          'method-policy-human',
+          fflInlineAlert(
+            'error',
+            'Policy hooks',
+            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
+          )
+        );
       }
     }
   }
@@ -7596,9 +8207,8 @@
       dp.innerHTML =
         '<div class="note-panel">' +
         '<h2>' + escapeHtml(county) + '</h2>' +
-        '<p style="color:var(--critical);font-size:0.82rem;margin-top:0.65rem;line-height:1.5">' +
-        escapeHtml(message) + '</p>' +
-        '<p class="panel-refresh-hint">Change the price or retry.</p>' +
+        fflInlineAlert('error', 'Could not show county detail', message || 'Unknown error.') +
+        '<p class="panel-refresh-hint">Change the price or pick another county from the register.</p>' +
         '</div>';
     }
   }
@@ -7673,7 +8283,9 @@
 
     dp.innerHTML =
       '<div class="detail-stack">' +
-      '<div class="note-panel">' +
+      '<div class="note-panel tier-tone-' +
+      tier +
+      '">' +
       '<h2>' + escapeHtml(d.county) + '</h2>' +
       '<p class="sub">' +
       escapeHtml(d.province) +
@@ -7681,8 +8293,8 @@
       getActivePrice().toFixed(2) +
       '/L scenario</p>' +
       '<div class="score-block">' +
-      '<div class="num" style="color:' + scoreColor + '">' + formatNum(d.vulnerability_score) + '</div>' +
-      '<div class="meta">Composite index<br><strong style="color:' + scoreColor + '">' +
+      '<div class="num">' + formatNum(d.vulnerability_score) + '</div>' +
+      '<div class="meta">Composite index<br><strong class="tier-label">' +
       escapeHtml(String(d.risk_tier)) + '</strong></div></div>' +
       '<p class="drivers-label">Component scores (0–100)</p>' +
       '<div class="chart-radar-wrap"><canvas id="radar-canvas-host"></canvas></div>' +
@@ -7775,7 +8387,13 @@
     const base = d || countyData[county];
     if (!base) {
       mb.innerHTML =
-        '<p style="color:var(--critical);font-size:0.82rem">Could not load county data.</p>';
+        '<div class="modal-error-wrap">' +
+        fflInlineAlert(
+          'error',
+          'County data unavailable',
+          'Could not load this county from the API at the current fuel price.'
+        ) +
+        '</div>';
       renderDetailError(county, 'Could not load county.');
       return;
     }
@@ -7788,9 +8406,13 @@
       updateDashboardCharts();
     } catch (err) {
       mb.innerHTML =
-        '<p style="color:var(--critical);font-size:0.82rem">' +
-        escapeHtml(err.message || 'Could not render county.') +
-        '</p>';
+        '<div class="modal-error-wrap">' +
+        fflInlineAlert(
+          'error',
+          'Could not render county',
+          err.message || 'Could not render county.'
+        ) +
+        '</div>';
       renderDetailError(county, err.message || 'Could not render county.');
     }
   };
@@ -8154,7 +8776,11 @@
   try {
     var savedPage = localStorage.getItem('ffl_page');
     if (savedPage && PAGE_TITLES[savedPage]) window.__fflSetPage(savedPage);
-  } catch (eBoot) {}
+    else __fflSyncPageAria();
+  } catch (eBoot) {
+    __fflSyncPageAria();
+  }
+  __fflSyncNavTooltips();
   updateConnectionPill();
   (async function boot() {
     await fetchCountiesList();
