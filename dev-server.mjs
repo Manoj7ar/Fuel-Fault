@@ -78,32 +78,50 @@ const server = http.createServer((req, res) => {
     let upstreamPath = url.pathname.replace(/^\/api/, '') || '/';
     if (!upstreamPath.startsWith('/')) upstreamPath = '/' + upstreamPath;
     upstreamPath += url.search;
-    const opts = {
-      hostname: UPSTREAM_HOST,
-      port: 443,
-      path: upstreamPath,
-      method: 'GET',
-      headers: {
-        Host: UPSTREAM_HOST,
-        'User-Agent': 'FuelFaultLines-LocalProxy/1.0',
-      },
-    };
-    const pReq = https.request(opts, (pRes) => {
-      const chunks = [];
-      pRes.on('data', (c) => chunks.push(c));
-      pRes.on('end', () => {
-        const body = Buffer.concat(chunks);
-        res.writeHead(pRes.statusCode || 500, cors({
-          'Content-Type': pRes.headers['content-type'] || 'application/json; charset=utf-8',
-        }));
-        res.end(body);
+
+    function forwardOnce(attempt) {
+      const opts = {
+        hostname: UPSTREAM_HOST,
+        port: 443,
+        path: upstreamPath,
+        method: 'GET',
+        headers: {
+          Host: UPSTREAM_HOST,
+          'User-Agent': 'FuelFaultLines-LocalProxy/1.0',
+        },
+      };
+      const pReq = https.request(opts, (pRes) => {
+        const chunks = [];
+        pRes.on('data', (c) => chunks.push(c));
+        pRes.on('end', () => {
+          const code = pRes.statusCode || 500;
+          const body = Buffer.concat(chunks);
+          if ((code === 502 || code === 503) && attempt < 1) {
+            setTimeout(function () {
+              forwardOnce(attempt + 1);
+            }, 450);
+            return;
+          }
+          res.writeHead(code, cors({
+            'Content-Type': pRes.headers['content-type'] || 'application/json; charset=utf-8',
+          }));
+          res.end(body);
+        });
       });
-    });
-    pReq.on('error', (e) => {
-      res.writeHead(502, cors({ 'Content-Type': 'application/json; charset=utf-8' }));
-      res.end(JSON.stringify({ error: 'Proxy error', message: e.message }));
-    });
-    pReq.end();
+      pReq.on('error', (e) => {
+        if (attempt < 1) {
+          setTimeout(function () {
+            forwardOnce(attempt + 1);
+          }, 450);
+          return;
+        }
+        res.writeHead(502, cors({ 'Content-Type': 'application/json; charset=utf-8' }));
+        res.end(JSON.stringify({ error: 'Proxy error', message: e.message }));
+      });
+      pReq.end();
+    }
+
+    forwardOnce(0);
     return;
   }
 

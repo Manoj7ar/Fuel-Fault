@@ -55,22 +55,16 @@
       --glass-bg-strong: rgba(255, 255, 255, 0.86);
       --glass-border: rgba(226, 232, 240, 0.9);
       --glass-highlight: rgba(255, 255, 255, 0.55);
+      --glass-highlight-strong: rgba(255, 255, 255, 0.72);
       --glass-shadow: 0 4px 28px rgba(15, 23, 42, 0.06), 0 1px 0 var(--glass-highlight) inset;
+      --glass-btn-shadow: 0 2px 12px rgba(15, 23, 42, 0.06), 0 1px 0 var(--glass-highlight-strong) inset;
       --shadow-modal: 0 12px 48px rgba(15, 23, 42, 0.14), 0 1px 0 rgba(255, 255, 255, 0.75) inset;
+      --radius-pill: 14px;
     }
 
-    /* Minimal UI icons: stroke-only, black or white via currentColor */
-    svg.min-icon {
-      display: block;
+    /* Lucide icons: size via CSS; stroke follows currentColor */
+    svg.lucide {
       flex-shrink: 0;
-    }
-    svg.min-icon,
-    svg.min-icon path,
-    svg.min-icon circle,
-    svg.min-icon line,
-    svg.min-icon polyline,
-    svg.min-icon rect {
-      fill: none;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -129,36 +123,50 @@
     }
     .ffl-btn--primary {
       padding: 0.5rem 1rem;
-      background: linear-gradient(165deg, var(--accent) 0%, var(--accent-deep) 100%);
       color: #fff;
-      border-color: rgba(13, 148, 136, 0.35);
-      box-shadow: 0 1px 4px rgba(13, 148, 136, 0.22);
+      border-color: rgba(255, 255, 255, 0.28);
+      background: linear-gradient(
+        165deg,
+        rgba(13, 148, 136, 0.92) 0%,
+        rgba(15, 118, 110, 0.96) 100%
+      );
+      backdrop-filter: blur(10px) saturate(1.25);
+      -webkit-backdrop-filter: blur(10px) saturate(1.25);
+      box-shadow: 0 2px 14px rgba(13, 148, 136, 0.28), var(--glass-btn-shadow);
     }
     .ffl-btn--primary:hover:not(:disabled) {
-      filter: brightness(1.05);
-      box-shadow: 0 2px 10px rgba(13, 148, 136, 0.28);
+      filter: brightness(1.06);
+      border-color: rgba(255, 255, 255, 0.38);
+      box-shadow: 0 4px 20px rgba(13, 148, 136, 0.32), var(--glass-btn-shadow);
     }
     .ffl-btn--secondary {
       padding: 0.48rem 0.92rem;
-      background: var(--glass-bg-strong);
       color: var(--ink2);
-      border-color: var(--rule);
+      background: rgba(255, 255, 255, 0.55);
+      border-color: rgba(226, 232, 240, 0.95);
+      backdrop-filter: blur(14px) saturate(1.35);
+      -webkit-backdrop-filter: blur(14px) saturate(1.35);
+      box-shadow: var(--glass-btn-shadow);
     }
     .ffl-btn--secondary:hover:not(:disabled) {
-      border-color: rgba(13, 148, 136, 0.45);
-      background: var(--accent-soft);
+      border-color: rgba(13, 148, 136, 0.42);
+      background: rgba(255, 255, 255, 0.72);
       color: var(--accent-deep);
-      box-shadow: 0 1px 4px rgba(13, 148, 136, 0.1);
+      box-shadow: 0 2px 16px rgba(13, 148, 136, 0.12), var(--glass-btn-shadow);
     }
     .ffl-btn--ghost {
       padding: 0.45rem 0.78rem;
-      background: transparent;
+      background: rgba(255, 255, 255, 0.28);
       color: var(--ink2);
-      border-color: var(--rule);
+      border-color: rgba(226, 232, 240, 0.85);
+      backdrop-filter: blur(12px) saturate(1.2);
+      -webkit-backdrop-filter: blur(12px) saturate(1.2);
+      box-shadow: 0 1px 0 var(--glass-highlight) inset;
     }
     .ffl-btn--ghost:hover:not(:disabled) {
-      background: var(--surface-muted);
+      background: rgba(255, 255, 255, 0.52);
       color: var(--ink);
+      border-color: rgba(13, 148, 136, 0.25);
     }
     .ffl-btn--danger {
       padding: 0.48rem 0.85rem;
@@ -183,7 +191,9 @@
     }
     .ffl-btn--icon:hover:not(:disabled) {
       color: var(--ink);
-      background: var(--surface-muted);
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
     .ffl-btn--sidebar {
       flex-shrink: 0;
@@ -192,15 +202,18 @@
       padding: 0;
       font-size: 0;
       line-height: 0;
-      border: 1px solid var(--sidebar-border);
+      border: 1px solid rgba(148, 163, 184, 0.22);
       border-radius: var(--radius-sm);
-      background: var(--sidebar-hover);
+      background: rgba(30, 41, 59, 0.65);
+      backdrop-filter: blur(12px) saturate(1.2);
+      -webkit-backdrop-filter: blur(12px) saturate(1.2);
       color: #e2e8f0;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
     }
     .ffl-btn--sidebar:hover:not(:disabled) {
-      background: #334155;
+      background: rgba(51, 65, 85, 0.85);
       color: #fff;
-      border-color: #475569;
+      border-color: rgba(148, 163, 184, 0.35);
     }
     .ffl-btn--notice {
       padding: 0.32rem 0.58rem;
@@ -276,21 +289,20 @@
       justify-content: center;
       overflow: hidden;
     }
-    .sidebar-logo svg {
+    .sidebar-logo .lucide {
       width: 22px;
       height: 22px;
-      display: block;
+      color: #5eead4;
+      stroke-width: 2.25px;
     }
-    .sidebar-toggle svg {
+    .sidebar-toggle .lucide {
       width: 16px;
       height: 16px;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      stroke-width: 2px;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    .sidebar-toggle svg path {
-      fill: none;
+    .app-sidebar.collapsed .sidebar-toggle .lucide {
+      transform: rotate(180deg);
     }
     .sidebar-title-text {
       font-family: var(--display);
@@ -405,21 +417,11 @@
       flex-shrink: 0;
       opacity: 0.9;
     }
-    .nav-ico svg {
+    .nav-ico .lucide {
       width: 18px;
       height: 18px;
       stroke: currentColor;
-      fill: none;
-      stroke-width: 1.75;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-    .nav-ico svg circle:not(.nav-ico-dot) {
-      fill: none;
-    }
-    .nav-ico svg circle.nav-ico-dot {
-      fill: currentColor;
-      stroke: none;
+      stroke-width: 1.85px;
     }
     .sidebar-foot {
       padding: 0.75rem;
@@ -463,6 +465,9 @@
       .nav-item-label,
       .sidebar-foot {
         transition-duration: 0.01ms !important;
+      }
+      .sidebar-toggle .lucide {
+        transition: none;
       }
     }
     .main-topbar {
@@ -536,11 +541,13 @@
     @keyframes ffl-notice-in {
       from {
         opacity: 0;
-        transform: translateY(-6px);
+        transform: translateY(-8px);
+        filter: blur(4px);
       }
       to {
         opacity: 1;
         transform: translateY(0);
+        filter: blur(0);
       }
     }
     .app-notice--error {
@@ -567,17 +574,11 @@
       align-items: center;
       justify-content: center;
     }
-    .app-notice-ico svg {
+    .app-notice-ico .lucide {
       width: 1.25rem;
       height: 1.25rem;
       display: block;
-    }
-    .app-notice-ico svg path {
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 1.75;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      stroke-width: 2px;
     }
     .app-notice--error .app-notice-ico { background: rgba(254, 202, 202, 0.85); color: #991b1b; }
     .app-notice--warn .app-notice-ico { background: rgba(254, 240, 138, 0.9); color: #854d0e; }
@@ -643,15 +644,10 @@
       color: #854d0e;
       background: rgba(254, 240, 138, 0.75);
     }
-    .ffl-inline-svg {
-      display: block;
-    }
-    .ffl-inline-svg path {
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 1.75;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+    .ffl-inline-alert__ico .lucide {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2px;
     }
     .ffl-inline-alert__title {
       font-weight: 650;
@@ -745,34 +741,94 @@
       margin-top: 1rem;
     }
 
-    /* AI full page */
+    /* AI full page (Chat-style + glass) */
     .ai-page {
       flex: 1;
       min-height: 0;
       display: flex;
       flex-direction: column;
-      background: var(--surface);
-      border: 1px solid var(--rule);
-      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(16px) saturate(1.25);
+      -webkit-backdrop-filter: blur(16px) saturate(1.25);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
       overflow: hidden;
+      box-shadow: var(--glass-shadow);
+      min-height: min(72vh, 640px);
     }
     .ai-page-head {
-      padding: 1.05rem 1.2rem;
-      border-bottom: 1px solid var(--rule);
-      background: var(--surface-elevated);
+      padding: 1rem 1.2rem 0.95rem;
+      border-bottom: 1px solid var(--glass-border);
+      background: rgba(250, 251, 252, 0.92);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      box-shadow: 0 1px 0 rgba(15, 23, 42, 0.06);
+    }
+    .ai-key-label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-deep);
+      margin-top: 0.75rem;
+      margin-bottom: 0.35rem;
+    }
+    .ai-nav-hint {
+      font-size: 0.7rem;
+      color: var(--ink3);
+      margin: 0 0 0.5rem;
+      padding: 0.4rem 0.55rem;
+      border-radius: var(--radius-sm);
+      background: rgba(13, 148, 136, 0.08);
+      border: 1px solid rgba(13, 148, 136, 0.18);
+      max-width: 40rem;
+      line-height: 1.4;
     }
     .ai-page-head h2 {
       font-family: var(--display);
-      font-size: 1.05rem;
-      font-weight: 600;
+      font-size: 1.12rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
     }
     .ai-page-head .sub {
-      font-size: 0.75rem;
+      font-size: 0.78rem;
+      color: var(--ink2);
+      margin-top: 0.35rem;
+      line-height: 1.45;
+      max-width: 40rem;
+    }
+    .ai-page-status {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 0.85rem;
+      margin-top: 0.65rem;
+      padding: 0.45rem 0.65rem;
+      border-radius: var(--radius-sm);
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid var(--rule-light);
       color: var(--ink3);
-      margin-top: 0.25rem;
+    }
+    .ai-page-status strong {
+      font-weight: 600;
+      color: var(--ink2);
+    }
+    .ai-page-status.is-ok strong { color: var(--low); }
+    .ai-page-status.is-warn strong { color: var(--high); }
+    .ai-page-status.is-bad strong { color: var(--critical); }
+    .ai-page-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 0.55rem;
+      align-items: center;
     }
     .ai-page-key {
-      margin-top: 0.75rem;
+      margin-top: 0.65rem;
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
@@ -781,28 +837,58 @@
     .ai-page-key input {
       flex: 1;
       min-width: 12rem;
-      padding: 0.45rem 0.55rem;
+      padding: 0.48rem 0.6rem;
       border: 1px solid var(--rule);
       border-radius: var(--radius-sm);
       font-family: var(--mono);
       font-size: 0.72rem;
+      background: rgba(255, 255, 255, 0.85);
     }
     .ai-page-key .ffl-btn--primary {
       font-size: 0.75rem;
     }
+    .ai-key-details {
+      margin-top: 0.55rem;
+      max-width: 42rem;
+    }
+    .ai-key-details summary {
+      cursor: pointer;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--accent-deep);
+      user-select: none;
+    }
+    .ai-key-details .ai-key-details-body {
+      margin-top: 0.45rem;
+      font-size: 0.72rem;
+      color: var(--ink2);
+      line-height: 1.5;
+    }
+    .ai-key-details code {
+      font-size: 0.65rem;
+      padding: 0.08rem 0.28rem;
+      border-radius: 4px;
+      background: var(--surface-muted);
+      border: 1px solid var(--rule-light);
+    }
     .ai-key-notice-page {
       font-size: 0.68rem;
-      color: var(--high);
-      margin-top: 0.35rem;
-      max-width: 36rem;
+      color: var(--ink3);
+      margin-top: 0.4rem;
+      max-width: 40rem;
+      line-height: 1.45;
+    }
+    .ai-key-notice-page a {
+      color: var(--accent-deep);
+      font-weight: 600;
     }
     .ai-chips-page {
       display: flex;
       flex-wrap: wrap;
       gap: 0.45rem;
-      padding: 0.7rem 1.1rem;
+      padding: 0.65rem 1.1rem;
       border-bottom: 1px solid var(--rule-light);
-      background: var(--surface-muted);
+      background: rgba(244, 246, 249, 0.65);
     }
     .ai-chip-page {
       font-size: 0.72rem;
@@ -822,19 +908,54 @@
     .ai-thread-page {
       flex: 1;
       overflow-y: auto;
-      padding: 1rem 1.1rem;
+      padding: 1rem 1.1rem 1.1rem;
       display: flex;
       flex-direction: column;
-      gap: 0.65rem;
-      background: var(--surface-muted);
+      gap: 0.75rem;
+      background: rgba(241, 245, 249, 0.45);
+    }
+    .ai-welcome {
+      align-self: center;
+      max-width: 38rem;
+      padding: 1rem 1.15rem;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-sm);
+    }
+    .ai-welcome-title {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--ink);
+      margin: 0 0 0.4rem;
+    }
+    .ai-welcome-body {
+      font-size: 0.82rem;
+      color: var(--ink2);
+      line-height: 1.55;
+      margin: 0;
     }
     .ai-msg-page {
-      max-width: 42rem;
-      padding: 0.65rem 0.85rem;
+      max-width: min(42rem, 100%);
+      padding: 0.72rem 0.95rem;
       border-radius: var(--radius-md);
-      font-size: 0.85rem;
-      line-height: 1.5;
-      white-space: pre-wrap;
+      font-size: 0.875rem;
+      line-height: 1.55;
+      word-wrap: break-word;
+    }
+    .ai-msg-page.bot .ai-msg-body {
+      margin: 0;
+    }
+    .ai-msg-page.bot .ai-msg-body p {
+      margin: 0 0 0.55rem;
+    }
+    .ai-msg-page.bot .ai-msg-body p:last-child {
+      margin-bottom: 0;
+    }
+    .ai-msg-page.bot .ai-msg-body strong {
+      font-weight: 650;
+      color: var(--ink);
     }
     .ai-msg-page.user {
       align-self: flex-end;
@@ -849,21 +970,29 @@
     .ai-msg-page.bot.typing { font-style: italic; color: var(--ink3); }
     .ai-input-row-page {
       display: flex;
-      gap: 0.5rem;
-      padding: 0.9rem 1.1rem;
+      gap: 0.55rem;
+      align-items: flex-end;
+      padding: 0.85rem 1.1rem 1rem;
       border-top: 1px solid var(--rule-light);
-      background: var(--surface);
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
-    .ai-input-row-page input {
+    .ai-input-row-page textarea {
       flex: 1;
-      padding: 0.55rem 0.7rem;
+      min-height: 2.65rem;
+      max-height: 10rem;
+      padding: 0.58rem 0.75rem;
       border: 1px solid var(--rule);
-      border-radius: var(--radius-sm);
-      font-size: 0.85rem;
-      background: var(--surface-elevated);
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      font-family: var(--sans);
+      line-height: 1.45;
+      background: rgba(255, 255, 255, 0.92);
+      resize: vertical;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
-    .ai-input-row-page input:focus {
+    .ai-input-row-page textarea:focus {
       outline: none;
       border-color: rgba(13, 148, 136, 0.4);
       box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
@@ -1551,12 +1680,21 @@
       text-align: left;
       background: rgba(255, 255, 255, 0.5);
     }
-    .empty-state::before {
-      content: "→";
-      display: block;
-      font-family: var(--mono);
-      margin-bottom: 0.5rem;
-      color: var(--ink);
+    .empty-state__ico {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.25rem;
+      height: 2.25rem;
+      margin-bottom: 0.55rem;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid var(--rule-light);
+      color: var(--ink2);
+    }
+    .empty-state__ico .lucide {
+      width: 18px;
+      height: 18px;
     }
 
     .loading-inline {
@@ -1797,49 +1935,60 @@
     .price-mode-segment {
       display: inline-flex;
       flex-wrap: wrap;
-      padding: 0.2rem;
-      border-radius: var(--radius-md);
-      background: var(--surface-muted);
-      border: 1px solid var(--rule);
-      gap: 0.15rem;
+      padding: 0.22rem;
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, 0.45);
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      backdrop-filter: blur(14px) saturate(1.25);
+      -webkit-backdrop-filter: blur(14px) saturate(1.25);
+      gap: 0.18rem;
+      box-shadow: 0 1px 0 var(--glass-highlight) inset;
     }
     .btn-mode {
       font-family: var(--sans);
       font-size: 0.74rem;
       font-weight: 600;
-      padding: 0.42rem 0.85rem;
-      border: none;
+      padding: 0.46rem 0.92rem;
+      border: 1px solid transparent;
       background: transparent;
-      border-radius: calc(var(--radius-sm) - 1px);
+      border-radius: calc(var(--radius-pill) - 4px);
       cursor: pointer;
       color: var(--ink3);
-      transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+      transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
     }
     .btn-mode:hover {
       color: var(--accent-deep);
-      background: rgba(255, 255, 255, 0.65);
+      background: rgba(255, 255, 255, 0.55);
+      border-color: rgba(13, 148, 136, 0.12);
     }
     .btn-mode.active {
-      background: var(--surface);
+      background: rgba(255, 255, 255, 0.82);
       color: var(--ink);
-      box-shadow: var(--shadow-sm);
+      border-color: rgba(226, 232, 240, 0.9);
+      box-shadow: var(--glass-btn-shadow), 0 2px 8px rgba(15, 23, 42, 0.06);
     }
     .btn-compare-run {
       font-family: var(--sans);
       font-size: 0.78rem;
-      padding: 0.5rem 1.1rem;
-      background: var(--accent);
+      padding: 0.52rem 1.15rem;
       color: #fff;
-      border: none;
+      border: 1px solid rgba(255, 255, 255, 0.28);
       font-weight: 600;
       cursor: pointer;
-      border-radius: var(--radius-sm);
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
-      transition: background 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(
+        165deg,
+        rgba(13, 148, 136, 0.92) 0%,
+        rgba(15, 118, 110, 0.96) 100%
+      );
+      backdrop-filter: blur(10px) saturate(1.25);
+      -webkit-backdrop-filter: blur(10px) saturate(1.25);
+      box-shadow: 0 2px 14px rgba(13, 148, 136, 0.28), var(--glass-btn-shadow);
+      transition: filter 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease;
     }
     .btn-compare-run:hover {
-      background: var(--accent-deep);
-      box-shadow: 0 4px 12px var(--accent-glow);
+      filter: brightness(1.06);
+      box-shadow: 0 4px 18px var(--accent-glow), var(--glass-btn-shadow);
     }
     .btn-compare-run:active { transform: scale(0.98); }
     .compare-sliders { display: none; }
@@ -1987,15 +2136,10 @@
       color: var(--pill-fg);
       border: none;
     }
-    .modal-close svg {
+    .modal-close .lucide {
       width: 18px;
       height: 18px;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-    }
-    .modal-close svg path {
-      fill: none;
+      stroke-width: 2px;
     }
     .modal-body {
       overflow-y: auto;
@@ -2438,35 +2582,43 @@
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      padding: 0.3rem 0.65rem;
+      padding: 0.32rem 0.72rem;
       border-radius: 999px;
-      background: var(--surface-muted);
-      border: 1px solid var(--rule);
+      background: rgba(255, 255, 255, 0.52);
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      backdrop-filter: blur(14px) saturate(1.35);
+      -webkit-backdrop-filter: blur(14px) saturate(1.35);
       color: var(--ink2);
       font-family: var(--sans);
       font-size: 0.7rem;
       font-weight: 600;
       letter-spacing: -0.01em;
+      box-shadow: 0 1px 0 var(--glass-highlight) inset, 0 2px 10px rgba(15, 23, 42, 0.04);
     }
-    .pill-live i {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #94a3b8;
+    .pill-live-ico {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
-      transition: background 0.2s ease, box-shadow 0.2s ease;
+      color: #94a3b8;
+      transition: color 0.22s ease, filter 0.22s ease;
     }
-    .pill-live.connected i {
-      background: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+    .pill-live-ico .lucide {
+      width: 14px;
+      height: 14px;
+      stroke-width: 2.25px;
     }
-    .pill-live.degraded i {
-      background: #f59e0b;
-      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+    .pill-live.connected .pill-live-ico {
+      color: #10b981;
+      filter: drop-shadow(0 0 5px rgba(16, 185, 129, 0.35));
     }
-    .pill-live.offline i {
-      background: #ef4444;
-      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+    .pill-live.degraded .pill-live-ico {
+      color: #f59e0b;
+      filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.3));
+    }
+    .pill-live.offline .pill-live-ico {
+      color: #ef4444;
+      filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.25));
     }
     .pill-live .pill-live-text {
       font-family: var(--mono);
@@ -2490,11 +2642,11 @@
       align-items: stretch;
       padding: 0.45rem 0.55rem;
       border-radius: var(--radius-md);
-      background: var(--glass-bg);
-      backdrop-filter: blur(12px) saturate(var(--glass-saturate));
-      -webkit-backdrop-filter: blur(12px) saturate(var(--glass-saturate));
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(16px) saturate(var(--glass-saturate));
+      -webkit-backdrop-filter: blur(16px) saturate(var(--glass-saturate));
       border: 1px solid var(--glass-border);
-      box-shadow: inset 0 1px 0 var(--glass-highlight), 0 1px 12px rgba(15, 23, 42, 0.04);
+      box-shadow: inset 0 1px 0 var(--glass-highlight), 0 2px 14px rgba(15, 23, 42, 0.05);
     }
     .stat-chip {
       display: inline-flex;
@@ -2505,9 +2657,11 @@
       min-height: 2.65rem;
       padding: 0.38rem 0.62rem 0.42rem;
       border-radius: var(--radius-sm);
-      background: var(--surface);
-      border: 1px solid rgba(226, 232, 240, 0.9);
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+      background: rgba(255, 255, 255, 0.58);
+      border: 1px solid rgba(226, 232, 240, 0.92);
+      backdrop-filter: blur(10px) saturate(1.2);
+      -webkit-backdrop-filter: blur(10px) saturate(1.2);
+      box-shadow: 0 1px 0 var(--glass-highlight) inset, 0 1px 6px rgba(15, 23, 42, 0.04);
     }
     .stat-chip strong {
       font-family: var(--display);
@@ -2668,11 +2822,11 @@
     @keyframes ffl-dash-card-in {
       from {
         opacity: 0;
-        transform: translateY(8px);
+        transform: translateY(14px) scale(0.988);
       }
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
       }
     }
     .dash-card:hover {
@@ -2705,17 +2859,11 @@
       border: 1px solid var(--rule);
       flex-shrink: 0;
     }
-    .dash-card-icon svg {
+    .dash-card-icon .lucide {
       width: 18px;
       height: 18px;
       stroke: var(--ink);
-      fill: none;
-      stroke-width: 1.75;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-    .dash-card-icon svg circle {
-      fill: none;
+      stroke-width: 1.85px;
     }
     .dash-card-title {
       font-family: var(--display);
@@ -2726,11 +2874,13 @@
     }
     .dash-card-sub {
       font-family: var(--mono);
-      font-size: 0.52rem;
+      font-size: 0.54rem;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.09em;
       color: var(--ink3);
-      margin-top: 0.15rem;
+      margin-top: 0.2rem;
+      max-width: 36rem;
+      line-height: 1.35;
     }
     .dash-pill-tag {
       flex-shrink: 0;
@@ -2961,17 +3111,11 @@
       opacity: 0.55;
       flex-shrink: 0;
     }
-    .matrices-nav-top-ico svg {
+    .matrices-nav-top-ico .lucide {
       width: 16px;
       height: 16px;
-      stroke: #e2e8f0;
-      stroke-width: 1.75;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      fill: none;
-    }
-    .matrices-nav-top-ico svg path {
-      fill: none;
+      color: #e2e8f0;
+      stroke-width: 1.85px;
     }
     .matrices-nav-search {
       margin: 0.5rem 0.65rem;
@@ -3067,18 +3211,27 @@
       align-items: center;
     }
     .matrices-tb-btn {
-      font-size: 0.62rem;
-      padding: 0.28rem 0.5rem;
-      border-radius: 6px;
-      border: 1px solid #e2e4ea;
-      background: #fff;
+      font-size: 0.64rem;
+      font-weight: 600;
+      padding: 0.34rem 0.62rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(226, 228, 234, 0.95);
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(12px) saturate(1.2);
+      -webkit-backdrop-filter: blur(12px) saturate(1.2);
       color: var(--ink2);
       cursor: pointer;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.75) inset;
+      transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+    }
+    .matrices-tb-btn:hover {
+      border-color: rgba(13, 148, 136, 0.28);
+      background: rgba(255, 255, 255, 0.88);
     }
     .matrices-tb-btn.primary {
-      border-color: var(--accent);
+      border-color: rgba(13, 148, 136, 0.45);
       color: var(--accent-deep);
-      background: var(--accent-soft);
+      background: rgba(13, 148, 136, 0.12);
     }
 
     .matrices-graph-block {
@@ -3306,12 +3459,21 @@
       }
       .app-notice {
         animation: none;
+        filter: none;
       }
       .load-overlay:not(.hidden) .load-overlay-card {
         animation: none;
       }
+      #page-dashboard.active .thesis-banner,
+      #page-dashboard.active .key-finding-card {
+        animation: none;
+        opacity: 1;
+        transform: none;
+      }
       #page-dashboard.active .dashboard-grid .dash-card {
         animation: none;
+        opacity: 1;
+        transform: none;
       }
       .history-panel,
       .history-panel.open {
@@ -3344,15 +3506,10 @@
       border-color: #cbd5e1;
       color: var(--ink);
     }
-    .county-drawer-close svg {
+    .county-drawer-close .lucide {
       width: 18px;
       height: 18px;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-    }
-    .county-drawer-close svg path {
-      fill: none;
+      stroke-width: 2px;
     }
     .county-drawer-body {
       flex: 1;
@@ -3362,31 +3519,55 @@
 
     .thesis-banner {
       margin: 0 0 1rem;
-      padding: 1rem 1.15rem 1.05rem;
+      padding: 1.05rem 1.2rem 1.08rem;
       background: linear-gradient(118deg, rgba(13, 148, 136, 0.12) 0%, var(--glass-bg-strong) 50%, rgba(37, 99, 235, 0.07) 100%);
       backdrop-filter: blur(14px) saturate(var(--glass-saturate));
       -webkit-backdrop-filter: blur(14px) saturate(var(--glass-saturate));
       border: 1px solid var(--glass-border);
-      border-radius: var(--radius-md);
-      font-size: 0.9rem;
+      border-radius: var(--radius-lg);
+      font-size: 0.9375rem;
       color: var(--ink2);
-      line-height: 1.55;
+      line-height: 1.58;
       box-shadow: var(--glass-shadow);
       transition: opacity 0.35s ease, box-shadow 0.3s ease, border-color 0.25s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+    }
+    .thesis-banner__ico {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.1rem;
+      height: 2.1rem;
+      margin-top: 0.05rem;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid rgba(226, 232, 240, 0.85);
+      color: var(--accent-deep);
+    }
+    .thesis-banner__ico .lucide {
+      width: 18px;
+      height: 18px;
+    }
+    .thesis-banner__text {
+      min-width: 0;
+      flex: 1;
     }
     .thesis-banner.ffl-content-dim {
       opacity: 0.55;
     }
-    .thesis-banner strong { color: var(--ink); }
+    .thesis-banner__text strong { color: var(--ink); }
 
     .key-finding-card {
       margin: 0 0 1rem;
-      padding: 1.05rem 1.2rem 1.1rem;
+      padding: 1.08rem 1.25rem 1.12rem;
       background: var(--glass-bg-strong);
       backdrop-filter: blur(14px) saturate(var(--glass-saturate));
       -webkit-backdrop-filter: blur(14px) saturate(var(--glass-saturate));
       border: 1px solid var(--glass-border);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-lg);
       box-shadow: var(--glass-shadow);
       border-left: 4px solid var(--accent);
       transition: opacity 0.35s ease, box-shadow 0.3s ease, border-color 0.25s ease;
@@ -3400,14 +3581,49 @@
       text-transform: uppercase;
       letter-spacing: 0.12em;
       color: var(--accent-deep);
-      margin-bottom: 0.45rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .key-finding-card .kf-label-ico {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.35rem;
+      height: 1.35rem;
+      border-radius: 6px;
+      background: rgba(13, 148, 136, 0.12);
+      color: var(--accent-deep);
+    }
+    .key-finding-card .kf-label-ico .lucide {
+      width: 14px;
+      height: 14px;
+      stroke-width: 2.25px;
     }
     .key-finding-card .kf-body {
-      font-size: 0.92rem;
-      line-height: 1.55;
+      font-size: 0.945rem;
+      line-height: 1.58;
       color: var(--ink2);
     }
     .key-finding-card .kf-body strong { color: var(--ink); }
+
+    @keyframes ffl-insight-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    #page-dashboard.active .thesis-banner {
+      animation: ffl-insight-in 0.48s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+    #page-dashboard.active .key-finding-card {
+      animation: ffl-insight-in 0.5s 0.07s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
 
     .method-page .method-section {
       margin-bottom: 1.25rem;
@@ -3640,40 +3856,36 @@
   <aside class="app-sidebar" id="app-sidebar" aria-label="Main navigation">
     <div class="sidebar-brand">
       <div class="sidebar-logo" aria-hidden="true">
-        <svg class="min-icon" viewBox="0 0 32 32" width="22" height="22" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path stroke="#5eead4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 22c3.5-6 7-9 12-9s6.5 4 10 9"/>
-          <circle cx="25" cy="11" r="2" fill="#f8fafc"/>
-          <path stroke="#64748b" stroke-width="1.2" stroke-linecap="round" d="M5 27h22"/>
-        </svg>
+        <i data-lucide="zap"></i>
       </div>
       <button type="button" class="sidebar-toggle ffl-btn ffl-btn--sidebar" id="sidebar-toggle" onclick="window.__fflToggleSidebar()" title="Collapse sidebar" aria-expanded="true">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path id="sidebar-chevron-path" d="M15 6l-6 6 6 6"/></svg>
+        <i data-lucide="chevron-left"></i>
       </button>
       <span class="sidebar-title-text">Fuel fault lines<small>Energy vulnerability</small></span>
     </div>
     <nav class="sidebar-nav" aria-label="Pages">
       <div class="sidebar-nav-section" aria-hidden="true">Explore</div>
       <button type="button" class="nav-item active" data-page="dashboard" onclick="window.__fflSetPage('dashboard')">
-        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg></span><span class="nav-item-label">Dashboard</span>
+        <span class="nav-ico" aria-hidden="true"><i data-lucide="layout-dashboard"></i></span><span class="nav-item-label">Dashboard</span>
       </button>
       <button type="button" class="nav-item" data-page="scenarios" onclick="window.__fflSetPage('scenarios')">
-        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 13V3M20 21v-5M20 9V3"/><circle cx="4" cy="13" r="2"/><circle cx="12" cy="11" r="2"/><circle cx="20" cy="14" r="2"/></svg></span><span class="nav-item-label">Scenarios</span>
+        <span class="nav-ico" aria-hidden="true"><i data-lucide="sliders-horizontal"></i></span><span class="nav-item-label">Scenarios</span>
       </button>
       <button type="button" class="nav-item" data-page="compare" onclick="window.__fflSetPage('compare')">
-        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></span><span class="nav-item-label">Compare</span>
+        <span class="nav-ico" aria-hidden="true"><i data-lucide="bar-chart-3"></i></span><span class="nav-item-label">Compare</span>
       </button>
       <button type="button" class="nav-item" data-page="counties" onclick="window.__fflSetPage('counties')">
-        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-8-6.5-8-11a8 8 0 1116 0c0 4.5-8 11-8 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span class="nav-item-label">Counties</span>
+        <span class="nav-ico" aria-hidden="true"><i data-lucide="map-pin"></i></span><span class="nav-item-label">Counties</span>
       </button>
       <div class="sidebar-nav-section" aria-hidden="true">Workspace</div>
       <button type="button" class="nav-item" data-page="method" onclick="window.__fflSetPage('method')">
-        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v15H6.5A2.5 2.5 0 0 1 4 14.5v-10A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 10h6M9 14h4M8 22h8l-1-4H9l-1 4z"/></svg></span><span class="nav-item-label">Method &amp; lab</span>
+        <span class="nav-ico" aria-hidden="true"><i data-lucide="flask-conical"></i></span><span class="nav-item-label">Method &amp; lab</span>
       </button>
       <button type="button" class="nav-item" data-page="submit" onclick="window.__fflSetPage('submit')">
-        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span><span class="nav-item-label">Demo &amp; submit</span>
+        <span class="nav-ico" aria-hidden="true"><i data-lucide="clipboard-check"></i></span><span class="nav-item-label">Demo &amp; submit</span>
       </button>
       <button type="button" class="nav-item" data-page="ai" onclick="window.__fflSetPage('ai')">
-        <span class="nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4h11a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-5l-3 3v-3H8a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3z"/><circle class="nav-ico-dot" cx="10" cy="11" r="1.15"/><circle class="nav-ico-dot" cx="14" cy="11" r="1.15"/><path d="M10 14c.8.6 1.8.9 3 .9s2.2-.3 3-.9"/></svg></span><span class="nav-item-label">AI · Gemini</span>
+        <span class="nav-ico" aria-hidden="true"><i data-lucide="sparkles"></i></span><span class="nav-item-label">AI · Gemini</span>
       </button>
     </nav>
     <div class="sidebar-foot">Ireland · 26 counties · SEAI / CSO / AA</div>
@@ -3683,7 +3895,7 @@
     <header class="main-topbar">
       <h1 id="page-title">Dashboard</h1>
       <div class="main-topbar-meta">
-        <span class="pill-live" id="pill-connection" title="API connection status"><i aria-hidden="true"></i><span class="pill-live-text">Checking…</span></span>
+        <span class="pill-live" id="pill-connection" title="API connection status"><span class="pill-live-ico" aria-hidden="true"><i data-lucide="radio"></i></span><span class="pill-live-text">Checking…</span></span>
         <span class="topbar-divider" aria-hidden="true"></span>
         <span class="dash-date" id="doc-date"></span>
         <span class="dash-api" id="dash-api-endpoint" title="API base"></span>
@@ -3724,12 +3936,16 @@
           </div>
         </header>
 
-        <p class="thesis-banner" id="thesis-banner" aria-live="polite">
-          <strong>Loading headline…</strong>
-        </p>
+        <div class="thesis-banner" id="thesis-banner" aria-live="polite">
+          <span class="thesis-banner__ico" aria-hidden="true"><i data-lucide="quote"></i></span>
+          <div class="thesis-banner__text" id="thesis-banner-text"><strong>Loading headline…</strong></div>
+        </div>
 
         <div class="key-finding-card" id="key-finding-card" aria-live="polite">
-          <div class="kf-label">Key finding</div>
+          <div class="kf-label">
+            <span class="kf-label-ico" aria-hidden="true"><i data-lucide="lightbulb"></i></span>
+            Key finding
+          </div>
           <p class="kf-body" id="key-finding-body">Loading insight from the live model…</p>
         </div>
 
@@ -3738,7 +3954,7 @@
       <div class="dash-card-head">
         <div class="dash-card-title-row">
           <div class="dash-card-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16"/><path d="M6 16l3.5-4 3 2.5L17 8l3 3.5"/></svg>
+            <i data-lucide="line-chart"></i>
           </div>
           <div>
             <h2 class="dash-card-title" id="card-curve-title">Scenario curve</h2>
@@ -3758,7 +3974,7 @@
       <div class="dash-card-head">
         <div class="dash-card-title-row">
           <div class="dash-card-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M5 20V12M9 20V8M13 20V10M17 20V6M21 20V14"/></svg>
+            <i data-lucide="chart-column"></i>
           </div>
           <div>
             <h2 class="dash-card-title" id="card-tl-title">Index by tier</h2>
@@ -3776,7 +3992,7 @@
       <div class="dash-card-head">
         <div class="dash-card-title-row">
           <div class="dash-card-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M3 12c2.5-4 6-6 9-6s6.5 2 9 6c-2.5 4-6 6-9 6s-6.5-2-9-6z"/><circle cx="12" cy="12" r="2.5"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>
+            <i data-lucide="activity"></i>
           </div>
           <div>
             <h2 class="dash-card-title" id="card-tr-title">Stress trajectory</h2>
@@ -3800,7 +4016,7 @@
       <div class="dash-card-head">
         <div class="dash-card-title-row">
           <div class="dash-card-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="3.5"/><circle cx="16" cy="8" r="4.5"/><circle cx="14" cy="16" r="3"/><path d="M4 20c2-2 4.5-3 7-3s5 1 7 3"/></svg>
+            <i data-lucide="users"></i>
           </div>
           <div>
             <h2 class="dash-card-title" id="card-bl-title">County spotlight</h2>
@@ -3815,7 +4031,7 @@
       <div class="dash-card-head">
         <div class="dash-card-title-row">
           <div class="dash-card-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18"/><path d="M3 12h18"/></svg>
+            <i data-lucide="chart-pie"></i>
           </div>
           <div>
             <h2 class="dash-card-title" id="card-br-title">Risk mix</h2>
@@ -3913,7 +4129,7 @@
         <div class="matrices-nav-top">
           <span>MATRICES</span>
           <span class="matrices-nav-top-ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h14"/></svg>
+            <i data-lucide="menu"></i>
           </span>
         </div>
         <input type="search" class="matrices-nav-search" id="matrices-dataset-search" placeholder="Search datasets…" autocomplete="off"
@@ -4257,27 +4473,62 @@
     </div>
 
     <div id="page-ai" class="page-view" role="region" aria-label="AI policy analyst powered by Google Gemini">
-      <div class="page-inner" style="max-width:720px">
+      <div class="page-inner" style="max-width:56rem">
         <div class="ai-page">
           <div class="ai-page-head">
-            <h2>AI policy analyst</h2>
-            <p class="sub"><strong>Google Gemini</strong> (Generative Language API) · chat is generated client-side; optional API key stays in this browser only</p>
-            <p class="ai-key-notice-page">Get a key from <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a> — we call Gemini directly from your browser, not through the Fuel Fault Lines API.</p>
-            <div class="ai-page-key">
-              <input type="password" id="ai-api-key" placeholder="Gemini API key…" autocomplete="off" aria-label="Google Gemini API key"
-                     onblur="window.__fflSaveAiKey()">
-              <button type="button" class="ffl-btn ffl-btn--primary" onclick="window.__fflSaveAiKey()">Save key</button>
+            <h2>Fuel policy copilot</h2>
+            <p class="ai-nav-hint" role="note">
+              <strong>Can’t find this screen?</strong> In the left sidebar, under <strong>Workspace</strong>, click <strong>AI · Gemini</strong> (sparkles icon). The API key field is directly below.
+            </p>
+            <p class="sub">
+              <strong>Google Gemini</strong> answers in natural language. Each reply is grounded in <strong>live numbers</strong> from the same Fuel Fault Lines API as the dashboard (Zerve-hosted hub or your local FastAPI via the dev-server <code>/api</code> proxy). Your Gemini key never touches that hub.
+            </p>
+            <label class="ai-key-label" for="ai-api-key">Gemini API key — paste here, then Save</label>
+            <div class="ai-page-actions" style="margin-top:0">
+              <div class="ai-page-key" style="margin-top:0;flex:1">
+                <input type="text" id="ai-api-key" placeholder="e.g. AIza… (from Google AI Studio)" autocomplete="off" spellcheck="false" autocapitalize="off" aria-label="Google Gemini API key"
+                       onblur="window.__fflSaveAiKey()">
+                <button type="button" class="ffl-btn ffl-btn--primary" onclick="window.__fflSaveAiKey()">Save key</button>
+              </div>
+              <button type="button" class="ffl-btn ffl-btn--secondary" onclick="window.__fflAiClearChat()">Clear chat</button>
             </div>
+            <div class="ai-page-status" id="ai-page-status" aria-live="polite">
+              <span>Data layer: <strong>—</strong></span>
+              <span>Scenario: <strong>—</strong></span>
+              <span>API: <strong>—</strong></span>
+            </div>
+            <p class="ai-key-notice-page">
+              <strong>Gemini only:</strong> create a key at
+              <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>
+              and paste it here — it is stored in <code>localStorage</code> on this device only.
+              <strong>Model API:</strong> no separate key for the Irish vulnerability API; if you see HTTP 502, the Zerve hub or proxy may be busy — the dev-server retries once, or run <code>uvicorn</code> locally and set <code>window.__FFL_API_BASE__ = 'http://127.0.0.1:8000'</code> before load.
+            </p>
+            <details class="ai-key-details">
+              <summary>What each layer does</summary>
+              <div class="ai-key-details-body">
+                <p><strong>Data (Zerve / FastAPI)</strong> — County scores, national snapshot, headline insight, thresholds, and tiers at your scenario €/L. Fetched fresh when you send a chat message (summarised for the model).</p>
+                <p><strong>Knowledge (Gemini)</strong> — Explains policy trade-offs, drafts briefings, and reasons about the numbers. If the data fetch fails, say so clearly instead of inventing figures.</p>
+              </div>
+            </details>
           </div>
           <div class="ai-chips-page" id="ai-chips">
-            <button type="button" class="ai-chip-page" data-q="Which county needs help most urgently?">Urgent county?</button>
-            <button type="button" class="ai-chip-page" data-q="What would retrofitting Donegal cost the state?">Donegal retrofit cost</button>
-            <button type="button" class="ai-chip-page" data-q="Write a briefing note for the Minister">Minister briefing</button>
-            <button type="button" class="ai-chip-page" data-q="What happens at €3 diesel?">€3 diesel</button>
+            <button type="button" class="ai-chip-page" data-q="Which counties look worst at the current scenario price, and why?">Worst-hit counties</button>
+            <button type="button" class="ai-chip-page" data-q="Summarise the national snapshot and headline insight from the live data.">Summarise live data</button>
+            <button type="button" class="ai-chip-page" data-q="What would materially change if diesel went to €3/L? Use the model context.">€3 diesel</button>
+            <button type="button" class="ai-chip-page" data-q="Draft a short ministerial briefing note in plain language.">Minister briefing</button>
           </div>
-          <div class="ai-thread-page" id="ai-thread"></div>
+          <div class="ai-thread-page" id="ai-thread">
+            <div class="ai-welcome" id="ai-welcome">
+              <p class="ai-welcome-title">Ask about Irish fuel stress and policy</p>
+              <p class="ai-welcome-body">
+                <strong>First:</strong> scroll up to the green <strong>Gemini API key</strong> field, paste your key from
+                <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>,
+                and click <strong>Save key</strong>. Then type below or use a chip. Enter sends; Shift+Enter adds a line.
+              </p>
+            </div>
+          </div>
           <div class="ai-input-row-page">
-            <input type="text" id="ai-input" placeholder="Message…" maxlength="2000" aria-label="Message to analyst">
+            <textarea id="ai-input" placeholder="Message the copilot…" maxlength="8000" rows="2" aria-label="Message to analyst"></textarea>
             <button type="button" id="ai-send" class="ffl-btn ffl-btn--primary" onclick="window.__fflAiSend()">Send</button>
           </div>
         </div>
@@ -4297,7 +4548,7 @@
         <p class="dash-card-sub" style="margin-top:0.25rem">Tap a row for details</p>
       </div>
       <button type="button" class="county-drawer-close ffl-btn ffl-btn--icon" onclick="window.__fflCloseCountyDrawer()" aria-label="Close">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        <i data-lucide="x"></i>
       </button>
     </div>
     <div class="county-drawer-body">
@@ -4332,16 +4583,25 @@
         <p class="sub" id="modal-province" style="margin-top:0.35rem;font-family:var(--mono);font-size:0.62rem;color:var(--ink3);text-transform:uppercase;letter-spacing:0.06em"></p>
       </div>
       <button type="button" class="modal-close ffl-btn ffl-btn--icon" id="modal-close-btn" aria-label="Close">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        <i data-lucide="x"></i>
       </button>
     </div>
     <div class="modal-body" id="modal-body"></div>
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js" crossorigin="anonymous"></script>
 <script>
 (function () {
   'use strict';
+
+  function __fflIconsRefresh() {
+    try {
+      if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+        lucide.createIcons();
+      }
+    } catch (e) {}
+  }
 
   document.getElementById('doc-date').textContent = new Date().toLocaleDateString('en-IE', {
     weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
@@ -4426,6 +4686,7 @@
   }
   var useLocalProxy = __fflIsLocalDevHost(h);
   var API = useLocalProxy ? location.origin.replace(/\/+$/, '') + '/api' : API_PUBLIC;
+  var UPSTREAM_ZERVE_HOST = 'fuel-ireland.hub.zerve.cloud';
 
   (function labelApiEndpoint() {
     var el = document.getElementById('dash-api-endpoint');
@@ -4552,8 +4813,8 @@
   /** @type {{role:string, content:string}[]} */
   let aiChatMessages = [];
 
-  const AI_SYSTEM =
-    'You are the in-app assistant for Fuel Fault Lines, answering as Google Gemini via the Generative Language API. You are an expert Irish energy policy analyst. The dashboard uses a county-level energy vulnerability model for Ireland built on Zerve AI.\n\nThe live API may expose /meta (lineage), /insights/submission-pack (Devpost draft and video checklist), /model/claims (pass/fail checks), and /model/sensitivity (stress tests). Exact counts change with data pulls and assumption sliders — prefer qualitative patterns unless the user supplied current numbers.\n\nIllustrative snapshot (often true but verify against the app): several counties are Critical tier; rural oil-heavy counties tend to show higher modelled fuel-income stress than Dublin; retrofit paybacks are often long at illustrative grant levels.\n\nData sources: SEAI-style profiles, CSO deprivation (or synthetic fallback), AA Ireland price snapshot.\n\nAnswer concisely. Use Irish county names. Note limitations: synthetic income bands from deprivation, not survey microdata; fuel use is a proxy. When asked to write documents, format them clearly for policymakers.';
+  const AI_SYSTEM_CORE =
+    'You are the Fuel Fault Lines copilot: an expert Irish energy and social policy analyst. You answer via Google Gemini; factual claims about counties, tiers, poverty proxy %, and national counts MUST follow the LIVE MODEL CONTEXT block appended below (from the same REST API as the dashboard — Zerve-deployed FastAPI or local).\n\nIf that block reports fetch errors, HTTP 502, or missing data, say so honestly and give qualitative guidance only. Never invent county-level statistics.\n\nData lineage: SEAI-style energy profiles, CSO deprivation (or synthetic cohort), liquid-fuel price scenario. Limitations: modelled fuel share of income, not survey microdata.\n\nStyle: concise, Irish county names, **bold** for key numbers when helpful, short paragraphs. For memos or briefings, use clear headings in plain text.';
 
   function getActivePrice() {
     return compareMode ? priceA : currentPrice;
@@ -4594,11 +4855,6 @@
       .replace(/"/g, '&quot;');
   }
 
-  var FFL_SVG_TRI_ALERT =
-    '<svg class="ffl-inline-svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h18.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>';
-  var FFL_SVG_INFO =
-    '<svg class="ffl-inline-svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none"/><path d="M12 16v-4M12 8h.01"/></svg>';
-
   var __fflLastNoticePlain = '';
 
   function fflInlineAlert(kind, title, msg) {
@@ -4608,7 +4864,7 @@
       k +
       '" role="alert">' +
       '<span class="ffl-inline-alert__ico" aria-hidden="true">' +
-      FFL_SVG_TRI_ALERT +
+      '<i data-lucide="triangle-alert"></i>' +
       '</span><div class="ffl-inline-alert__body">' +
       '<p class="ffl-inline-alert__title">' +
       escapeHtml(title) +
@@ -5145,6 +5401,7 @@
     const prefersReduce =
       typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
     animateCountUp(document.getElementById('modal-score-num'), vuln, prefersReduce ? 0 : 750);
+    __fflIconsRefresh();
   }
 
   function normalizeHistoryPayload(raw) {
@@ -5943,6 +6200,9 @@
       if (appPage === 'submit') {
         refreshSubmissionPage();
       }
+      if (appPage === 'ai') {
+        refreshAiPageStatus();
+      }
       try {
         localStorage.setItem('ffl_page', appPage);
       } catch (eP) {}
@@ -6012,10 +6272,6 @@
       __fflResizeChartsAfterSidebar();
     }, 520);
     if (tg) {
-      var ch = document.getElementById('sidebar-chevron-path');
-      if (ch) {
-        ch.setAttribute('d', sidebarCollapsed ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6');
-      }
       tg.setAttribute('aria-expanded', sidebarCollapsed ? 'false' : 'true');
       tg.setAttribute('title', sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar');
     }
@@ -6319,7 +6575,10 @@
     var detail = opts.detail || '';
     var code = opts.code || '';
     var dismissible = opts.dismissible !== false;
-    var icoInner = sev === 'info' ? FFL_SVG_INFO : FFL_SVG_TRI_ALERT;
+    var icoInner =
+      sev === 'info'
+        ? '<i data-lucide="info"></i>'
+        : '<i data-lucide="triangle-alert"></i>';
     __fflLastNoticePlain =
       title + (detail ? '\n\n' + detail : '') + (code ? '\n\n' + code : '');
     var canRetry =
@@ -6359,6 +6618,7 @@
         : '') +
       '</div>';
     wrap.classList.add('visible');
+    __fflIconsRefresh();
   }
 
   function clearAppNotice() {
@@ -6446,12 +6706,14 @@
     if (!loadFinishedOnce) {
       if (txt) txt.textContent = 'Connecting…';
       pill.title = 'Loading county data from the API';
+      if (appPage === 'ai') refreshAiPageStatus();
       return;
     }
     if (lastLoadOkCount <= 0) {
       pill.classList.add('offline');
       if (txt) txt.textContent = 'Offline';
       pill.title = 'No county data loaded — check API or network';
+      if (appPage === 'ai') refreshAiPageStatus();
       return;
     }
     if (lastLoadOkCount < lastLoadTotal) {
@@ -6462,11 +6724,13 @@
         ' of ' +
         lastLoadTotal +
         ' counties loaded — retry failed rows in the register';
+      if (appPage === 'ai') refreshAiPageStatus();
       return;
     }
     pill.classList.add('connected');
     if (txt) txt.textContent = 'Connected';
     pill.title = 'All counties loaded from the API';
+    if (appPage === 'ai') refreshAiPageStatus();
   }
 
   function describeLoadFailure(sampleErr) {
@@ -6540,7 +6804,10 @@
 
   function setHtml(id, html) {
     const el = document.getElementById(id);
-    if (el) el.innerHTML = html;
+    if (el) {
+      el.innerHTML = html;
+      __fflIconsRefresh();
+    }
   }
 
   function formatNationalHuman(s) {
@@ -6999,7 +7266,7 @@
   };
 
   async function refreshThesisBanner() {
-    const el = document.getElementById('thesis-banner');
+    const el = document.getElementById('thesis-banner-text');
     if (!el) return;
     __fflPulseInsightBlocks(true);
     const price = getActivePrice();
@@ -7047,10 +7314,12 @@
         '</strong> registered model claims pass (see Method &amp; lab). ' +
         snapLine +
         ' <span style="opacity:0.88">Illustrative model — synthetic income bands, not survey microdata.</span>';
+      __fflIconsRefresh();
     } catch (e) {
       el.innerHTML =
         'Model compares county-level SEAI energy profiles with CSO deprivation and a liquid-fuel proxy. ' +
         'Open <strong>Method &amp; lab</strong> when the API exposes <code>/meta</code> and <code>/model/claims</code> for full lineage.';
+      __fflIconsRefresh();
     } finally {
       __fflPulseInsightBlocks(false);
     }
@@ -8210,6 +8479,7 @@
         fflInlineAlert('error', 'Could not show county detail', message || 'Unknown error.') +
         '<p class="panel-refresh-hint">Change the price or pick another county from the register.</p>' +
         '</div>';
+      __fflIconsRefresh();
     }
   }
 
@@ -8360,6 +8630,7 @@
     const mb = document.getElementById('modal-body');
     mb.innerHTML =
       '<div class="loading-inline"><div class="spinner"></div> Loading deep dive…</div>';
+    __fflIconsRefresh();
 
     var dpLoad = document.getElementById('detail-panel');
     if (dpLoad) {
@@ -8394,6 +8665,7 @@
           'Could not load this county from the API at the current fuel price.'
         ) +
         '</div>';
+      __fflIconsRefresh();
       renderDetailError(county, 'Could not load county.');
       return;
     }
@@ -8413,6 +8685,7 @@
           err.message || 'Could not render county.'
         ) +
         '</div>';
+      __fflIconsRefresh();
       renderDetailError(county, err.message || 'Could not render county.');
     }
   };
@@ -8628,22 +8901,195 @@
     document.body.style.overflow = '';
   };
 
-  function appendAiMsg(cls, text) {
+  function __fflRemoveAiWelcome() {
+    var w = document.getElementById('ai-welcome');
+    if (w && w.parentNode) w.parentNode.removeChild(w);
+  }
+
+  function formatAiReplyHtml(text) {
+    var t = String(text || '');
+    var paras = t.split(/\n\n+/);
+    var out = '';
+    for (var i = 0; i < paras.length; i++) {
+      var para = paras[i].trim();
+      if (!para) continue;
+      var lines = para.split('\n');
+      var inner = '';
+      for (var j = 0; j < lines.length; j++) {
+        if (j > 0) inner += '<br>';
+        var line = escapeHtml(lines[j]);
+        inner += line.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      }
+      out += '<p>' + inner + '</p>';
+    }
+    return out || '<p>' + escapeHtml(t) + '</p>';
+  }
+
+  function appendAiMsg(cls, text, asHtml) {
     var th = document.getElementById('ai-thread');
     if (!th) return null;
     var d = document.createElement('div');
     var role = cls.indexOf('user') !== -1 ? 'user' : 'bot';
     var typing = cls.indexOf('typing') !== -1 ? ' typing' : '';
     d.className = 'ai-msg-page ' + role + typing;
-    d.textContent = text;
+    if (role === 'user') {
+      __fflRemoveAiWelcome();
+      d.textContent = text;
+    } else if (typing) {
+      d.textContent = text;
+    } else if (asHtml) {
+      var body = document.createElement('div');
+      body.className = 'ai-msg-body';
+      body.innerHTML = formatAiReplyHtml(text);
+      d.appendChild(body);
+    } else {
+      d.textContent = text;
+    }
     th.appendChild(d);
     th.scrollTop = th.scrollHeight;
     return d;
   }
 
+  function buildCountyDigestForAi() {
+    var rows = [];
+    for (var c in countyData) {
+      if (!Object.prototype.hasOwnProperty.call(countyData, c)) continue;
+      var d = countyData[c];
+      if (!d || typeof d !== 'object') continue;
+      rows.push({
+        county: d.county || c,
+        tier: d.risk_tier || null,
+        vulnerability: num(d.vulnerability_score),
+        poverty_pct_at_scenario: povertyPct(d)
+      });
+    }
+    rows.sort(function (a, b) {
+      return (b.vulnerability || 0) - (a.vulnerability || 0);
+    });
+    var top = rows.slice(0, 18);
+    try {
+      return JSON.stringify({
+        counties_in_memory: top.length,
+        top_by_vulnerability_score: top
+      });
+    } catch (eJ) {
+      return '';
+    }
+  }
+
+  async function buildAiHubContext() {
+    var price = getActivePrice();
+    var base = API;
+    var errors = [];
+    var lines = [];
+
+    async function fetchJson(label, url) {
+      try {
+        var res = await fetch(url);
+        if (!res.ok) {
+          errors.push(label + ' HTTP ' + res.status);
+          return null;
+        }
+        return await res.json();
+      } catch (e) {
+        errors.push(label + ' ' + (e && e.message ? e.message : 'network'));
+        return null;
+      }
+    }
+
+    lines.push('Scenario €/L (retail diesel proxy): ' + price.toFixed(2));
+    lines.push('Fuel-income stress threshold (%): ' + povertyThresholdPct);
+
+    var snap = await fetchJson('national/snapshot', base + '/national/snapshot?price_eur_l=' + encodeURIComponent(price));
+    if (snap) {
+      var sStr = JSON.stringify(snap);
+      if (sStr.length > 3200) sStr = sStr.slice(0, 3200) + '…[truncated]';
+      lines.push('national/snapshot: ' + sStr);
+    }
+
+    var headline = await fetchJson('headline', base + '/insights/headline?price_eur_l=' + encodeURIComponent(price));
+    if (headline) {
+      var hStr = JSON.stringify(headline);
+      if (hStr.length > 2000) hStr = hStr.slice(0, 2000) + '…[truncated]';
+      lines.push('insights/headline: ' + hStr);
+    }
+
+    var meta = metaCache;
+    if (!meta || typeof meta !== 'object') {
+      meta = await fetchJson('meta', base + '/meta');
+    }
+    if (meta) {
+      var metaBrief = {
+        params: meta.params || null,
+        limitations: meta.limitations || null,
+        data_lineage: meta.data_lineage || null
+      };
+      var mStr = JSON.stringify(metaBrief);
+      if (mStr.length > 2200) mStr = mStr.slice(0, 2200) + '…[truncated]';
+      lines.push('meta (abbrev): ' + mStr);
+    }
+
+    var digest = buildCountyDigestForAi();
+    if (digest) lines.push('county_digest_from_app: ' + digest);
+
+    if (errors.length) {
+      lines.push(
+        'WARNINGS: ' +
+          errors.join('; ') +
+          '. The hub may be down (502) or unreachable — tell the user and avoid fabricating numbers.'
+      );
+    }
+
+    return {
+      text: lines.join('\n'),
+      ok: errors.length === 0 && !!snap,
+      errors: errors
+    };
+  }
+
+  function refreshAiPageStatus() {
+    var el = document.getElementById('ai-page-status');
+    if (!el) return;
+    var price = getActivePrice();
+    var apiLabel = useLocalProxy ? 'Local /api → ' + UPSTREAM_ZERVE_HOST : API_PUBLIC.replace(/^https?:\/\//, '');
+    var dataLabel = '…';
+    if (loadFinishedOnce) {
+      if (lastLoadOkCount <= 0) dataLabel = 'No county rows loaded';
+      else if (lastLoadOkCount < lastLoadTotal) dataLabel = 'Partial (' + lastLoadOkCount + '/' + lastLoadTotal + ')';
+      else dataLabel = 'OK (' + lastLoadOkCount + ' counties)';
+    } else dataLabel = 'Loading…';
+    el.classList.remove('is-ok', 'is-warn', 'is-bad');
+    if (loadFinishedOnce && lastLoadOkCount >= lastLoadTotal && lastLoadTotal > 0) el.classList.add('is-ok');
+    else if (loadFinishedOnce && lastLoadOkCount > 0) el.classList.add('is-warn');
+    else if (loadFinishedOnce) el.classList.add('is-bad');
+    el.innerHTML =
+      '<span>Data layer: <strong>' +
+      escapeHtml(dataLabel) +
+      '</strong></span><span>Scenario: <strong>€' +
+      price.toFixed(2) +
+      '/L</strong></span><span>API: <strong>' +
+      escapeHtml(apiLabel) +
+      '</strong></span>';
+  }
+
   window.__fflSaveAiKey = function () {
     var inp = document.getElementById('ai-api-key');
     if (inp && inp.value.trim()) localStorage.setItem(LS_AI_KEY, inp.value.trim());
+  };
+
+  window.__fflAiClearChat = function () {
+    aiChatMessages = [];
+    var th = document.getElementById('ai-thread');
+    if (!th) return;
+    th.innerHTML = '';
+    var w = document.createElement('div');
+    w.className = 'ai-welcome';
+    w.id = 'ai-welcome';
+    w.innerHTML =
+      '<p class="ai-welcome-title">Ask about Irish fuel stress and policy</p>' +
+      '<p class="ai-welcome-body"><strong>First:</strong> scroll up, paste your Gemini API key, click <strong>Save key</strong>. Then chat here. Enter sends; Shift+Enter adds a line.</p>';
+    th.appendChild(w);
+    __fflIconsRefresh();
   };
 
   function geminiContentsFromChat(msgs) {
@@ -8655,21 +9101,28 @@
 
   window.__fflAiSend = async function () {
     var input = document.getElementById('ai-input');
+    var sendBtn = document.getElementById('ai-send');
     var keyEl = document.getElementById('ai-api-key');
     var key = (keyEl && keyEl.value.trim()) || localStorage.getItem(LS_AI_KEY) || '';
     var text = (input && input.value.trim()) || '';
     if (!text) return;
     if (!key) {
-      appendAiMsg('bot', 'Add your Gemini API key above and click Save to send messages.');
+      appendAiMsg('bot', 'Add your Gemini API key above and click **Save** to send messages.', true);
       return;
     }
+    refreshAiPageStatus();
     appendAiMsg('user', text);
     if (input) input.value = '';
-    var typing = appendAiMsg('bot typing', '...');
-    await new Promise(function (r) {
-      setTimeout(r, 500);
-    });
+    if (sendBtn) sendBtn.disabled = true;
+
+    var typing = appendAiMsg('bot typing', 'Fetching live model data & calling Gemini…');
+    var hubCtx = await buildAiHubContext();
     if (typing) typing.remove();
+
+    var systemText =
+      AI_SYSTEM_CORE +
+      '\n\n--- LIVE MODEL CONTEXT (Fuel Fault Lines API; refresh each message) ---\n' +
+      hubCtx.text;
 
     var nextMsgs = aiChatMessages.concat([{ role: 'user', content: text }]);
     var url =
@@ -8682,9 +9135,9 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          systemInstruction: { parts: [{ text: AI_SYSTEM }] },
+          systemInstruction: { parts: [{ text: systemText }] },
           contents: geminiContentsFromChat(nextMsgs),
-          generationConfig: { maxOutputTokens: 1000 }
+          generationConfig: { maxOutputTokens: 2048, temperature: 0.7 }
         })
       });
       var j = await res.json().catch(function () {
@@ -8694,11 +9147,12 @@
         var errObj = j.error || {};
         var errTxt =
           errObj.message || errObj.status || res.statusText || 'Request failed';
-        appendAiMsg('bot', String(errTxt));
+        appendAiMsg('bot', String(errTxt), false);
         if (/not found|NOT_FOUND|model|invalid/i.test(String(errTxt))) {
           appendAiMsg(
             'bot',
-            'If the model was rejected, change GEMINI_MODEL in the page script to a model your key supports (e.g. gemini-2.5-flash).'
+            'If the model was rejected, set GEMINI_MODEL in the page script to a model your key supports (e.g. gemini-2.0-flash).',
+            false
           );
         }
         return;
@@ -8714,17 +9168,20 @@
         txt = 'No text returned (finish: ' + String(cand.finishReason) + ').';
       }
       aiChatMessages = nextMsgs.concat([{ role: 'assistant', content: txt }]);
-      appendAiMsg('bot', txt || '(empty response)');
+      appendAiMsg('bot', txt || '(empty response)', true);
     } catch (e3) {
       var msg = e3 && e3.message ? String(e3.message) : 'Failed to fetch';
       if (msg.indexOf('Failed to fetch') !== -1 || e3 instanceof TypeError) {
         appendAiMsg(
           'bot',
-          'Browser blocked the request (CORS). Use a CORS-safe environment or add a small POST proxy on your dev server.'
+          'Could not reach Google Generative Language API (network or CORS). Gemini must be called from a normal browsing context; keys are not proxied through this app.',
+          false
         );
       } else {
-        appendAiMsg('bot', msg);
+        appendAiMsg('bot', msg, false);
       }
+    } finally {
+      if (sendBtn) sendBtn.disabled = false;
     }
   };
 
@@ -8761,7 +9218,19 @@
       if (!t) return;
       var q = t.getAttribute('data-q');
       var inp = document.getElementById('ai-input');
-      if (q && inp) inp.value = q;
+      if (q && inp) {
+        inp.value = q;
+        inp.focus();
+      }
+    });
+  }
+
+  var aiInputEl = document.getElementById('ai-input');
+  if (aiInputEl) {
+    aiInputEl.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey) return;
+      ev.preventDefault();
+      window.__fflAiSend();
     });
   }
 
@@ -8782,6 +9251,7 @@
   }
   __fflSyncNavTooltips();
   updateConnectionPill();
+  __fflIconsRefresh();
   (async function boot() {
     await fetchCountiesList();
     metaCache = await fetchApiMeta();
