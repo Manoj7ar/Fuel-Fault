@@ -5,6 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fuel Fault Lines — Ireland</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <script>
+    (function () {
+      if (typeof window.__FFL_API_BASE__ === 'string' && window.__FFL_API_BASE__.trim()) return;
+      try {
+        var q = new URLSearchParams(window.location.search);
+        var fromQuery = q.get('api') || q.get('api_base');
+        if (fromQuery && String(fromQuery).trim()) {
+          window.__FFL_API_BASE__ = decodeURIComponent(String(fromQuery).trim());
+          return;
+        }
+      } catch (e1) {}
+      try {
+        var ls = localStorage.getItem('ffl_api_base');
+        if (ls && typeof ls === 'string' && ls.trim()) window.__FFL_API_BASE__ = ls.trim();
+      } catch (e2) {}
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -33,9 +50,9 @@
       --accent-deep: #0f766e;
       --accent-soft: rgba(13, 148, 136, 0.1);
       --accent-glow: rgba(13, 148, 136, 0.28);
-      --sidebar-bg: #0f172a;
-      --sidebar-border: #1e293b;
-      --sidebar-hover: #1e293b;
+      --sidebar-bg: #000000;
+      --sidebar-border: rgba(255, 255, 255, 0.08);
+      --sidebar-hover: rgba(255, 255, 255, 0.06);
       --pill-bg: #0f172a;
       --pill-fg: #f8fafc;
       --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
@@ -44,8 +61,8 @@
       --radius-lg: 16px;
       --radius-md: 12px;
       --radius-sm: 8px;
-      --sidebar-w: 232px;
-      --sidebar-w-collapsed: 58px;
+      --sidebar-w: 272px;
+      --sidebar-w-collapsed: 76px;
       --display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
       --sans: "Inter", system-ui, sans-serif;
       --mono: "IBM Plex Mono", ui-monospace, monospace;
@@ -197,23 +214,25 @@
     }
     .ffl-btn--sidebar {
       flex-shrink: 0;
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       padding: 0;
       font-size: 0;
       line-height: 0;
-      border: 1px solid rgba(148, 163, 184, 0.22);
-      border-radius: var(--radius-sm);
-      background: rgba(30, 41, 59, 0.65);
-      backdrop-filter: blur(12px) saturate(1.2);
-      -webkit-backdrop-filter: blur(12px) saturate(1.2);
-      color: #e2e8f0;
-      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 11px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(14px) saturate(1.25);
+      -webkit-backdrop-filter: blur(14px) saturate(1.25);
+      color: #cbd5e1;
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.07) inset,
+        0 10px 22px rgba(0, 0, 0, 0.18);
     }
     .ffl-btn--sidebar:hover:not(:disabled) {
-      background: rgba(51, 65, 85, 0.85);
-      color: #fff;
-      border-color: rgba(148, 163, 184, 0.35);
+      background: rgba(255, 255, 255, 0.1);
+      color: #f8fafc;
+      border-color: rgba(255, 255, 255, 0.22);
     }
     .ffl-btn--notice {
       padding: 0.32rem 0.58rem;
@@ -239,24 +258,38 @@
       }
     }
 
-    /* App shell + sidebar (minimal SaaS) */
+    /* App shell + sidebar (pitch black, floating rail) */
     .app-shell {
+      --shell-inset: 0.75rem;
       display: flex;
+      align-items: stretch;
       height: 100dvh;
       width: 100%;
       overflow: hidden;
+      padding: var(--shell-inset);
+      gap: var(--shell-inset);
+      box-sizing: border-box;
     }
     .app-sidebar {
+      --sidebar-ease: cubic-bezier(0.22, 1, 0.36, 1);
+      position: relative;
+      z-index: 2;
       flex-shrink: 0;
+      min-height: 0;
       width: var(--sidebar-w);
-      background: var(--sidebar-bg);
       color: #cbd5e1;
       display: flex;
       flex-direction: column;
-      --sidebar-ease: cubic-bezier(0.22, 1, 0.36, 1);
-      transition: width 0.42s var(--sidebar-ease);
-      border-right: 1px solid var(--sidebar-border);
+      transition: width 0.42s var(--sidebar-ease), box-shadow 0.35s var(--sidebar-ease);
       will-change: width;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--sidebar-bg);
+      box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.12),
+        0 22px 48px rgba(0, 0, 0, 0.28),
+        0 1px 0 rgba(255, 255, 255, 0.05) inset;
     }
     .app-sidebar.collapsed {
       width: var(--sidebar-w-collapsed);
@@ -264,40 +297,60 @@
     .sidebar-brand {
       display: flex;
       align-items: center;
-      gap: 0.55rem;
-      padding: 1rem 0.75rem;
-      border-bottom: 1px solid var(--sidebar-border);
+      justify-content: flex-start;
+      gap: 0.65rem;
+      padding: 1.05rem 0.95rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       flex-shrink: 0;
       transition: padding 0.35s var(--sidebar-ease), gap 0.35s var(--sidebar-ease);
+    }
+    .sidebar-brand-main {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      min-width: 0;
+      flex: 1;
+      transition: flex 0.35s var(--sidebar-ease), gap 0.35s var(--sidebar-ease);
+    }
+    .sidebar-headlines {
+      min-width: 0;
+      flex: 1;
     }
     .app-sidebar.collapsed .sidebar-brand {
       flex-direction: column;
       justify-content: center;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.85rem 0.45rem;
+      padding: 0.95rem 0.55rem 0.85rem;
+    }
+    .app-sidebar.collapsed .sidebar-brand-main {
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
     }
     .sidebar-logo {
-      width: 32px;
-      height: 32px;
-      border-radius: var(--radius-sm);
-      background: #0f172a;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
       flex-shrink: 0;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      background: #141414;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
     }
-    .sidebar-logo .lucide {
-      width: 22px;
-      height: 22px;
-      color: #5eead4;
-      stroke-width: 2.25px;
+    .sidebar-logo__mark {
+      width: 26px;
+      height: 26px;
+      display: block;
+      color: #f1f5f9;
+      flex-shrink: 0;
     }
     .sidebar-toggle .lucide {
-      width: 16px;
-      height: 16px;
+      width: 17px;
+      height: 17px;
       stroke-width: 2px;
       transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
     }
@@ -307,14 +360,13 @@
     .sidebar-title-text {
       font-family: var(--display);
       font-weight: 700;
-      font-size: 0.8125rem;
-      letter-spacing: -0.025em;
+      font-size: 0.9375rem;
+      letter-spacing: -0.03em;
       color: #f8fafc;
-      line-height: 1.25;
+      line-height: 1.2;
       min-width: 0;
-      flex: 1;
       overflow: hidden;
-      max-width: 11rem;
+      max-width: 13rem;
       opacity: 1;
       transition: max-width 0.38s var(--sidebar-ease), opacity 0.28s ease, margin 0.3s var(--sidebar-ease);
     }
@@ -325,38 +377,64 @@
       flex: 0 0 0;
       pointer-events: none;
     }
+    .app-sidebar.collapsed .sidebar-headlines {
+      display: none;
+    }
     .sidebar-title-text small {
       display: block;
-      font-size: 0.58rem;
+      font-family: var(--mono);
+      font-size: 0.56rem;
       font-weight: 500;
-      color: #64748b;
-      letter-spacing: 0.04em;
+      color: #7c8d9f;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      margin-top: 0.15rem;
+      margin-top: 0.28rem;
     }
     .sidebar-nav {
       flex: 1;
       overflow-y: auto;
-      padding: 0.35rem 0.4rem 0.5rem;
+      overflow-x: hidden;
+      padding: 0.4rem 0.65rem 0.6rem;
       display: flex;
       flex-direction: column;
-      gap: 0.12rem;
+      gap: 0.18rem;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(148, 163, 184, 0.25) transparent;
+    }
+    .sidebar-nav::-webkit-scrollbar {
+      width: 5px;
+    }
+    .sidebar-nav::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.22);
+      border-radius: 99px;
     }
     .sidebar-nav-section {
+      display: flex;
+      align-items: center;
+      gap: 0.48rem;
       font-family: var(--mono);
-      font-size: 0.5rem;
+      font-size: 0.56rem;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: #64748b;
-      padding: 0.55rem 0.65rem 0.28rem;
-      margin-top: 0.15rem;
+      letter-spacing: 0.16em;
+      color: #6c7c90;
+      padding: 0.65rem 0.55rem 0.22rem;
+      margin-top: 0.12rem;
       pointer-events: none;
       transition: opacity 0.25s ease, max-height 0.35s cubic-bezier(0.22, 1, 0.36, 1), padding 0.35s ease, margin 0.35s ease;
     }
+    .sidebar-nav-section::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: #525252;
+      opacity: 0.9;
+    }
     .sidebar-nav-section:first-child {
       margin-top: 0;
-      padding-top: 0.2rem;
+      padding-top: 0.35rem;
     }
     .app-sidebar.collapsed .sidebar-nav-section {
       max-height: 0;
@@ -369,22 +447,27 @@
     .nav-item {
       display: flex;
       align-items: center;
-      gap: 0.55rem;
+      gap: 0.65rem;
       width: 100%;
       text-align: left;
-      padding: 0.55rem 0.65rem;
+      padding: 0.5rem 0.58rem;
       border: none;
-      border-radius: var(--radius-sm);
+      border-radius: 14px;
       background: transparent;
       color: #94a3b8;
       font-size: 0.8125rem;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
-      transition: background 0.15s ease, color 0.15s ease, padding 0.35s var(--sidebar-ease), gap 0.35s var(--sidebar-ease);
+      transition:
+        background 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease,
+        padding 0.35s var(--sidebar-ease),
+        gap 0.35s var(--sidebar-ease);
     }
     .app-sidebar.collapsed .nav-item {
       justify-content: center;
-      padding: 0.65rem 0.45rem;
+      padding: 0.58rem 0.42rem;
       gap: 0;
     }
     .nav-item-label {
@@ -392,7 +475,8 @@
       min-width: 0;
       overflow: hidden;
       white-space: nowrap;
-      max-width: 11rem;
+      max-width: 12.5rem;
+      letter-spacing: -0.015em;
       opacity: 1;
       transition: max-width 0.38s var(--sidebar-ease), opacity 0.26s ease 0.04s;
     }
@@ -402,35 +486,71 @@
       pointer-events: none;
       transition: max-width 0.34s var(--sidebar-ease), opacity 0.18s ease;
     }
-    .nav-item:hover { background: var(--sidebar-hover); color: #f1f5f9; }
+    .nav-item:hover {
+      background: var(--sidebar-hover);
+      color: #f1f5f9;
+    }
+    .nav-item:hover .nav-ico {
+      background: rgba(255, 255, 255, 0.09);
+      color: #e2e8f0;
+    }
     .nav-item.active {
-      background: linear-gradient(90deg, rgba(13, 148, 136, 0.22) 0%, rgba(30, 41, 59, 0.65) 100%);
       color: #f8fafc;
-      box-shadow: inset 3px 0 0 var(--accent), 0 1px 0 rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.07);
+      box-shadow: inset 3px 0 0 #f1f5f9;
+    }
+    .nav-item.active .nav-ico {
+      color: #f8fafc;
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.14);
+      box-shadow: none;
     }
     .nav-ico {
-      width: 1.25rem;
-      height: 1.25rem;
+      width: 2.25rem;
+      height: 2.25rem;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      opacity: 0.9;
+      border-radius: 11px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(148, 163, 184, 0.09);
+      color: inherit;
+      transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
     }
     .nav-ico .lucide {
       width: 18px;
       height: 18px;
       stroke: currentColor;
-      stroke-width: 1.85px;
+      stroke-width: 1.9px;
+    }
+    .sidebar-toggle-bar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0.5rem 0.95rem 0.45rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      transition: padding 0.35s var(--sidebar-ease);
+    }
+    .app-sidebar.collapsed .sidebar-toggle-bar {
+      justify-content: center;
+      padding: 0.45rem 0.5rem 0.4rem;
     }
     .sidebar-foot {
-      padding: 0.75rem;
-      font-size: 0.65rem;
-      color: #64748b;
-      border-top: 1px solid var(--sidebar-border);
-      line-height: 1.45;
+      margin: 0.35rem 0.65rem 0.85rem;
+      padding: 0.7rem 0.75rem;
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      line-height: 1.55;
+      color: #7c8c9f;
+      border-radius: 13px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #0a0a0a;
       overflow: hidden;
-      max-height: 5rem;
+      max-height: 5.5rem;
       opacity: 1;
       transition: max-height 0.35s var(--sidebar-ease), opacity 0.28s ease, padding 0.35s var(--sidebar-ease), margin 0.35s var(--sidebar-ease);
     }
@@ -440,13 +560,16 @@
       padding-top: 0;
       padding-bottom: 0;
       margin: 0;
-      border-top-color: transparent;
+      border-color: transparent;
       pointer-events: none;
     }
 
     .app-main {
+      position: relative;
+      z-index: 1;
       flex: 1;
       min-width: 0;
+      min-height: 0;
       display: flex;
       flex-direction: column;
       background: transparent;
@@ -460,7 +583,10 @@
         transition-duration: 0.01ms !important;
       }
       .sidebar-brand,
+      .sidebar-brand-main,
+      .sidebar-headlines,
       .sidebar-title-text,
+      .sidebar-toggle-bar,
       .nav-item,
       .nav-item-label,
       .sidebar-foot {
@@ -607,6 +733,81 @@
       opacity: 0.75;
       word-break: break-word;
     }
+    .app-notice-steps {
+      margin: 0.35rem 0 0;
+      padding: 0 0 0 1.2rem;
+      font-size: 0.76rem;
+      line-height: 1.5;
+      opacity: 0.95;
+    }
+    .app-notice-steps li {
+      margin: 0.28rem 0;
+    }
+    .app-notice-tech {
+      margin: 0.55rem 0 0;
+      font-size: 0.74rem;
+    }
+    .app-notice-tech summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: inherit;
+      opacity: 0.95;
+    }
+    .app-notice-tech summary::-webkit-details-marker {
+      display: none;
+    }
+    .app-notice-detail--tech {
+      margin: 0.45rem 0 0;
+      font-size: 0.72rem;
+      opacity: 0.9;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .ffl-chart-empty {
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
+      text-align: left;
+      gap: 0.45rem;
+      max-height: 100%;
+      overflow-y: auto;
+    }
+    .ffl-chart-empty__title {
+      font-weight: 600;
+      color: var(--ink2);
+      margin: 0;
+      font-size: 0.88rem;
+    }
+    .ffl-chart-empty__summary {
+      margin: 0;
+      font-size: 0.78rem;
+      color: var(--ink3);
+      line-height: 1.45;
+    }
+    .ffl-chart-empty__steps {
+      margin: 0;
+      padding-left: 1.15rem;
+      font-size: 0.75rem;
+      line-height: 1.45;
+      color: var(--ink3);
+    }
+    .ffl-chart-empty__steps li {
+      margin: 0.22rem 0;
+    }
+    .ffl-chart-empty__tech {
+      font-size: 0.72rem;
+      color: var(--ink3);
+    }
+    .ffl-chart-empty__tech summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--ink2);
+    }
+    .ffl-chart-empty__tech-p {
+      margin: 0.35rem 0 0;
+      font-size: 0.72rem;
+      line-height: 1.4;
+    }
 
     .ffl-inline-alert {
       display: flex;
@@ -667,41 +868,39 @@
       min-height: 0;
       position: relative;
       display: block;
-      view-transition-name: ffl-app-pages;
     }
+    /* Do not animate opacity here: fill-mode "both" applied opacity:0 before the run and could leave Compare/Counties blank if the run stalls. */
     @keyframes ffl-page-inner-in {
       from {
-        opacity: 0;
         transform: translateY(10px);
       }
       to {
-        opacity: 1;
         transform: translateY(0);
       }
     }
+    /* Inactive routes: display:none so they are not stacked, hit-tested, or painted. Runtime proof:
+       elementFromPoint(center of Compare) was hitting #app-page-views — inactive absolute panels
+       were letting events/paint fall through (blank main). */
     .page-view {
-      display: flex;
+      display: none;
       flex-direction: column;
       min-height: 0;
       overflow: auto;
       padding: 1.1rem 1.5rem 1.35rem;
       position: absolute;
       inset: 0;
-      opacity: 0;
-      transform: translateY(12px);
-      pointer-events: none;
       z-index: 0;
-      transition: opacity 0.34s cubic-bezier(0.22, 1, 0.36, 1), transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: none;
     }
     .page-view.active {
-      opacity: 1;
+      display: flex;
       transform: translateY(0);
       pointer-events: auto;
       z-index: 2;
-      transition: opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.05s, transform 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.05s;
+      transition: none;
     }
     .page-view.active > .page-inner {
-      animation: ffl-page-inner-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation: ffl-page-inner-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
     .page-inner {
@@ -713,6 +912,10 @@
       max-width: 1400px;
       width: 100%;
       margin: 0 auto;
+    }
+    #page-counties .page-inner {
+      flex: 1 1 auto;
+      min-height: min(50vh, 480px);
     }
 
     .page-panel {
@@ -3025,6 +3228,47 @@
     }
     .overview-sub strong { color: var(--ink); }
 
+    .dash-chart-drilldown {
+      margin-top: 0.65rem;
+      padding: 0.65rem 0.85rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--rule);
+      background: var(--surface-muted);
+      font-size: 0.76rem;
+      line-height: 1.45;
+      color: var(--ink2);
+    }
+    .dash-chart-drilldown[hidden] {
+      display: none !important;
+    }
+    .dash-chart-drilldown--compact {
+      margin-top: 0.45rem;
+    }
+    .dash-chart-drilldown h4 {
+      margin: 0 0 0.35rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .dash-chart-drilldown .curve-names {
+      margin: 0.35rem 0 0;
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      color: var(--ink2);
+      word-break: break-word;
+    }
+    .dash-chart-drilldown .drilldown-dismiss {
+      margin-top: 0.45rem;
+      font-size: 0.7rem;
+      color: var(--accent-deep);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: var(--sans);
+      text-decoration: underline;
+    }
+
     .donut-wrap-inner {
       position: relative;
       width: 100%;
@@ -3066,11 +3310,20 @@
       display: flex;
       flex-direction: column;
     }
+    #page-compare .matrices-page-wrap {
+      flex: 1 1 auto;
+      min-height: min(72vh, 720px);
+    }
+    #page-compare .matrices-shell {
+      flex: 1 1 auto;
+      min-height: min(64vh, 640px);
+    }
     .matrices-shell {
       flex: 1;
       min-height: 280px;
       display: grid;
-      grid-template-columns: minmax(0, 200px) minmax(0, 1fr) minmax(0, 240px);
+      /* minmax(0, Npx) lets tracks collapse to 0 — nav/inspector disappear, centre looks “blank”. */
+      grid-template-columns: minmax(11rem, 200px) minmax(0, 1fr) minmax(12.5rem, 240px);
       gap: 0;
       border-radius: var(--radius-lg);
       overflow: hidden;
@@ -3855,16 +4108,25 @@
 <div class="app-shell">
   <aside class="app-sidebar" id="app-sidebar" aria-label="Main navigation">
     <div class="sidebar-brand">
-      <div class="sidebar-logo" aria-hidden="true">
-        <i data-lucide="zap"></i>
+      <div class="sidebar-brand-main">
+        <div class="sidebar-logo" aria-hidden="true">
+          <svg class="sidebar-logo__mark" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <!-- Strata / baseline layers -->
+            <path d="M6 13h12M6 20h17M6 27h11" stroke="currentColor" stroke-opacity="0.28" stroke-width="2" stroke-linecap="round"/>
+            <!-- Fault trace -->
+            <path d="M26 7l-6 12 8 6-9 12" stroke="currentColor" stroke-width="2.35" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Stress locus -->
+            <circle cx="24.5" cy="19" r="2.75" fill="currentColor" fill-opacity="0.88"/>
+            <circle cx="24.5" cy="19" r="5" stroke="currentColor" stroke-opacity="0.2" stroke-width="1.25" fill="none"/>
+          </svg>
+        </div>
+        <div class="sidebar-headlines">
+          <span class="sidebar-title-text">Fuel fault lines<small>Energy vulnerability</small></span>
+        </div>
       </div>
-      <button type="button" class="sidebar-toggle ffl-btn ffl-btn--sidebar" id="sidebar-toggle" onclick="window.__fflToggleSidebar()" title="Collapse sidebar" aria-expanded="true">
-        <i data-lucide="chevron-left"></i>
-      </button>
-      <span class="sidebar-title-text">Fuel fault lines<small>Energy vulnerability</small></span>
     </div>
     <nav class="sidebar-nav" aria-label="Pages">
-      <div class="sidebar-nav-section" aria-hidden="true">Explore</div>
+      <div class="sidebar-nav-section">Explore</div>
       <button type="button" class="nav-item active" data-page="dashboard" onclick="window.__fflSetPage('dashboard')">
         <span class="nav-ico" aria-hidden="true"><i data-lucide="layout-dashboard"></i></span><span class="nav-item-label">Dashboard</span>
       </button>
@@ -3877,17 +4139,16 @@
       <button type="button" class="nav-item" data-page="counties" onclick="window.__fflSetPage('counties')">
         <span class="nav-ico" aria-hidden="true"><i data-lucide="map-pin"></i></span><span class="nav-item-label">Counties</span>
       </button>
-      <div class="sidebar-nav-section" aria-hidden="true">Workspace</div>
-      <button type="button" class="nav-item" data-page="method" onclick="window.__fflSetPage('method')">
-        <span class="nav-ico" aria-hidden="true"><i data-lucide="flask-conical"></i></span><span class="nav-item-label">Method &amp; lab</span>
-      </button>
-      <button type="button" class="nav-item" data-page="submit" onclick="window.__fflSetPage('submit')">
-        <span class="nav-ico" aria-hidden="true"><i data-lucide="clipboard-check"></i></span><span class="nav-item-label">Demo &amp; submit</span>
-      </button>
+      <div class="sidebar-nav-section">Workspace</div>
       <button type="button" class="nav-item" data-page="ai" onclick="window.__fflSetPage('ai')">
         <span class="nav-ico" aria-hidden="true"><i data-lucide="sparkles"></i></span><span class="nav-item-label">AI · Gemini</span>
       </button>
     </nav>
+    <div class="sidebar-toggle-bar">
+      <button type="button" class="sidebar-toggle ffl-btn ffl-btn--sidebar" id="sidebar-toggle" onclick="window.__fflToggleSidebar()" title="Collapse sidebar" aria-expanded="true">
+        <i data-lucide="chevron-left"></i>
+      </button>
+    </div>
     <div class="sidebar-foot">Ireland · 26 counties · SEAI / CSO / AA</div>
   </aside>
 
@@ -3965,10 +4226,21 @@
       </div>
       <div class="dash-chart-wrap dash-chart-wrap--curve is-empty" id="curve-chart-wrap">
         <canvas id="chart-scenario-curve" aria-label="Counties over threshold by fuel price"></canvas>
-        <div class="chart-placeholder" id="curve-chart-placeholder" aria-hidden="true">
-          <span><strong>Curve needs the API</strong>Deploy the FastAPI hub (with <code>/model/scenario-curve</code>) or run locally with <code>uvicorn</code> and set <code>window.__FFL_API_BASE__</code> before load.</span>
+        <div class="chart-placeholder ffl-chart-empty" id="curve-chart-placeholder" aria-hidden="true">
+          <p class="ffl-chart-empty__title">Scenario curve needs the API</p>
+          <p class="ffl-chart-empty__summary">This chart loads from <code>GET /model/scenario-curve</code>. If you see this message, that endpoint did not return any points.</p>
+          <ol class="ffl-chart-empty__steps">
+            <li>Open the app at <strong>http://127.0.0.1:5500/</strong> using <code>node dev-server.mjs</code> so requests can reach your backend.</li>
+            <li>Or run FastAPI locally: open <code>http://127.0.0.1:5500/?api=http://127.0.0.1:8000</code> once, or run <code>localStorage.setItem('ffl_api_base','http://127.0.0.1:8000')</code> then reload — on localhost that bypasses the <code>/api</code> proxy. You can also set <code>window.__FFL_API_BASE__</code> in a script that runs before the main app (see <code>&lt;head&gt;</code> bootstrap).</li>
+            <li>Confirm your API build includes the scenario-curve route (see Technical below).</li>
+          </ol>
+          <details class="ffl-chart-empty__tech">
+            <summary>Technical</summary>
+            <p class="ffl-chart-empty__tech-p">Expected: <code>GET /model/scenario-curve?price_min=&amp;price_max=&amp;steps=</code> returning JSON with a <code>points</code> array.</p>
+          </details>
         </div>
       </div>
+      <div class="dash-chart-drilldown" id="curve-chart-drilldown" role="region" aria-live="polite" hidden></div>
     </section>
     <section class="dash-card dash-card--tl" aria-labelledby="card-tl-title">
       <div class="dash-card-head">
@@ -3986,6 +4258,7 @@
       <div class="dash-chart-wrap">
         <canvas id="chart-tier-bars" aria-label="Mean index by risk tier"></canvas>
       </div>
+      <div class="dash-chart-drilldown dash-chart-drilldown--compact" id="tier-bars-drilldown" role="region" aria-live="polite" hidden></div>
     </section>
 
     <section class="dash-card dash-card--tr" aria-labelledby="card-tr-title">
@@ -4010,6 +4283,7 @@
         <canvas id="chart-stress-area" aria-label="Counties in energy poverty over time"></canvas>
       </div>
       <div class="adoption-totals" id="adoption-totals"></div>
+      <div class="dash-chart-drilldown dash-chart-drilldown--compact" id="stress-chart-drilldown" role="region" aria-live="polite" hidden></div>
     </section>
 
     <section class="dash-card dash-card--bl" aria-labelledby="card-bl-title">
@@ -4050,6 +4324,7 @@
         <div class="overview-legend" id="overview-legend"></div>
       </div>
       <p class="overview-sub" id="overview-foot">Largest segment: <strong id="overview-largest">—</strong></p>
+      <div class="dash-chart-drilldown dash-chart-drilldown--compact" id="risk-mix-drilldown" role="region" aria-live="polite" hidden></div>
     </section>
   </div>
 
@@ -4595,6 +4870,7 @@
 (function () {
   'use strict';
 
+
   function __fflIconsRefresh() {
     try {
       if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
@@ -4664,7 +4940,7 @@
   var API_PUBLIC = (
     typeof window.__FFL_API_BASE__ === 'string' && window.__FFL_API_BASE__.trim()
       ? window.__FFL_API_BASE__.trim()
-      : 'https://fuel-ireland.hub.zerve.cloud'
+      : 'https://26db1629-947d4286.hub.zerve.cloud'
   )
     .replace(/\/+$/, '')
     .replace(/\/api$/i, '')
@@ -4685,24 +4961,30 @@
     return false;
   }
   var useLocalProxy = __fflIsLocalDevHost(h);
-  var API = useLocalProxy ? location.origin.replace(/\/+$/, '') + '/api' : API_PUBLIC;
-  var UPSTREAM_ZERVE_HOST = 'fuel-ireland.hub.zerve.cloud';
+  /** If set, use this origin for all fetches — including on localhost (otherwise /api proxy is used). */
+  var userSetApiBase =
+    typeof window.__FFL_API_BASE__ === 'string' && window.__FFL_API_BASE__.trim();
+  var API = useLocalProxy
+    ? userSetApiBase
+      ? API_PUBLIC
+      : location.origin.replace(/\/+$/, '') + '/api'
+    : API_PUBLIC;
+  var UPSTREAM_ZERVE_HOST = '26db1629-947d4286.hub.zerve.cloud';
 
   (function labelApiEndpoint() {
     var el = document.getElementById('dash-api-endpoint');
     if (!el) return;
-    el.textContent = useLocalProxy ? 'Local · /api → hub' : API_PUBLIC.replace(/^https?:\/\//, '');
+    el.textContent = useLocalProxy
+      ? userSetApiBase
+        ? API_PUBLIC.replace(/^https?:\/\//, '')
+        : 'Local · /api → hub'
+      : API_PUBLIC.replace(/^https?:\/\//, '');
   })();
 
   const LITRES_PER_HH_PA = 1275;
 
-  const FALLBACK_COUNTIES = [
-    'Longford', 'Donegal', 'Leitrim', 'Roscommon', 'Mayo', 'Monaghan',
-    'Offaly', 'Sligo', 'Cavan', 'Kerry', 'Westmeath', 'Laois', 'Tipperary',
-    'Clare', 'Carlow', 'Wexford', 'Galway', 'Limerick', 'Kilkenny',
-    'Waterford', 'Louth', 'Cork', 'Wicklow', 'Kildare', 'Meath', 'Dublin'
-  ];
-  let COUNTIES = FALLBACK_COUNTIES.slice();
+  /** Filled from GET /counties after the API responds; empty until then. */
+  let COUNTIES = [];
 
   function normalizeCountiesPayload(raw) {
     function pickName(x) {
@@ -4756,7 +5038,7 @@
         return true;
       }
     } catch (eC) {
-      /* keep FALLBACK_COUNTIES */
+      /* leave COUNTIES unchanged */
     }
     return false;
   }
@@ -4778,6 +5060,12 @@
   let stressAreaChartInstance = null;
   let tierDonutChartInstance = null;
   let scenarioCurveChartInstance = null;
+  /** @type {Array<Record<string, unknown>>} */
+  let scenarioCurvePoints = [];
+  /** @type {Record<string, string[]>} */
+  let lastTierCountyLists = { Critical: [], High: [], Medium: [], Low: [] };
+  /** @type {number[]|null} */
+  let lastTierMeans = null;
   let radarChartInstance = null;
 
   let compareMode = false;
@@ -5484,41 +5772,6 @@
     return Number.isFinite(d.getTime()) ? d : null;
   }
 
-  function buildSyntheticHistory() {
-    const hist = [];
-    const proj = [];
-    const d = new Date('2022-01-01');
-    let price = 1.42;
-    let i = 0;
-    while (d <= new Date('2026-04-01')) {
-      const ds = d.toISOString().slice(0, 10);
-      price += Math.sin(i / 5) * 0.04 + 0.018;
-      price = Math.min(2.42, Math.max(1.25, price));
-      hist.push({ date: ds, price: Number(price.toFixed(2)) });
-      d.setMonth(d.getMonth() + 1);
-      i++;
-    }
-    const d2 = new Date('2026-05-01');
-    while (d2 <= new Date('2026-10-01')) {
-      const ds = d2.toISOString().slice(0, 10);
-      price += 0.045;
-      proj.push({ date: ds, price: Number(price.toFixed(2)) });
-      d2.setMonth(d2.getMonth() + 1);
-    }
-    return {
-      historical: hist,
-      projected: proj,
-      events: [
-        { date: '2022-02-24', label: 'Russia invades Ukraine' },
-        { date: '2025-06-01', label: 'Iran conflict' },
-        { date: '2026-04-08', label: 'Today' }
-      ],
-      threshold: 2.14,
-      july: { counties_in_poverty: 14 },
-      oct: { counties_in_poverty: 16 }
-    };
-  }
-
   function povertyCountAtPrice(price) {
     const p = num(price);
     if (!Number.isFinite(p) || p <= 0) return 0;
@@ -5528,8 +5781,11 @@
       if (!d) continue;
       const inc = num(d.estimated_annual_income);
       if (!Number.isFinite(inc) || inc <= 0) continue;
-      const dep = num(d.fuel_dependency_score);
-      const litres = LITRES_PER_HH_PA * (0.5 + (Number.isFinite(dep) ? dep : 0) / 100);
+      let litres = num(d.model_litres_proxy_pa);
+      if (!Number.isFinite(litres) || litres <= 0) {
+        const dep = num(d.fuel_dependency_score);
+        litres = LITRES_PER_HH_PA * (0.5 + (Number.isFinite(dep) ? dep : 0) / 100);
+      }
       const pct = (litres * p) / inc * 100;
       if (pct > povertyThresholdPct) n++;
     }
@@ -5655,6 +5911,8 @@
             spanGaps: false,
             fill: true,
             pointRadius: 0,
+            pointHoverRadius: 5,
+            pointHitRadius: 12,
             borderWidth: 2
           },
           {
@@ -5667,6 +5925,8 @@
             spanGaps: false,
             fill: true,
             pointRadius: 0,
+            pointHoverRadius: 5,
+            pointHitRadius: 12,
             borderWidth: 2
           }
         ]
@@ -5676,6 +5936,10 @@
           responsive: true,
           maintainAspectRatio: false,
           interaction: { mode: 'index', intersect: false },
+          onClick: function (_evt, elements) {
+            if (!elements.length) return;
+            showStressChartDrilldown(elements[0].index, labels, hMap, pMap);
+          },
           plugins: {
             legend: { display: false },
             tooltip: {
@@ -5684,6 +5948,22 @@
                   const v = ctx.raw;
                   if (v == null) return '';
                   return ctx.dataset.label + ': ' + v + ' counties';
+                },
+                afterBody: function (tooltipItems) {
+                  if (!tooltipItems.length) return '';
+                  const idx = tooltipItems[0].dataIndex;
+                  const lb = labels[idx];
+                  const hv = hMap[lb];
+                  const pv = pMap[lb];
+                  const fp = hv != null && !Number.isNaN(hv) ? hv : pv != null && !Number.isNaN(pv) ? pv : null;
+                  const lines = [];
+                  if (fp != null && Number.isFinite(fp)) {
+                    lines.push('Implied €/L: €' + fp.toFixed(2));
+                    lines.push(
+                      'Counties over ' + povertyThresholdPct + '% at this price: ' + povertyCountAtPrice(fp)
+                    );
+                  }
+                  return lines;
                 }
               }
             },
@@ -5733,7 +6013,7 @@
         ((!data.historical || !data.historical.length) &&
           (!data.projected || !data.projected.length))
       ) {
-        data = buildSyntheticHistory();
+        data = { historical: [], projected: [], events: [], threshold: 2.14 };
       }
       historyCache = data;
     }
@@ -5753,15 +6033,19 @@
     const out = { Critical: 0, High: 0, Medium: 0, Low: 0 };
     const p = num(price);
     if (!Number.isFinite(p) || p <= 0) return out;
+    const thr = povertyThresholdPct;
     for (let i = 0; i < COUNTIES.length; i++) {
       const d = countyData[COUNTIES[i]];
       if (!d) continue;
       const inc = num(d.estimated_annual_income);
       if (!Number.isFinite(inc) || inc <= 0) continue;
-      const dep = num(d.fuel_dependency_score);
-      const litres = LITRES_PER_HH_PA * (0.5 + (Number.isFinite(dep) ? dep : 0) / 100);
+      let litres = num(d.model_litres_proxy_pa);
+      if (!Number.isFinite(litres) || litres <= 0) {
+        const dep = num(d.fuel_dependency_score);
+        litres = LITRES_PER_HH_PA * (0.5 + (Number.isFinite(dep) ? dep : 0) / 100);
+      }
       const pct = (litres * p) / inc * 100;
-      if (pct <= 10) continue;
+      if (pct <= thr) continue;
       const t = d.risk_tier;
       if (out[t] != null) out[t]++;
     }
@@ -6009,10 +6293,11 @@
     if (!canvas || typeof Chart === 'undefined') return;
 
     if (!historyCache) {
-      historyCache = buildSyntheticHistory();
+      historyCache = { historical: [], projected: [], events: [], threshold: 2.14 };
     }
 
-    const labels = matricesHistoryLabelList();
+    let labels = matricesHistoryLabelList();
+    if (!labels.length) return;
     const maps = matricesPriceMaps();
     const colors = matricesTierColors();
 
@@ -6137,23 +6422,26 @@
       matricesChartInstance = null;
     }
 
-    matricesChartInstance = new Chart(canvas.getContext('2d'), {
-      type: matricesChartType === 'bar' ? 'bar' : 'line',
-      data: { labels: labels, datasets: datasets },
-      options: Object.assign(
-        {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
-          plugins: plugins,
-          scales: scales
-        },
-        __fflChartMotionOverrides()
-      )
-    });
-
-    attachMatricesChartHover(matricesChartInstance);
-    fillMatricesTable(labels, seriesForTable);
+    try {
+      matricesChartInstance = new Chart(canvas.getContext('2d'), {
+        type: matricesChartType === 'bar' ? 'bar' : 'line',
+        data: { labels: labels, datasets: datasets },
+        options: Object.assign(
+          {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: plugins,
+            scales: scales
+          },
+          __fflChartMotionOverrides()
+        )
+      });
+      attachMatricesChartHover(matricesChartInstance);
+      fillMatricesTable(labels, seriesForTable);
+    } catch (eMx) {
+      console.warn('Compare chart:', eMx);
+    }
   }
 
   var PAGE_TITLES = {
@@ -6161,8 +6449,6 @@
     scenarios: 'Scenarios',
     compare: 'Compare',
     counties: 'Counties',
-    method: 'Method & lab',
-    submit: 'Demo & submit',
     ai: 'AI · Gemini'
   };
 
@@ -6176,7 +6462,8 @@
   }
 
   window.__fflSetPage = function (page) {
-    appPage = page || 'dashboard';
+    var raw = page == null ? '' : String(page);
+    appPage = raw.trim() || 'dashboard';
     if (!PAGE_TITLES[appPage]) appPage = 'dashboard';
 
     function applyPageDom() {
@@ -6187,18 +6474,31 @@
         el.classList.remove('active');
       });
       var panel = document.getElementById('page-' + appPage);
+      if (!panel) {
+        appPage = 'dashboard';
+        panel = document.getElementById('page-dashboard');
+      }
       if (panel) panel.classList.add('active');
       var titleEl = document.getElementById('page-title');
       if (titleEl) titleEl.textContent = PAGE_TITLES[appPage] || 'Dashboard';
       __fflSyncPageAria();
       if (appPage === 'compare') {
-        refreshMatricesChart();
+        if (typeof window.__fflMatricesViewMode === 'function') {
+          window.__fflMatricesViewMode('graph');
+        }
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            try {
+              refreshMatricesChart();
+            } catch (eC) {
+              console.warn('refreshMatricesChart:', eC);
+            }
+            __fflResizeChartsAfterSidebar();
+          });
+        });
       }
-      if (appPage === 'method') {
-        refreshMethodPage();
-      }
-      if (appPage === 'submit') {
-        refreshSubmissionPage();
+      if (appPage === 'counties') {
+        fillCompareCountySelects();
       }
       if (appPage === 'ai') {
         refreshAiPageStatus();
@@ -6211,15 +6511,34 @@
           __fflResizeChartsAfterSidebar();
         });
       });
+
+      requestAnimationFrame(function () {
+        var act = document.querySelectorAll('.page-view.active');
+        if (act.length === 1) return;
+        document.querySelectorAll('.page-view').forEach(function (el) {
+          el.classList.remove('active');
+        });
+        var expectId = 'page-' + appPage;
+        var fix = document.getElementById(expectId) || document.getElementById('page-dashboard');
+        if (!fix) return;
+        fix.classList.add('active');
+        if (fix.id !== expectId) {
+          appPage = 'dashboard';
+          document.querySelectorAll('.nav-item[data-page]').forEach(function (btn) {
+            btn.classList.toggle('active', btn.getAttribute('data-page') === appPage);
+          });
+          var tFix = document.getElementById('page-title');
+          if (tFix) tFix.textContent = PAGE_TITLES[appPage] || 'Dashboard';
+          try {
+            localStorage.setItem('ffl_page', appPage);
+          } catch (eSf) {}
+        }
+        __fflSyncPageAria();
+      });
     }
 
-    if (typeof document.startViewTransition === 'function') {
-      document.startViewTransition(function () {
-        applyPageDom();
-      });
-    } else {
-      applyPageDom();
-    }
+    /* View transitions snapshot .app-page-views poorly with stacked absolute page panels — skip to avoid blank Compare/Counties. */
+    applyPageDom();
   };
 
   function __fflResizeChartsAfterSidebar() {
@@ -6500,16 +6819,50 @@
     return results;
   }
 
+  function fflJoinNoticeBody(opts) {
+    if (!opts) return '';
+    if (opts.steps && opts.steps.length) {
+      var parts = [];
+      if (opts.summary) parts.push(opts.summary);
+      for (var i = 0; i < opts.steps.length; i++) {
+        parts.push(String(i + 1) + '. ' + opts.steps[i]);
+      }
+      return parts.join('\n');
+    }
+    return opts.detail || opts.summary || '';
+  }
+
+  function fflNoticePlainText(opts) {
+    var sev = opts.severity === 'warn' || opts.severity === 'info' ? opts.severity : 'error';
+    var title = opts.title || (sev === 'error' ? 'Error' : 'Notice');
+    var lines = [title];
+    var body = fflJoinNoticeBody(opts);
+    if (!body && opts.detail) body = opts.detail;
+    if (body) lines.push('', body);
+    if (opts.technical) lines.push('', 'Technical details:', opts.technical);
+    var code = opts.code != null && opts.code !== '' ? String(opts.code) : '';
+    if (code) lines.push('', 'Code: ' + code);
+    return lines.join('\n');
+  }
+
   function classifyApiError(sampleErr) {
     var proto = location.protocol;
     var host = location.hostname;
     if (proto === 'file:') {
       return {
         severity: 'error',
-        title: 'Open via local server',
-        detail:
-          'This file was opened with file://. Run node dev-server.mjs and open http://127.0.0.1:5500/ so the API proxy works.',
-        code: 'FILE_PROTOCOL'
+        title: 'Open this app from the dev server',
+        summary:
+          'You opened this page with file://. Browsers block most API calls from local files, so the data layer cannot start.',
+        steps: [
+          'Open a terminal in the Fuel Fault project folder.',
+          'Run: node dev-server.mjs',
+          'Visit http://127.0.0.1:5500/ in your browser (not the HTML file directly).'
+        ],
+        technical:
+          'The dev server serves index.html and proxies /api to your configured backend. file:// cannot use that proxy.',
+        code: 'FILE_PROTOCOL',
+        detail: ''
       };
     }
     var st = sampleErr && sampleErr.status;
@@ -6517,28 +6870,47 @@
       return {
         severity: 'error',
         title: 'Service temporarily unavailable',
-        detail:
-          'The model API returned HTTP ' +
-          st +
-          '. Wait a moment and try again, or check hub status.',
-        code: 'HTTP_' + st
+        summary: 'The API returned HTTP ' + st + ' (often overload or maintenance).',
+        steps: [
+          'Wait a short time, then click Retry load.',
+          'If you use a hosted hub, try again when traffic is lower.'
+        ],
+        technical: 'Upstream returned status ' + st + '.',
+        code: 'HTTP_' + st,
+        detail: ''
       };
     }
     if (typeof st === 'number' && st >= 400) {
       if (st === 404) {
         return {
           severity: 'error',
-          title: 'API not found',
-          detail:
-            'Expected hub routes at the root (/counties, /county/…, /history). If you use dev-server.mjs, open http://127.0.0.1:5500/. You can set window.__FFL_API_BASE__ before load.',
-          code: 'HTTP_404'
+          title: 'API not found at this URL',
+          summary:
+            'The server responded, but the Fuel Fault routes were not found at the API base you are using.',
+          steps: [
+            'Check the API base in the header (connection pill). It should point at the API root, not a subpath.',
+            'If you use node dev-server.mjs, open http://127.0.0.1:5500/ so /api is proxied correctly.',
+            'To talk to FastAPI on your machine: set window.__FFL_API_BASE__ = "http://127.0.0.1:8000" in the console, then reload.',
+            'Confirm the server exposes routes like GET /counties at that origin.'
+          ],
+          technical:
+            'Expected hub paths include /counties, /county/{name}, /history. Open /docs on the same origin to verify.',
+          code: 'HTTP_404',
+          detail: ''
         };
       }
       return {
         severity: 'error',
         title: 'Request failed',
-        detail: 'The API returned HTTP ' + st + '. Check the endpoint and your connection.',
-        code: 'HTTP_' + st
+        summary: 'The API returned HTTP ' + st + '.',
+        steps: [
+          'Verify the API is running and reachable from your browser.',
+          'Check VPN / firewall if this is a remote deployment.',
+          'If you changed window.__FFL_API_BASE__, reload the page after setting it.'
+        ],
+        technical: 'HTTP status ' + st + ' from the configured API origin.',
+        code: 'HTTP_' + st,
+        detail: ''
       };
     }
     var msg = sampleErr && sampleErr.message ? String(sampleErr.message) : '';
@@ -6552,35 +6924,79 @@
         host === '0.0.0.0';
       return {
         severity: 'error',
-        title: 'Cannot reach API',
-        detail: local
-          ? 'Start the dev server (node dev-server.mjs) and use http://127.0.0.1:5500/ with the /api proxy.'
-          : 'Network or CORS blocked the request. Use the deployed site or serve locally with dev-server.mjs.',
-        code: 'NETWORK'
+        title: 'Cannot reach the API',
+        summary: local
+          ? 'The browser could not connect to the API from this machine.'
+          : 'The browser could not complete the request (network, DNS, or CORS).',
+        steps: local
+          ? [
+              'Start your FastAPI app (e.g. uvicorn) if you use a local API.',
+              'Use http://127.0.0.1:5500/ with node dev-server.mjs so /api can be proxied.',
+              'Optional: point at local API with window.__FFL_API_BASE__ = "http://127.0.0.1:8000", then reload.'
+            ]
+          : [
+              'Check your internet connection and VPN.',
+              'Open the official deployed URL or use the dev-server flow locally.',
+              'If the API allows only certain origins, use the site as documented by the host.'
+            ],
+        technical:
+          (msg ? 'Message: ' + msg + '. ' : '') +
+          (local
+            ? 'Often caused by the dev server not running or nothing listening on the API port.'
+            : 'CORS or mixed content can block requests from the wrong origin.'),
+        code: 'NETWORK',
+        detail: ''
       };
     }
     return {
       severity: 'error',
       title: 'Something went wrong',
-      detail: msg || 'The API did not return usable data.',
-      code: 'UNKNOWN'
+      summary: msg || 'The API did not return usable data.',
+      code: 'UNKNOWN',
+      detail: ''
     };
   }
 
   function showAppNotice(opts) {
     var wrap = document.getElementById('app-notice-wrap');
     if (!wrap) return;
+    opts = opts || {};
+    if (opts.steps && opts.steps.length && !opts.detail) {
+      opts.detail = fflJoinNoticeBody(opts);
+    } else if (!opts.detail && opts.summary && !opts.steps) {
+      opts.detail = opts.summary;
+    }
     var sev = opts.severity === 'warn' || opts.severity === 'info' ? opts.severity : 'error';
     var title = opts.title || (sev === 'error' ? 'Error' : 'Notice');
     var detail = opts.detail || '';
-    var code = opts.code || '';
+    var code = opts.code != null && opts.code !== '' ? String(opts.code) : '';
     var dismissible = opts.dismissible !== false;
     var icoInner =
       sev === 'info'
         ? '<i data-lucide="info"></i>'
         : '<i data-lucide="triangle-alert"></i>';
-    __fflLastNoticePlain =
-      title + (detail ? '\n\n' + detail : '') + (code ? '\n\n' + code : '');
+    var bodyHtml = '';
+    if (opts.steps && opts.steps.length) {
+      if (opts.summary) {
+        bodyHtml += '<p class="app-notice-detail">' + escapeHtml(opts.summary) + '</p>';
+      }
+      bodyHtml += '<ol class="app-notice-steps">';
+      for (var si = 0; si < opts.steps.length; si++) {
+        bodyHtml += '<li>' + escapeHtml(opts.steps[si]) + '</li>';
+      }
+      bodyHtml += '</ol>';
+    } else if (detail) {
+      bodyHtml += '<p class="app-notice-detail">' + escapeHtml(detail) + '</p>';
+    } else if (opts.summary) {
+      bodyHtml += '<p class="app-notice-detail">' + escapeHtml(opts.summary) + '</p>';
+    }
+    if (opts.technical) {
+      bodyHtml +=
+        '<details class="app-notice-tech"><summary>Technical details</summary><p class="app-notice-detail app-notice-detail--tech">' +
+        escapeHtml(opts.technical) +
+        '</p></details>';
+    }
+    __fflLastNoticePlain = fflNoticePlainText(opts);
     var canRetry =
       code === 'NETWORK' || (typeof code === 'string' && code.indexOf('HTTP_') === 0);
     var actions = '';
@@ -6589,7 +7005,7 @@
         '<div class="app-notice-actions">' +
         '<button type="button" class="ffl-btn ffl-btn--secondary ffl-btn--sm" onclick="window.__fflNoticeRetry()">Retry load</button>' +
         '<button type="button" class="ffl-btn ffl-btn--ghost ffl-btn--sm" onclick="window.__fflNoticeCopyDetail()">Copy details</button></div>';
-    } else if (detail || code) {
+    } else if (bodyHtml || detail || code) {
       actions +=
         '<div class="app-notice-actions">' +
         '<button type="button" class="ffl-btn ffl-btn--ghost ffl-btn--sm" onclick="window.__fflNoticeCopyDetail()">Copy details</button></div>';
@@ -6605,9 +7021,7 @@
       '<p class="app-notice-title">' +
       escapeHtml(title) +
       '</p>' +
-      (detail
-        ? '<p class="app-notice-detail">' + escapeHtml(detail) + '</p>'
-        : '') +
+      bodyHtml +
       (code
         ? '<p class="app-notice-code">' + escapeHtml(code) + '</p>'
         : '') +
@@ -6734,7 +7148,8 @@
   }
 
   function describeLoadFailure(sampleErr) {
-    return classifyApiError(sampleErr).detail;
+    var o = classifyApiError(sampleErr);
+    return o.summary || o.detail || '';
   }
 
   function getTierClass(d) {
@@ -7219,9 +7634,16 @@
       showAppNotice({
         severity: 'error',
         title: 'Submission pack unavailable',
-        detail:
-          'Could not load GET /insights/submission-pack. Deploy the FastAPI hub or check the dev-server /api proxy.',
-        code: 'PACK'
+        summary:
+          'The app could not load the hackathon submission helper (GET /insights/submission-pack).',
+        steps: [
+          'Confirm the API is running and matches the URL in the header.',
+          'Use http://127.0.0.1:5500/ with node dev-server.mjs if you rely on the /api proxy.',
+          'If you use a local FastAPI app, set window.__FFL_API_BASE__ to its origin, reload, and try again.'
+        ],
+        technical: 'Endpoint: GET /insights/submission-pack?price_eur_l=…',
+        code: 'PACK',
+        detail: ''
       });
     }
   }
@@ -7240,7 +7662,7 @@
       showAppNotice({
         severity: 'warn',
         title: 'Nothing to copy',
-        detail: 'Open Demo & submit and click Refresh pack first.',
+        detail: 'Load the submission pack from the API first (Refresh pack), then copy again.',
         code: null
       });
       return;
@@ -7868,31 +8290,227 @@
 
   const TIER_ORDER = ['Critical', 'High', 'Medium', 'Low'];
 
+  async function fetchScenarioCurvePayload(lo, hi, steps) {
+    const gap = 0.08;
+    let a = Math.max(0.5, Math.min(lo, 7.92));
+    let b = Math.min(8, Math.max(hi, a + gap));
+    if (!(b > a)) b = Math.min(8, a + gap);
+    const url =
+      API +
+      '/model/scenario-curve?price_min=' +
+      encodeURIComponent(a) +
+      '&price_max=' +
+      encodeURIComponent(b) +
+      '&steps=' +
+      encodeURIComponent(steps);
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return { points: [], price_min: a, price_max: b };
+      return await res.json();
+    } catch (e) {
+      return { points: [] };
+    }
+  }
+
+  function showCurveChartDrilldown(pt) {
+    const el = document.getElementById('curve-chart-drilldown');
+    if (!el) return;
+    const thr = povertyThresholdPct;
+    const names = pt.counties_over_names;
+    const arr = Array.isArray(names) ? names : [];
+    const namesHtml = arr.length
+      ? '<p class="curve-names">' +
+        arr
+          .map(function (n) {
+            return escapeHtml(String(n));
+          })
+          .join(', ') +
+        '</p>'
+      : '<p class="muted">No counties over threshold at this price (or list not available).</p>';
+    el.innerHTML =
+      '<button type="button" class="drilldown-dismiss" aria-label="Dismiss">×</button>' +
+      '<h4>€' +
+      (pt.price_eur_l != null ? Number(pt.price_eur_l).toFixed(2) : '—') +
+      '/L</h4>' +
+      '<p><strong>' +
+      (pt.counties_over_threshold != null ? pt.counties_over_threshold : '—') +
+      '</strong> counties over ' +
+      thr +
+      '% fuel-income line</p>' +
+      '<p>Mean fuel share (all counties): <strong>' +
+      (pt.mean_fuel_share_pct != null ? Number(pt.mean_fuel_share_pct).toFixed(1) : '—') +
+      '%</strong></p>' +
+      '<p class="muted drilldown-sub">Counties over threshold (up to 28 shown)</p>' +
+      namesHtml;
+    el.hidden = false;
+    var btn = el.querySelector('.drilldown-dismiss');
+    if (btn) {
+      btn.onclick = function () {
+        el.hidden = true;
+        el.innerHTML = '';
+      };
+    }
+  }
+
+  function showTierBarsDrilldown(tier) {
+    const el = document.getElementById('tier-bars-drilldown');
+    if (!el) return;
+    const names = (lastTierCountyLists[tier] || []).slice();
+    const mi = TIER_ORDER.indexOf(tier);
+    const mean = lastTierMeans && mi >= 0 ? lastTierMeans[mi] : null;
+    const namesHtml = names.length
+      ? '<p class="curve-names">' +
+        names
+          .map(function (n) {
+            return escapeHtml(String(n));
+          })
+          .join(', ') +
+        '</p>'
+      : '<p class="muted">No counties in this tier.</p>';
+    el.innerHTML =
+      '<button type="button" class="drilldown-dismiss" aria-label="Dismiss">×</button>' +
+      '<h4>' +
+      escapeHtml(tier) +
+      '</h4>' +
+      '<p>Mean index: <strong>' +
+      (mean != null ? mean.toFixed(1) : '—') +
+      '</strong> · n=' +
+      names.length +
+      '</p>' +
+      '<p class="muted drilldown-sub">Counties</p>' +
+      namesHtml;
+    el.hidden = false;
+    var btn = el.querySelector('.drilldown-dismiss');
+    if (btn) {
+      btn.onclick = function () {
+        el.hidden = true;
+        el.innerHTML = '';
+      };
+    }
+  }
+
+  function showRiskMixDrilldown(tier) {
+    const el = document.getElementById('risk-mix-drilldown');
+    if (!el) return;
+    const names = (lastTierCountyLists[tier] || []).slice();
+    const ti = TIER_ORDER.indexOf(tier);
+    const mean = lastTierMeans && ti >= 0 ? lastTierMeans[ti] : null;
+    const total = TIER_ORDER.reduce(function (s, t) {
+      const a = lastTierCountyLists[t];
+      return s + (Array.isArray(a) ? a.length : 0);
+    }, 0);
+    const n = names.length;
+    const pct = total > 0 ? ((n / total) * 100).toFixed(1) : '0';
+    const namesHtml = names.length
+      ? '<p class="curve-names">' +
+        names
+          .map(function (x) {
+            return escapeHtml(String(x));
+          })
+          .join(', ') +
+        '</p>'
+      : '<p class="muted">No counties in this tier.</p>';
+    el.innerHTML =
+      '<button type="button" class="drilldown-dismiss" aria-label="Dismiss">×</button>' +
+      '<h4>' +
+      escapeHtml(tier) +
+      ' · ' +
+      n +
+      ' counties</h4>' +
+      '<p>Share of all tiered counties: <strong>' +
+      pct +
+      '%</strong></p>' +
+      '<p>Mean vulnerability index: <strong>' +
+      (mean != null ? mean.toFixed(1) : '—') +
+      '</strong></p>' +
+      '<p class="muted drilldown-sub">County names</p>' +
+      namesHtml;
+    el.hidden = false;
+    var btn = el.querySelector('.drilldown-dismiss');
+    if (btn) {
+      btn.onclick = function () {
+        el.hidden = true;
+        el.innerHTML = '';
+      };
+    }
+  }
+
+  function showStressChartDrilldown(idx, labels, hMap, pMap) {
+    const el = document.getElementById('stress-chart-drilldown');
+    if (!el) return;
+    const lb = labels[idx];
+    const hv = hMap[lb];
+    const pv = pMap[lb];
+    const hist = hv != null && !Number.isNaN(hv);
+    const proj = pv != null && !Number.isNaN(pv);
+    const fp = hist ? hv : proj ? pv : null;
+    const n = fp != null && Number.isFinite(fp) ? povertyCountAtPrice(fp) : null;
+    el.innerHTML =
+      '<button type="button" class="drilldown-dismiss" aria-label="Dismiss">×</button>' +
+      '<h4>' +
+      escapeHtml(lb || 'Point') +
+      '</h4>' +
+      '<p>Series: <strong>' +
+      (hist ? 'Historical' : proj ? 'Projected' : '—') +
+      '</strong></p>' +
+      '<p>Implied fuel price: <strong>' +
+      (fp != null && Number.isFinite(fp) ? '€' + fp.toFixed(2) + '/L' : '—') +
+      '</strong></p>' +
+      '<p>Counties over ' +
+      povertyThresholdPct +
+      '% at this price: <strong>' +
+      (n != null ? n : '—') +
+      '</strong></p>' +
+      '<p class="muted">Uses the same fuel-income proxy as the main dashboard.</p>';
+    el.hidden = false;
+    var btn = el.querySelector('.drilldown-dismiss');
+    if (btn) {
+      btn.onclick = function () {
+        el.hidden = true;
+        el.innerHTML = '';
+      };
+    }
+  }
+
   async function renderScenarioCurveChart() {
     const canvas = document.getElementById('chart-scenario-curve');
     const wrap = document.getElementById('curve-chart-wrap');
     const pill = document.getElementById('curve-pill-range');
     if (!canvas || typeof Chart === 'undefined') return;
     const price = getActivePrice();
-    const lo = Math.max(0.5, Math.min(price - 0.85, 3.2));
-    const hi = Math.min(8, Math.max(price + 0.85, lo + 0.5));
-    if (pill) pill.textContent = '€' + lo.toFixed(2) + '–€' + hi.toFixed(2) + '/L';
-    let pts = [];
-    try {
-      const res = await fetch(
-        API +
-          '/model/scenario-curve?price_min=' +
-          encodeURIComponent(lo) +
-          '&price_max=' +
-          encodeURIComponent(hi) +
-          '&steps=28'
-      );
-      if (res.ok) {
-        const j = await res.json();
-        pts = j.points || [];
-      }
-    } catch (eC) {}
+    let lo = Math.max(0.5, Math.min(price - 0.85, 3.2));
+    let hi = Math.min(8, Math.max(price + 0.85, lo + 0.5));
+    if (hi - lo < 0.2) {
+      lo = Math.max(0.5, price - 0.55);
+      hi = Math.min(8, price + 0.55);
+    }
+    if (!(hi > lo)) {
+      lo = Math.max(0.5, price - 0.3);
+      hi = Math.min(8, price + 0.3);
+    }
+    if (!(hi > lo)) {
+      lo = 1.5;
+      hi = 4.0;
+    }
+
+    let j = await fetchScenarioCurvePayload(lo, hi, 28);
+    let pts = j.points || [];
+    if (j.price_min != null && j.price_max != null) {
+      lo = Number(j.price_min);
+      hi = Number(j.price_max);
+    }
     if (!pts.length) {
+      j = await fetchScenarioCurvePayload(1.5, 4.0, 28);
+      pts = j.points || [];
+      if (j.price_min != null && j.price_max != null) {
+        lo = Number(j.price_min);
+        hi = Number(j.price_max);
+      }
+    }
+    if (pill) pill.textContent = '€' + lo.toFixed(2) + '–€' + hi.toFixed(2) + '/L';
+
+    if (!pts.length) {
+      scenarioCurvePoints = [];
       if (scenarioCurveChartInstance) {
         scenarioCurveChartInstance.destroy();
         scenarioCurveChartInstance = null;
@@ -7901,6 +8519,8 @@
       return;
     }
     if (wrap) wrap.classList.remove('is-empty');
+
+    scenarioCurvePoints = pts;
 
     const labels = pts.map(function (p) {
       return p.price_eur_l != null ? p.price_eur_l.toFixed(2) : '';
@@ -7911,6 +8531,11 @@
     const means = pts.map(function (p) {
       return p.mean_fuel_share_pct != null ? p.mean_fuel_share_pct : null;
     });
+
+    const maxCount = counts.reduce(function (m, v) {
+      return Math.max(m, v);
+    }, 0);
+    const yMax = Math.min(26, Math.max(5, Math.ceil(maxCount * 1.12) + 1));
 
     if (scenarioCurveChartInstance) {
       scenarioCurveChartInstance.destroy();
@@ -7931,6 +8556,8 @@
             tension: 0.25,
             yAxisID: 'y',
             pointRadius: 0,
+            pointHoverRadius: 6,
+            pointHitRadius: 14,
             borderWidth: 2
           },
           {
@@ -7942,6 +8569,8 @@
             tension: 0.25,
             yAxisID: 'y1',
             pointRadius: 0,
+            pointHoverRadius: 5,
+            pointHitRadius: 12,
             borderWidth: 1.5
           }
         ]
@@ -7951,10 +8580,43 @@
           responsive: true,
           maintainAspectRatio: false,
           interaction: { mode: 'index', intersect: false },
+          onClick: function (_evt, elements) {
+            if (!elements.length) return;
+            const di = elements[0].index;
+            const pt = scenarioCurvePoints[di];
+            if (pt) showCurveChartDrilldown(pt);
+          },
           plugins: {
             legend: {
               position: 'top',
               labels: { boxWidth: 10, font: { size: 10 }, color: '#334155' }
+            },
+            tooltip: {
+              callbacks: {
+                title: function (items) {
+                  if (!items.length) return '';
+                  const i = items[0].dataIndex;
+                  const pt = scenarioCurvePoints[i];
+                  return pt && pt.price_eur_l != null
+                    ? '€' + Number(pt.price_eur_l).toFixed(2) + '/L'
+                    : '';
+                },
+                afterBody: function (items) {
+                  if (!items.length) return '';
+                  const i = items[0].dataIndex;
+                  const pt = scenarioCurvePoints[i];
+                  if (!pt) return '';
+                  const lines = [];
+                  const names = pt.counties_over_names;
+                  if (Array.isArray(names) && names.length) {
+                    const head = names.slice(0, 14).join(', ');
+                    const more =
+                      names.length > 14 ? ' … +' + (names.length - 14) + ' more' : '';
+                    lines.push('Over ' + thrLine + '%: ' + head + more);
+                  }
+                  return lines;
+                }
+              }
             }
           },
           scales: {
@@ -7967,9 +8629,9 @@
               type: 'linear',
               position: 'left',
               min: 0,
-              max: 26,
+              max: yMax,
               title: { display: true, text: 'Counties', font: { size: 10 } },
-              ticks: { stepSize: 2, font: { size: 9 } },
+              ticks: { stepSize: 1, font: { size: 9 } },
               grid: { color: 'rgba(0,0,0,0.06)' }
             },
             y1: {
@@ -7992,6 +8654,7 @@
     const tierLabels = TIER_ORDER;
     const sums = { Critical: 0, High: 0, Medium: 0, Low: 0 };
     const counts = { Critical: 0, High: 0, Medium: 0, Low: 0 };
+    const tierCountyLists = { Critical: [], High: [], Medium: [], Low: [] };
     let maxIdxCounty = '';
     let maxIdx = -1;
 
@@ -8003,6 +8666,7 @@
       if (sums[t] != null) {
         sums[t] += num(d.vulnerability_score) || 0;
         counts[t]++;
+        if (tierCountyLists[t]) tierCountyLists[t].push(c);
       }
       const vs = num(d.vulnerability_score) || 0;
       if (vs > maxIdx) {
@@ -8010,10 +8674,15 @@
         maxIdxCounty = c;
       }
     }
+    TIER_ORDER.forEach(function (t) {
+      tierCountyLists[t].sort();
+    });
+    lastTierCountyLists = tierCountyLists;
 
     const tierMeans = tierLabels.map(function (t) {
       return counts[t] ? sums[t] / counts[t] : 0;
     });
+    lastTierMeans = tierMeans.slice();
     const tierMaxIdx = tierLabels.reduce(function (best, t, idx) {
       return tierMeans[idx] > tierMeans[best] ? idx : best;
     }, 0);
@@ -8054,13 +8723,36 @@
             {
               responsive: true,
               maintainAspectRatio: false,
+              onClick: function (_evt, elements) {
+                if (!elements.length) return;
+                const t = tierLabels[elements[0].index];
+                showTierBarsDrilldown(t);
+              },
               plugins: {
                 legend: { display: false },
                 tooltip: {
                   callbacks: {
+                    title: function (tooltipItems) {
+                      return tierLabels[tooltipItems[0].dataIndex] + ' tier';
+                    },
+                    label: function (ctx) {
+                      const t = tierLabels[ctx.dataIndex];
+                      const m = ctx.raw;
+                      return 'Mean index: ' + (m != null ? Number(m).toFixed(1) : '—');
+                    },
                     afterLabel: function (ctx) {
                       const t = tierLabels[ctx.dataIndex];
-                      return counts[t] ? t + ' · n=' + counts[t] : '';
+                      const n = counts[t] || 0;
+                      return n ? 'Counties in tier: ' + n : '';
+                    },
+                    footer: function (tooltipItems) {
+                      if (!tooltipItems.length) return '';
+                      const t = tierLabels[tooltipItems[0].dataIndex];
+                      const names = lastTierCountyLists[t] || [];
+                      if (!names.length) return '';
+                      const head = names.slice(0, 12).join(', ');
+                      const more = names.length > 12 ? ' … +' + (names.length - 12) + ' more' : '';
+                      return 'Counties: ' + head + more;
                     }
                   }
                 }
@@ -8177,6 +8869,11 @@
               responsive: true,
               maintainAspectRatio: false,
               cutout: '62%',
+              onClick: function (_evt, elements) {
+                if (!elements.length) return;
+                const t = tierLabels[elements[0].index];
+                showRiskMixDrilldown(t);
+              },
               plugins: {
                 legend: { display: false },
                 tooltip: {
@@ -8185,7 +8882,16 @@
                       const n = ctx.raw;
                       const pct =
                         totalCounties > 0 ? ((n / totalCounties) * 100).toFixed(0) : '0';
-                      return ctx.label + ': ' + n + ' (' + pct + '%)';
+                      return ctx.label + ': ' + n + ' counties (' + pct + '% of cohort)';
+                    },
+                    footer: function (tooltipItems) {
+                      if (!tooltipItems.length) return '';
+                      const t = tierLabels[tooltipItems[0].dataIndex];
+                      const names = lastTierCountyLists[t] || [];
+                      if (!names.length) return '';
+                      const head = names.slice(0, 12).join(', ');
+                      const more = names.length > 12 ? ' … +' + (names.length - 12) + ' more' : '';
+                      return 'Counties: ' + head + more;
                     }
                   }
                 }
@@ -8246,8 +8952,19 @@
         btn.style.height = h + 'px';
         btn.style.background = grad[idx % grad.length];
         btn.textContent = formatNum(d.vulnerability_score);
-        btn.title = c + ' · ' + pov.toFixed(1) + '% income · tap';
-        btn.setAttribute('aria-label', c + ', index ' + formatNum(d.vulnerability_score));
+        btn.title =
+          c +
+          ' · index ' +
+          formatNum(d.vulnerability_score) +
+          ' · ' +
+          pov.toFixed(1) +
+          '% fuel/income · ' +
+          String(d.risk_tier || '') +
+          ' · click for full detail';
+        btn.setAttribute(
+          'aria-label',
+          c + ', index ' + formatNum(d.vulnerability_score) + ', ' + pov.toFixed(1) + ' percent fuel share'
+        );
         btn.onclick = function () {
           window.__fflSelectCounty(c);
         };
@@ -8721,14 +9438,18 @@
       } else {
         clearAppNotice();
         if (okCount < COUNTIES.length) {
+          var miss = COUNTIES.length - okCount;
           showAppNotice({
             severity: 'warn',
             title: 'Partial load',
-            detail:
-              COUNTIES.length -
-              okCount +
-              ' counties failed to load. Click a failed row in the register to retry.',
-            code: null
+            summary: miss + ' ' + (miss === 1 ? 'county did' : 'counties did') + ' not load.',
+            steps: [
+              'Scroll to the county register and look for rows marked failed or empty.',
+              'Click a failed county to retry just that request.',
+              'If everything fails, use Retry load after checking the API (see connection pill).'
+            ],
+            code: null,
+            detail: ''
           });
         }
       }
@@ -8736,13 +9457,14 @@
       renderGrid();
       updateDashboardCharts();
       fillCompareCountySelects();
+      refreshMatricesIfCompare();
       refreshThesisBanner();
       refreshKeyFindingCard();
-      if (appPage === 'submit') refreshSubmissionPage();
       if (isInitial) {
         ensureHistoryStressRendered()
           .then(function () {
             updateDashboardCharts();
+            refreshMatricesIfCompare();
           })
           .catch(function () {
             /* history optional */
@@ -9051,7 +9773,9 @@
     var el = document.getElementById('ai-page-status');
     if (!el) return;
     var price = getActivePrice();
-    var apiLabel = useLocalProxy ? 'Local /api → ' + UPSTREAM_ZERVE_HOST : API_PUBLIC.replace(/^https?:\/\//, '');
+    var apiLabel = useLocalProxy
+      ? 'Local /api → ' + UPSTREAM_ZERVE_HOST
+      : API_PUBLIC.replace(/^https?:\/\//, '');
     var dataLabel = '…';
     if (loadFinishedOnce) {
       if (lastLoadOkCount <= 0) dataLabel = 'No county rows loaded';
@@ -9099,7 +9823,7 @@
     });
   }
 
-  window.__fflAiSend = async function () {
+    window.__fflAiSend = async function () {
     var input = document.getElementById('ai-input');
     var sendBtn = document.getElementById('ai-send');
     var keyEl = document.getElementById('ai-api-key');
@@ -9243,7 +9967,7 @@
   setSliderVisualB('3');
   initMatricesNav();
   try {
-    var savedPage = localStorage.getItem('ffl_page');
+    var savedPage = (localStorage.getItem('ffl_page') || '').trim();
     if (savedPage && PAGE_TITLES[savedPage]) window.__fflSetPage(savedPage);
     else __fflSyncPageAria();
   } catch (eBoot) {

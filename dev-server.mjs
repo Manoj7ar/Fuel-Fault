@@ -14,7 +14,9 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
-const UPSTREAM_HOST = process.env.UPSTREAM_HOST || 'fuel-ireland.hub.zerve.cloud';
+/** Must match the default hub in index.html (API_PUBLIC) when not using local FastAPI. */
+const UPSTREAM_HOST =
+  process.env.UPSTREAM_HOST || '26db1629-947d4286.hub.zerve.cloud';
 const PORT = Number(process.env.PORT) || 5500;
 const LISTEN_HOST = process.env.HOST || '0.0.0.0';
 
@@ -152,4 +154,5 @@ server.listen(PORT, LISTEN_HOST, () => {
   const hint = LISTEN_HOST === '0.0.0.0' ? '127.0.0.1' : LISTEN_HOST;
   console.log(`Fuel Fault Lines → http://${hint}:${PORT}/`);
   console.log(`API proxy     → http://${hint}:${PORT}/api/... → https://${UPSTREAM_HOST}/...`);
+  console.log(`Local FastAPI → add ?api=http://${hint}:8000 or localStorage ffl_api_base (see README)`);
 });

@@ -1,6 +1,6 @@
 """
 Fuel Fault Lines — data pipeline (notebook logic consolidated for API use).
-Sources: SEAI-style county energy (with CSV fallbacks), CSO FY068, AA Ireland fuel prices.
+Sources: SEAI-style county energy (remote CSV), CSO FY068, AA Ireland fuel prices.
 """
 from __future__ import annotations
 
@@ -152,82 +152,6 @@ def git_short_hash(fallback: str = "unknown") -> str:
     return fallback
 
 
-def _seai_fallback_df() -> pd.DataFrame:
-    counties_data = {
-        "county": [
-            "Carlow", "Cavan", "Clare", "Cork", "Donegal", "Dublin",
-            "Galway", "Kerry", "Kildare", "Kilkenny", "Laois", "Leitrim",
-            "Limerick", "Longford", "Louth", "Mayo", "Meath", "Monaghan",
-            "Offaly", "Roscommon", "Sligo", "Tipperary", "Waterford",
-            "Westmeath", "Wexford", "Wicklow",
-        ],
-        "province": [
-            "Leinster", "Ulster", "Munster", "Munster", "Ulster", "Leinster",
-            "Connacht", "Munster", "Leinster", "Leinster", "Leinster", "Connacht",
-            "Munster", "Leinster", "Leinster", "Connacht", "Leinster", "Ulster",
-            "Leinster", "Connacht", "Connacht", "Munster", "Munster",
-            "Leinster", "Leinster", "Leinster",
-        ],
-        "population_2022": [
-            61927, 82950, 129592, 570700, 168997, 1450358,
-            284322, 158268, 246977, 102085, 92015, 34950,
-            204666, 46464, 146389, 136872, 220248, 63363,
-            82668, 72183, 72987, 181316, 125450,
-            95419, 162540, 155258,
-        ],
-        "residential_energy_ktoe": [
-            38.2, 56.4, 92.3, 387.5, 131.8, 784.2,
-            195.8, 115.7, 161.4, 69.2, 62.8, 26.3,
-            141.5, 33.1, 98.7, 104.3, 148.7, 47.6,
-            58.4, 54.2, 53.9, 127.6, 87.3,
-            67.1, 113.4, 104.7,
-        ],
-        "dwellings_count": [
-            24801, 33456, 52184, 231960, 70245, 575423,
-            116178, 65894, 97823, 41678, 37264, 15234,
-            83567, 19456, 58934, 57123, 89234, 26345,
-            34567, 30123, 30456, 74523, 51234,
-            39456, 66123, 62345,
-        ],
-        "pct_ber_ab": [
-            12.3, 10.1, 11.8, 14.2, 9.7, 18.6,
-            13.5, 10.9, 15.8, 11.4, 10.8, 8.4,
-            13.2, 9.3, 14.7, 9.8, 16.2, 9.5,
-            10.4, 9.1, 10.3, 11.7, 13.1,
-            11.9, 12.6, 14.8,
-        ],
-        "pct_ber_defg": [
-            41.2, 46.8, 42.3, 38.7, 49.2, 29.8,
-            40.5, 45.8, 35.6, 43.2, 44.7, 52.3,
-            40.1, 47.6, 37.4, 47.3, 36.8, 48.2,
-            44.3, 49.7, 46.8, 43.2, 39.8,
-            42.7, 40.9, 36.5,
-        ],
-        "primary_fuel": [
-            "Oil", "Oil", "Oil", "Gas", "Oil", "Gas",
-            "Oil", "Oil", "Gas", "Oil", "Oil", "Oil",
-            "Gas", "Oil", "Gas", "Oil", "Gas", "Oil",
-            "Oil", "Oil", "Oil", "Oil", "Gas",
-            "Oil", "Oil", "Gas",
-        ],
-        "energy_per_dwelling_toe": [
-            1.54, 1.69, 1.77, 1.67, 1.88, 1.36,
-            1.69, 1.76, 1.65, 1.66, 1.69, 1.73,
-            1.69, 1.70, 1.67, 1.83, 1.67, 1.81,
-            1.69, 1.80, 1.77, 1.71, 1.70,
-            1.70, 1.72, 1.68,
-        ],
-        "residential_co2_kt": [
-            102.3, 151.2, 247.5, 1021.4, 361.8, 1824.6,
-            524.3, 313.7, 422.8, 185.6, 168.4, 71.8,
-            378.3, 89.7, 263.5, 285.6, 397.5, 129.8,
-            157.3, 147.9, 147.1, 342.8, 233.4,
-            180.3, 304.7, 278.9,
-        ],
-    }
-    return pd.DataFrame(counties_data)
-
-
 def load_seai_df() -> pd.DataFrame:
     headers = {"User-Agent": "Mozilla/5.0 (compatible; FuelFaultLines/1.0)"}
     for url in SEAI_URLS:
@@ -251,9 +175,10 @@ def load_seai_df() -> pd.DataFrame:
                 return df
         except Exception:
             continue
-    fb = _seai_fallback_df()
-    fb.attrs["ffl_seai_source"] = "embedded_fallback"
-    return fb
+    raise RuntimeError(
+        "Could not load SEAI county energy CSV from any configured URL. "
+        "Check network access and SEAI_URLS in pipeline.py."
+    )
 
 
 def _build_pos_to_label(cats: dict) -> dict:
@@ -1040,12 +965,15 @@ def scenario_curve_payload(
     series = []
     for p in prices:
         pct = df.apply(lambda r: poverty_pct_row_series(r, float(p), params), axis=1)
-        n_over = int((pct > thr).sum())
+        over_mask = pct > thr
+        n_over = int(over_mask.sum())
+        names = sorted(df.loc[over_mask, "county"].astype(str).tolist())[:28]
         series.append(
             {
                 "price_eur_l": float(p),
                 "counties_over_threshold": n_over,
                 "mean_fuel_share_pct": round(float(pct.mean()), 2),
+                "counties_over_names": names,
             }
         )
     return {
@@ -1174,7 +1102,7 @@ def narrative_insights_payload(df: pd.DataFrame, params: ModelParams, price_eur_
         "price_eur_l": price_eur_l,
         "bullets": bullets,
         "elevator_pitch": (
-            "Fuel Fault Lines fuses SEAI county energy profiles with CSO deprivation (or fallback), "
+            "Fuel Fault Lines fuses SEAI county energy profiles with CSO deprivation, "
             "adds a heating-demand-aware liquid-fuel proxy, and exposes every assumption through a FastAPI hub "
             "so policymakers can stress-test price shocks, compare counties, and export briefings."
         ),

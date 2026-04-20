@@ -14,7 +14,7 @@
 | **Share (LinkedIn / X)** | Tag **@Zerve AI** / **@Zerve_AI** per hackathon rules; link your deployed `*.hub.zerve.cloud` + this repo. |
 | **Bonus: deployed API** | Primary story: **Zerve-hosted FastAPI** + **zero-build** static UI (`index.html`). |
 
-**Deployed demo hub (default for local UI proxy):** `https://fuel-ireland.hub.zerve.cloud`  
+**Deployed demo hub (default for local UI proxy):** `https://26db1629-947d4286.hub.zerve.cloud`  
 **Zerve FastAPI guide:** [Notebook → FastAPI on Zerve](https://docs.zerve.ai/guide/notebook-view/deployment/fast-api)
 
 ---
@@ -62,8 +62,8 @@ flowchart TB
   UI -->|user Gemini key| GEM
 ```
 
-- **Normal local demo:** `node dev-server.mjs` → UI at `http://127.0.0.1:5500`, API calls go to **`/api`** → proxied to **`https://fuel-ireland.hub.zerve.cloud`** (or `UPSTREAM_HOST` you set).
-- **Full stack local:** `uvicorn main:app --port 8000` and set `window.__FFL_API_BASE__ = 'http://127.0.0.1:8000'` before load (see [Quick start](#quick-start-judges--teammates)).
+- **Normal local demo:** `node dev-server.mjs` → UI at `http://127.0.0.1:5500`, API calls go to **`/api`** → proxied to **`https://26db1629-947d4286.hub.zerve.cloud`** (override with env `UPSTREAM_HOST`).
+- **Full stack local:** run `uvicorn` on port 8000, then either open **`http://127.0.0.1:5500/?api=http://127.0.0.1:8000`**, or run `localStorage.setItem('ffl_api_base','http://127.0.0.1:8000')` and reload, or set `window.__FFL_API_BASE__` before the app script (see [Quick start](#quick-start-judges--teammates)).
 
 ---
 
@@ -170,7 +170,7 @@ Fuel-Fault/
 node dev-server.mjs
 ```
 
-Open **http://127.0.0.1:5500/** — by default **`/api/*`** proxies to **`https://fuel-ireland.hub.zerve.cloud`**.
+Open **http://127.0.0.1:5500/** — by default **`/api/*`** proxies to **`https://26db1629-947d4286.hub.zerve.cloud`** (same default as `API_PUBLIC` in `index.html`).
 
 Point at **your** hub:
 
@@ -192,13 +192,11 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 
 First boot may **fetch external datasets**; failures fall back to **bundled data** (a few seconds is normal).
 
-**Point the UI at local API** — before reload, in the browser console:
+**Point the UI at local API** (pick one):
 
-```js
-window.__FFL_API_BASE__ = 'http://127.0.0.1:8000';
-```
-
-Then reload.
+- **URL (one-shot):** open `http://127.0.0.1:5500/?api=http://127.0.0.1:8000` (the `<head>` bootstrap sets `window.__FFL_API_BASE__` before the app runs).
+- **Persist:** in the console run `localStorage.setItem('ffl_api_base', 'http://127.0.0.1:8000')` then reload.
+- **Manual:** set `window.__FFL_API_BASE__ = 'http://127.0.0.1:8000'` in the console and reload (must run before fetches; prefer the options above).
 
 ---
 

@@ -16,8 +16,8 @@ No database — all data is computed in-memory from public APIs (SEAI, CSO) with
 ### Running services
 
 - **Backend:** `cd api && uvicorn main:app --host 0.0.0.0 --port 8000`
-- **Frontend dev server:** `node dev-server.mjs` (serves on port 5500, proxies `/api/*` to Zerve cloud via HTTPS by default)
-- The dev-server proxy uses HTTPS to reach the upstream. To use the local FastAPI instead of Zerve cloud, open the frontend with `window.__FFL_API_BASE__ = 'http://127.0.0.1:8000'` in the browser console, or access the FastAPI directly at port 8000.
+- **Frontend dev server:** `node dev-server.mjs` (serves on port 5500, proxies `/api/*` to the default Zerve hub via HTTPS; default upstream host matches `API_PUBLIC` in `index.html`, overridable with `UPSTREAM_HOST`)
+- **API routing:** On localhost, fetches use `http://127.0.0.1:5500/api/...` unless `window.__FFL_API_BASE__` is set *before* the main app script — set via `<head>` bootstrap: URL query `?api=http://127.0.0.1:8000` or `localStorage` key `ffl_api_base`, or assign `window.__FFL_API_BASE__` and reload. Then the UI talks directly to local FastAPI (CORS is enabled in `main.py`).
 
 ### Key API endpoints (FastAPI)
 
