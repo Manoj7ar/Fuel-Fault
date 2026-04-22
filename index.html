@@ -7,21 +7,59 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <script>
     (function () {
-      if (typeof window.__FFL_API_BASE__ === 'string' && window.__FFL_API_BASE__.trim()) return;
+      /* ?api= / ?api_base= always wins over demo bundle and localStorage ffl_api_base. */
       try {
         var q = new URLSearchParams(window.location.search);
         var fromQuery = q.get('api') || q.get('api_base');
         if (fromQuery && String(fromQuery).trim()) {
-          window.__FFL_API_BASE__ = decodeURIComponent(String(fromQuery).trim());
+          var dec = decodeURIComponent(String(fromQuery).trim());
+          var mockRel = '/mock-api';
+          try {
+            if (/^https?:\/\//i.test(dec)) {
+              var apiU = new URL(dec);
+              var pageU = new URL(window.location.href);
+              var pathNorm = (apiU.pathname || '/').replace(/\/+$/, '') || '/';
+              var endsMock = /\/mock-api$/i.test(pathNorm);
+              var portA = apiU.port || (apiU.protocol === 'https:' ? '443' : '80');
+              var portP = pageU.port || (pageU.protocol === 'https:' ? '443' : '80');
+              var samePort = String(portA) === String(portP);
+              var aH = apiU.hostname;
+              var pH = pageU.hostname;
+              var loop = { localhost: 1, '127.0.0.1': 1, '[::1]': 1, '0.0.0.0': 1 };
+              var sameHostOrLoopback = aH === pH || !!(loop[aH] && loop[pH]);
+              if (endsMock && samePort && sameHostOrLoopback) {
+                window.__FFL_API_BASE__ = mockRel;
+                var nuFix = new URL(window.location.href);
+                nuFix.searchParams.delete('api_base');
+                nuFix.searchParams.set('api', mockRel);
+                if (String(nuFix.href) !== String(window.location.href)) {
+                  window.location.replace(nuFix.toString());
+                  return;
+                }
+                return;
+              }
+            }
+          } catch (eNorm) {}
+          window.__FFL_API_BASE__ = dec;
           return;
         }
       } catch (e1) {}
+      try {
+        var qd = new URLSearchParams(window.location.search);
+        var fq = qd.get('api') || qd.get('api_base');
+        if (localStorage.getItem('ffl_demo_mode') === '1' && !(fq && String(fq).trim())) {
+          window.__FFL_BUNDLED_DEMO = true;
+          return;
+        }
+      } catch (eDemo) {}
+      if (typeof window.__FFL_API_BASE__ === 'string' && window.__FFL_API_BASE__.trim()) return;
       try {
         var ls = localStorage.getItem('ffl_api_base');
         if (ls && typeof ls === 'string' && ls.trim()) window.__FFL_API_BASE__ = ls.trim();
       } catch (e2) {}
     })();
   </script>
+  <script src="demo-inline.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -3896,6 +3934,15 @@
     .method-page .method-section p,
     .method-page .method-section li { font-size: 0.88rem; color: var(--ink2); line-height: 1.5; }
     .method-page .method-section ul { margin: 0.35rem 0 0 1.1rem; }
+
+    /* Settings: same stacking as other routes; skip page-inner enter animation (avoids blank panel in some browsers). */
+    #page-settings.page-view.active > .page-inner {
+      animation: none !important;
+    }
+    #page-settings .page-inner {
+      min-height: min(52vh, 520px);
+      justify-content: flex-start;
+    }
     .method-pre {
       margin-top: 0.5rem;
       padding: 0.65rem 0.75rem;
@@ -4143,6 +4190,10 @@
       <button type="button" class="nav-item" data-page="ai" onclick="window.__fflSetPage('ai')">
         <span class="nav-ico" aria-hidden="true"><i data-lucide="sparkles"></i></span><span class="nav-item-label">AI · Gemini</span>
       </button>
+      <div class="sidebar-nav-section">App</div>
+      <button type="button" class="nav-item" data-page="settings" onclick="window.__fflSetPage('settings')">
+        <span class="nav-ico" aria-hidden="true"><i data-lucide="settings"></i></span><span class="nav-item-label">Settings</span>
+      </button>
     </nav>
     <div class="sidebar-toggle-bar">
       <button type="button" class="sidebar-toggle ffl-btn ffl-btn--sidebar" id="sidebar-toggle" onclick="window.__fflToggleSidebar()" title="Collapse sidebar" aria-expanded="true">
@@ -4219,7 +4270,7 @@
           </div>
           <div>
             <h2 class="dash-card-title" id="card-curve-title">Scenario curve</h2>
-            <p class="dash-card-sub">Counties over fuel-income threshold vs €/L (live model)</p>
+            <p class="dash-card-sub">Counties past the fuel-income threshold vs price per litre</p>
           </div>
         </div>
         <span class="dash-pill-tag" id="curve-pill-range">€/L</span>
@@ -4227,17 +4278,12 @@
       <div class="dash-chart-wrap dash-chart-wrap--curve is-empty" id="curve-chart-wrap">
         <canvas id="chart-scenario-curve" aria-label="Counties over threshold by fuel price"></canvas>
         <div class="chart-placeholder ffl-chart-empty" id="curve-chart-placeholder" aria-hidden="true">
-          <p class="ffl-chart-empty__title">Scenario curve needs the API</p>
-          <p class="ffl-chart-empty__summary">This chart loads from <code>GET /model/scenario-curve</code>. If you see this message, that endpoint did not return any points.</p>
+          <p class="ffl-chart-empty__title">No curve data yet</p>
+          <p class="ffl-chart-empty__summary">This line chart did not get any points back, so nothing can be drawn.</p>
           <ol class="ffl-chart-empty__steps">
-            <li>Open the app at <strong>http://127.0.0.1:5500/</strong> using <code>node dev-server.mjs</code> so requests can reach your backend.</li>
-            <li>Or run FastAPI locally: open <code>http://127.0.0.1:5500/?api=http://127.0.0.1:8000</code> once, or run <code>localStorage.setItem('ffl_api_base','http://127.0.0.1:8000')</code> then reload — on localhost that bypasses the <code>/api</code> proxy. You can also set <code>window.__FFL_API_BASE__</code> in a script that runs before the main app (see <code>&lt;head&gt;</code> bootstrap).</li>
-            <li>Confirm your API build includes the scenario-curve route (see Technical below).</li>
+            <li>Open the dashboard from your usual local server link, not by double-clicking the HTML file.</li>
+            <li>Start the data service the app expects, wait until it is ready, then reload the page.</li>
           </ol>
-          <details class="ffl-chart-empty__tech">
-            <summary>Technical</summary>
-            <p class="ffl-chart-empty__tech-p">Expected: <code>GET /model/scenario-curve?price_min=&amp;price_max=&amp;steps=</code> returning JSON with a <code>points</code> array.</p>
-          </details>
         </div>
       </div>
       <div class="dash-chart-drilldown" id="curve-chart-drilldown" role="region" aria-live="polite" hidden></div>
@@ -4396,6 +4442,7 @@
         <footer class="site-footer--compact">Adjust sliders · use Compare for A/B · county grid on Counties page</footer>
       </div>
     </div>
+    </div>
 
     <div id="page-compare" class="page-view" role="region" aria-label="Compare charts">
       <div class="page-inner matrices-page-wrap">
@@ -4521,232 +4568,6 @@
       </div>
     </div>
 
-    <div id="page-method" class="page-view" role="region" aria-label="Method and model lab">
-      <div class="page-inner method-page" style="max-width:46rem">
-        <header class="dash-top" style="margin-bottom:0">
-          <div class="dash-brand">
-            <h1>Method &amp; model lab</h1>
-            <p class="dash-tagline">Lineage, limitations, sensitivity, and session tuning (Zerve notebook → FastAPI)</p>
-          </div>
-        </header>
-
-        <section class="method-section" aria-labelledby="m-lineage-h">
-          <h2 id="m-lineage-h">Data lineage</h2>
-          <p id="method-lineage-p">Connect to the API to load provenance.</p>
-          <div id="method-lineage-human" class="method-human-box"></div>
-          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-meta-pre" aria-label="API metadata JSON"></pre></details>
-        </section>
-
-        <section class="method-section" aria-labelledby="m-judge-h">
-          <h2 id="m-judge-h">Judge / demo script (from API)</h2>
-          <p>Steps embedded in <code>/meta</code> for video walkthroughs — copy into your Devpost or recording outline.</p>
-          <ol id="method-judge-ol" style="margin:0.5rem 0 0 1.1rem;font-size:0.88rem;color:var(--ink2);line-height:1.55"></ol>
-        </section>
-
-        <section class="method-section" aria-labelledby="m-national-h">
-          <h2 id="m-national-h">National snapshot</h2>
-          <p>Headline counts at the active scenario €/L (same as Scenarios when not in compare A/B).</p>
-          <div id="method-national-human" class="method-human-box"></div>
-          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-national-pre"></pre></details>
-        </section>
-
-        <section class="method-section" aria-labelledby="m-validation-h">
-          <h2 id="m-validation-h">Internal validation (correlations)</h2>
-          <p>Sanity checks on the live model — not official fuel poverty statistics.</p>
-          <div id="method-validation-human" class="method-human-box"></div>
-          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-validation-pre"></pre></details>
-        </section>
-
-        <section class="method-section" aria-labelledby="m-dist-h">
-          <h2 id="m-dist-h">Distribution (deciles)</h2>
-          <p>Where fuel-income stress sits across counties at scenario €/L.</p>
-          <div id="method-distribution-human" class="method-human-box"></div>
-          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-distribution-pre"></pre></details>
-        </section>
-
-        <section class="method-section" aria-labelledby="m-breach-h">
-          <h2 id="m-breach-h">Fault-line €/L (breach prices)</h2>
-          <p>Per county: minimum €/L at which the model crosses the fuel-income threshold — sorted most resilient first.</p>
-          <div id="method-breach-human" class="method-human-box"></div>
-          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-breach-pre" style="max-height:18rem"></pre></details>
-        </section>
-
-        <section class="method-section" aria-labelledby="m-regional-h">
-          <h2 id="m-regional-h">Regional summary</h2>
-          <p>Province roll-ups at scenario €/L.</p>
-          <div id="method-regional-human" class="method-human-box"></div>
-          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-regional-pre"></pre></details>
-        </section>
-
-        <section class="method-section" aria-labelledby="m-export-h">
-          <h2 id="m-export-h">National markdown export</h2>
-          <p>One-page brief for write-ups: <code>GET /export/briefing</code></p>
-          <div class="method-lab-actions">
-            <button type="button" class="btn-drawer-counties ffl-btn ffl-btn--secondary" onclick="window.__fflCopyNationalBriefing()">Copy briefing markdown</button>
-            <button type="button" class="btn-drawer-counties ffl-btn ffl-btn--secondary" onclick="window.__fflOpenNationalBriefing()">Open in new tab</button>
-          </div>
-        </section>
-
-        <section class="method-section" aria-labelledby="m-narrative-h">
-          <h2 id="m-narrative-h">Auto narrative (voiceover / Devpost)</h2>
-          <p>Bullets from <code>GET /insights/narrative</code> — paste into your video script or summary.</p>
-          <div id="method-narrative-human" class="method-human-box"></div>
-          <p style="font-size:0.8rem;color:var(--ink3);margin:0.5rem 0 0.25rem"><strong>Elevator pitch</strong></p>
-          <p id="method-narrative-elevator" style="font-size:0.86rem;color:var(--ink2);line-height:1.5;margin:0"></p>
-          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-narrative-pre"></pre></details>
-        </section>
-
-        <section class="method-section" aria-labelledby="m-curve-json-h">
-          <h2 id="m-curve-json-h">Scenario curve (API)</h2>
-          <p>Same data as the dashboard chart: counties over threshold vs €/L.</p>
-          <div id="method-curve-human" class="method-human-box"></div>
-          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-scenario-curve-pre" style="max-height:14rem"></pre></details>
-        </section>
-
-        <section class="method-section" aria-labelledby="m-rank-h">
-          <h2 id="m-rank-h">Ranking stability</h2>
-          <p>Do the most vulnerable counties stay in the top‑k when we tilt composite weights toward social vs fuel drivers?</p>
-          <div id="method-ranking-human" class="method-human-box"></div>
-          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-ranking-pre"></pre></details>
-        </section>
-
-        <section class="method-section" aria-labelledby="m-openapi-h">
-          <h2 id="m-openapi-h">OpenAPI contract</h2>
-          <p>Interactive docs for judges and integrators: <a id="method-openapi-link" href="#" target="_blank" rel="noopener noreferrer">Open /docs</a> (grouped tags: core, county, scenario, model, insights, export).</p>
-        </section>
-
-        <section class="method-section" aria-labelledby="m-claims-h">
-          <h2 id="m-claims-h">Registered claims (pass/fail)</h2>
-          <p>Checkable statements evaluated on the live dataframe — useful for demos and write-ups.</p>
-          <div id="method-claims-human" class="method-human-box"></div>
-          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-claims-pre"></pre></details>
-        </section>
-
-        <section class="method-section" aria-labelledby="m-sens-h">
-          <h2 id="m-sens-h">Sensitivity (stress tests)</h2>
-          <p>How many counties sit above the threshold when we nudge litres, weights, or the HDD multiplier.</p>
-          <div id="method-sensitivity-human" class="method-human-box"></div>
-          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-sensitivity-pre"></pre></details>
-        </section>
-
-        <section class="method-section" aria-labelledby="m-policy-h">
-          <h2 id="m-policy-h">Policy counterfactual (illustrative)</h2>
-          <p>Universal vs targeted grant outlay using modelled vulnerable household counts — not an official costings.</p>
-          <div id="method-policy-human" class="method-human-box"></div>
-          <details class="method-raw"><summary>Raw JSON</summary><pre class="method-pre" id="method-policy-pre"></pre></details>
-        </section>
-
-        <section class="method-section" aria-labelledby="m-lab-h">
-          <h2 id="m-lab-h">Session lab</h2>
-          <p>POST model parameters to the hub (local or deployed). Resets when the server restarts. Requires API support for <code>/model/params</code>.</p>
-          <div class="method-lab-grid">
-            <div>
-              <label for="lab-litres">Litres / household / year (proxy base)</label>
-              <input type="number" id="lab-litres" step="1" min="400" max="3000" value="1275">
-            </div>
-            <div>
-              <label for="lab-threshold">Fuel share threshold (% of income)</label>
-              <input type="number" id="lab-threshold" step="0.5" min="5" max="25" value="10">
-            </div>
-            <div>
-              <label for="lab-w-fuel">Weight · fuel dependency</label>
-              <input type="number" id="lab-w-fuel" step="0.05" min="0.1" max="0.6" value="0.30">
-            </div>
-            <div>
-              <label for="lab-w-social">Weight · social deprivation</label>
-              <input type="number" id="lab-w-social" step="0.05" min="0.1" max="0.6" value="0.30">
-            </div>
-          </div>
-          <label style="display:flex;align-items:center;gap:0.35rem;margin-top:0.5rem;font-size:0.82rem;color:var(--ink2)">
-            <input type="checkbox" id="lab-hdd" checked> Apply heating-demand (HDD) multiplier to litres proxy
-          </label>
-          <div class="method-lab-actions">
-            <button type="button" class="btn-drawer-counties ffl-btn ffl-btn--secondary" onclick="window.__fflApplyModelLab()">Apply &amp; reload model</button>
-            <span id="lab-status" style="font-size:0.78rem;color:var(--ink3)"></span>
-          </div>
-        </section>
-
-        <section class="method-section" aria-labelledby="m-gloss-h">
-          <h2 id="m-gloss-h">Glossary</h2>
-          <dl class="glossary-dl">
-            <dt>BER</dt>
-            <dd>Building Energy Rating (Ireland). Poor bands (D–G) feed building stress in the model.</dd>
-            <dt>ktoe</dt>
-            <dd>Kilo-tonnes of oil equivalent — national/county energy use from SEAI-style tables.</dd>
-            <dt>Fuel-income share</dt>
-            <dd>Modelled share of synthetic income spent on a liquid-fuel proxy (litres × €/L), not metered bills.</dd>
-            <dt>HDD multiplier</dt>
-            <dd>Heating-demand heuristic by county (inland/coastal). Scales the litres proxy only.</dd>
-            <dt>Cliff price</dt>
-            <dd>First pre-computed price ladder step where the county crosses the threshold.</dd>
-            <dt>Breach price</dt>
-            <dd>€/L solved numerically where modelled fuel share crosses the threshold (may differ slightly from cliff ladder).</dd>
-          </dl>
-        </section>
-
-        <footer class="site-footer--compact">Notebook block <code>warmer_homes_roi</code> · variable <code>warmer_homes_df</code> · optional <code>USE_ZERVE_VARIABLE</code></footer>
-      </div>
-    </div>
-
-    <div id="page-submit" class="page-view" role="region" aria-label="Demo and hackathon submission">
-      <div class="page-inner submit-page" style="max-width:44rem">
-        <header class="dash-top" style="margin-bottom:0">
-          <div class="dash-brand">
-            <h1>Demo &amp; submit</h1>
-            <p class="dash-tagline">ZerveHack checklist, copy-paste drafts, and why this isn’t “just a spreadsheet”</p>
-          </div>
-        </header>
-
-        <div class="submit-hero">
-          <h2>Win the workflow story</h2>
-          <p style="font-size:0.88rem;color:var(--ink2);line-height:1.5;margin:0">
-            Judges score <strong>end-to-end workflow</strong> heavily. Your video must show <strong>Zerve</strong> (notebook / dataframe), then <strong>deployed API</strong>, then this dashboard — not only the UI.
-            Requirements from <a href="https://zervehack.devpost.com" target="_blank" rel="noopener noreferrer">ZerveHack on Devpost</a>: public Zerve project, ≤300 word summary, ≤3 min video, social post tagging Zerve.
-          </p>
-        </div>
-
-        <section class="method-section" aria-labelledby="sub-pack-h">
-          <h2 id="sub-pack-h">Submission pack (from API)</h2>
-          <p class="prose-hint">Loaded from <code>GET /insights/submission-pack</code> at your scenario €/L. Edit before pasting to Devpost.</p>
-          <div class="submit-copy-row">
-            <button type="button" class="btn-drawer-counties ffl-btn ffl-btn--secondary" onclick="window.__fflReloadSubmissionPack()">Refresh pack</button>
-            <button type="button" class="btn-drawer-counties ffl-btn ffl-btn--secondary" onclick="window.__fflCopySubmitField('devpost')">Copy Devpost draft</button>
-            <button type="button" class="btn-drawer-counties ffl-btn ffl-btn--secondary" onclick="window.__fflCopySubmitField('social')">Copy social post</button>
-            <button type="button" class="btn-drawer-counties ffl-btn ffl-btn--secondary" onclick="window.__fflCopySubmitField('headline')">Copy key headline</button>
-          </div>
-          <p style="font-size:0.72rem;color:var(--ink3);margin:0.75rem 0 0.25rem;font-family:var(--mono);text-transform:uppercase;letter-spacing:0.06em">Devpost summary (≤300 words)</p>
-          <textarea id="submit-devpost-ta" class="submit-textarea" readonly aria-label="Devpost summary draft"></textarea>
-          <p class="submit-word-count" id="submit-word-count"></p>
-          <details class="method-raw" style="margin-top:0.75rem">
-            <summary>Full JSON (submission-pack)</summary>
-            <pre class="method-pre" id="submit-pack-json-pre"></pre>
-          </details>
-        </section>
-
-        <section class="method-section" aria-labelledby="sub-video-h">
-          <h2 id="sub-video-h">3-minute video shot list</h2>
-          <ol id="submit-video-ol" class="submit-shot-list"></ol>
-        </section>
-
-        <section class="method-section" aria-labelledby="sub-zerve-h">
-          <h2 id="sub-zerve-h">Why Zerve (not only Jupyter + deploy)</h2>
-          <ul id="submit-zerve-ul" class="method-human-box" style="list-style:disc"></ul>
-        </section>
-
-        <section class="method-section" aria-labelledby="sub-req-h">
-          <h2 id="sub-req-h">Devpost required checklist</h2>
-          <ul id="submit-req-ul" class="submit-checklist"></ul>
-        </section>
-
-        <section class="method-section" aria-labelledby="sub-rubric-h">
-          <h2 id="sub-rubric-h">Rubric talking points</h2>
-          <dl class="method-kv" id="submit-rubric-dl"></dl>
-        </section>
-
-        <footer class="site-footer--compact">OpenAPI: <a id="submit-openapi-a" href="#" target="_blank" rel="noopener noreferrer">/docs</a> · Briefing: <code>/export/briefing</code></footer>
-      </div>
-    </div>
-
     <div id="page-ai" class="page-view" role="region" aria-label="AI policy analyst powered by Google Gemini">
       <div class="page-inner" style="max-width:56rem">
         <div class="ai-page">
@@ -4806,6 +4627,39 @@
             <textarea id="ai-input" placeholder="Message the copilot…" maxlength="8000" rows="2" aria-label="Message to analyst"></textarea>
             <button type="button" id="ai-send" class="ffl-btn ffl-btn--primary" onclick="window.__fflAiSend()">Send</button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="page-settings" class="page-view" role="region" aria-label="Settings">
+      <div class="page-inner">
+        <header class="dash-top" style="margin-bottom:0">
+          <div class="dash-brand">
+            <h2 class="settings-page-heading" style="font-size:clamp(1.1rem,2.2vw,1.35rem);font-weight:650;margin:0;color:var(--ink)">Settings</h2>
+            <p class="dash-tagline">Demo mode and where data comes from.</p>
+          </div>
+        </header>
+        <div class="page-panel method-page" style="max-width:40rem">
+          <section class="method-section" aria-labelledby="settings-demo-h">
+            <h2 id="settings-demo-h">Demo mode</h2>
+            <p style="font-size:0.88rem;color:var(--ink2);line-height:1.55">
+              You see practice county results instead of live data. Add a Google key on the AI tab only when you want chat.
+            </p>
+            <label class="settings-demo-row" style="display:flex;align-items:flex-start;gap:0.65rem;margin-top:0.75rem;cursor:pointer">
+              <input type="checkbox" id="settings-demo-checkbox" aria-describedby="settings-demo-help" style="margin-top:0.2rem">
+              <span id="settings-demo-help" style="font-size:0.88rem;line-height:1.5;color:var(--ink2)">
+                Use demo data instead of live model results. Open the site through your usual local run command, not by double‑clicking the HTML file.
+              </span>
+            </label>
+            <div class="method-lab-actions" style="margin-top:1rem">
+              <button type="button" class="ffl-btn ffl-btn--primary" onclick="window.__fflApplyDemoModeFromSettings()">Save and reload</button>
+              <button type="button" class="ffl-btn ffl-btn--secondary" onclick="window.__fflClearDemoModeAndReload()">Turn off demo and reload</button>
+            </div>
+          </section>
+          <section class="method-section" aria-labelledby="settings-api-h">
+            <h2 id="settings-api-h">Current data API</h2>
+            <p id="settings-api-summary" style="font-size:0.88rem;color:var(--ink2)">—</p>
+          </section>
         </div>
       </div>
     </div>
@@ -4937,14 +4791,17 @@
     };
   }
 
-  var API_PUBLIC = (
-    typeof window.__FFL_API_BASE__ === 'string' && window.__FFL_API_BASE__.trim()
-      ? window.__FFL_API_BASE__.trim()
-      : 'https://26db1629-947d4286.hub.zerve.cloud'
-  )
-    .replace(/\/+$/, '')
-    .replace(/\/api$/i, '')
-    .replace(/\/+$/, '');
+  var fflBundledDemo = !!window.__FFL_BUNDLED_DEMO;
+  var API_PUBLIC = fflBundledDemo
+    ? '/mock-api'
+    : ((
+        typeof window.__FFL_API_BASE__ === 'string' && window.__FFL_API_BASE__.trim()
+          ? window.__FFL_API_BASE__.trim()
+          : 'https://26db1629-947d4286.hub.zerve.cloud'
+      )
+        .replace(/\/+$/, '')
+        .replace(/\/api$/i, '')
+        .replace(/\/+$/, ''));
   var h = location.hostname;
   function __fflIsLocalDevHost(hostname) {
     if (
@@ -4964,21 +4821,32 @@
   /** If set, use this origin for all fetches — including on localhost (otherwise /api proxy is used). */
   var userSetApiBase =
     typeof window.__FFL_API_BASE__ === 'string' && window.__FFL_API_BASE__.trim();
-  var API = useLocalProxy
-    ? userSetApiBase
-      ? API_PUBLIC
-      : location.origin.replace(/\/+$/, '') + '/api'
-    : API_PUBLIC;
+  var API = fflBundledDemo
+    ? '/mock-api'
+    : useLocalProxy
+      ? userSetApiBase
+        ? API_PUBLIC
+        : location.origin.replace(/\/+$/, '') + '/api'
+      : API_PUBLIC;
   var UPSTREAM_ZERVE_HOST = '26db1629-947d4286.hub.zerve.cloud';
+  var fflDemoApiActive =
+    fflBundledDemo ||
+    (!!userSetApiBase && /\/mock-api$/i.test(String(API_PUBLIC).replace(/\/+$/, '')));
 
   (function labelApiEndpoint() {
     var el = document.getElementById('dash-api-endpoint');
     if (!el) return;
+    if (fflDemoApiActive) {
+      el.textContent = 'Demo data';
+      el.title = 'Sample county data (Settings → demo mode).';
+      return;
+    }
     el.textContent = useLocalProxy
       ? userSetApiBase
         ? API_PUBLIC.replace(/^https?:\/\//, '')
         : 'Local · /api → hub'
       : API_PUBLIC.replace(/^https?:\/\//, '');
+    el.title = 'API base';
   })();
 
   const LITRES_PER_HH_PA = 1275;
@@ -6449,7 +6317,8 @@
     scenarios: 'Scenarios',
     compare: 'Compare',
     counties: 'Counties',
-    ai: 'AI · Gemini'
+    ai: 'AI · Gemini',
+    settings: 'Settings'
   };
 
   function __fflSyncPageAria() {
@@ -6486,22 +6355,36 @@
         if (typeof window.__fflMatricesViewMode === 'function') {
           window.__fflMatricesViewMode('graph');
         }
-        requestAnimationFrame(function () {
+        function doCompareCharts() {
           requestAnimationFrame(function () {
-            try {
-              refreshMatricesChart();
-            } catch (eC) {
-              console.warn('refreshMatricesChart:', eC);
-            }
-            __fflResizeChartsAfterSidebar();
+            requestAnimationFrame(function () {
+              try {
+                refreshMatricesChart();
+              } catch (eC) {
+                console.warn('refreshMatricesChart:', eC);
+              }
+              __fflResizeChartsAfterSidebar();
+            });
           });
-        });
+        }
+        if (!matricesHistoryLabelList().length) {
+          historyCache = null;
+        }
+        ensureHistoryStressRendered()
+          .then(doCompareCharts)
+          .catch(function (eH) {
+            console.warn('ensureHistoryStressRendered:', eH);
+            doCompareCharts();
+          });
       }
       if (appPage === 'counties') {
         fillCompareCountySelects();
       }
       if (appPage === 'ai') {
         refreshAiPageStatus();
+      }
+      if (appPage === 'settings') {
+        __fflRefreshSettingsPage();
       }
       try {
         localStorage.setItem('ffl_page', appPage);
@@ -6535,6 +6418,9 @@
         }
         __fflSyncPageAria();
       });
+      try {
+        __fflIconsRefresh();
+      } catch (eIc) {}
     }
 
     /* View transitions snapshot .app-page-views poorly with stacked absolute page panels — skip to avoid blank Compare/Counties. */
@@ -6565,6 +6451,100 @@
       } catch (eM) {}
     }
   }
+
+  function __fflDemoModeStorageOn() {
+    try {
+      return localStorage.getItem('ffl_demo_mode') === '1';
+    } catch (eDm) {
+      return false;
+    }
+  }
+
+  function __fflUrlHasMockApiParam(u) {
+    var a = u.searchParams.get('api') || u.searchParams.get('api_base');
+    if (!a) return false;
+    try {
+      var s = decodeURIComponent(String(a).trim());
+      return /\/mock-api\/?$/i.test(s.replace(/\/+$/, ''));
+    } catch (eU) {
+      return false;
+    }
+  }
+
+  /** Demo on: drop ?api= (bundled data needs no URL). Demo off: strip mock-api query if present. */
+  function __fflHrefAfterDemoToggle(demoOn) {
+    var u = new URL(window.location.href);
+    if (demoOn) {
+      u.searchParams.delete('api');
+      u.searchParams.delete('api_base');
+    } else if (__fflUrlHasMockApiParam(u)) {
+      u.searchParams.delete('api');
+      u.searchParams.delete('api_base');
+    }
+    return u.toString();
+  }
+
+  function __fflRefreshSettingsPage() {
+    if (appPage !== 'settings') return;
+    try {
+      var cb = document.getElementById('settings-demo-checkbox');
+      if (cb) {
+        cb.checked =
+          __fflDemoModeStorageOn() ||
+          (__fflIsLocalDevHost(h) && typeof fflDemoApiActive !== 'undefined' && fflDemoApiActive);
+      }
+      var sum = document.getElementById('settings-api-summary');
+      if (sum) {
+        var line;
+        if (typeof fflDemoApiActive !== 'undefined' && fflDemoApiActive) {
+          line = fflBundledDemo
+            ? 'Demo mode · sample county data is <strong>built into this page</strong> (no model API round-trip).'
+            : 'Demo mode · model requests use <code>' +
+              escapeHtml(API) +
+              '</code> (sample data only).';
+        } else if (typeof useLocalProxy !== 'undefined' && useLocalProxy && !userSetApiBase) {
+          line =
+            'Local dev: default model API is <code>' +
+            escapeHtml(location.origin.replace(/\/+$/, '') + '/api') +
+            '</code> (proxied to the live hub).';
+        } else {
+          line = 'Model API origin: <code>' + escapeHtml(API_PUBLIC) + '</code>.';
+        }
+        sum.innerHTML = line;
+      }
+    } catch (eRs) {
+      console.warn('refresh settings:', eRs);
+    }
+  }
+
+  window.__fflApplyDemoModeFromSettings = function () {
+    var cb = document.getElementById('settings-demo-checkbox');
+    var on = cb && cb.checked;
+    try {
+      if (on) localStorage.setItem('ffl_demo_mode', '1');
+      else localStorage.removeItem('ffl_demo_mode');
+    } catch (eS) {}
+    var next = __fflHrefAfterDemoToggle(!!on);
+    try {
+      if (String(next) !== String(window.location.href)) window.location.replace(next);
+      else window.location.reload();
+    } catch (eNav) {
+      window.location.reload();
+    }
+  };
+
+  window.__fflClearDemoModeAndReload = function () {
+    try {
+      localStorage.removeItem('ffl_demo_mode');
+    } catch (eC) {}
+    var next = __fflHrefAfterDemoToggle(false);
+    try {
+      if (String(next) !== String(window.location.href)) window.location.replace(next);
+      else window.location.reload();
+    } catch (eNav2) {
+      window.location.reload();
+    }
+  };
 
   window.__fflToggleSidebar = function () {
     var sb = document.getElementById('app-sidebar');
@@ -6841,7 +6821,7 @@
     if (body) lines.push('', body);
     if (opts.technical) lines.push('', 'Technical details:', opts.technical);
     var code = opts.code != null && opts.code !== '' ? String(opts.code) : '';
-    if (code) lines.push('', 'Code: ' + code);
+    if (code && !opts.suppressNoticeCode) lines.push('', 'Code: ' + code);
     return lines.join('\n');
   }
 
@@ -6866,6 +6846,36 @@
       };
     }
     var st = sampleErr && sampleErr.status;
+    if (
+      typeof fflDemoApiActive !== 'undefined' &&
+      fflDemoApiActive &&
+      typeof fflBundledDemo !== 'undefined' &&
+      !fflBundledDemo
+    ) {
+      var msgDemo = sampleErr && sampleErr.message ? String(sampleErr.message) : '';
+      var isDemoNet =
+        (sampleErr && sampleErr.name === 'TypeError') || /Failed to fetch/i.test(msgDemo);
+      if (st === 404 || isDemoNet) {
+        return {
+          severity: 'error',
+          title: 'Demo (mock-api) did not respond',
+          summary:
+            'The app is using this site’s /mock-api route for sample county data, but the browser could not load it.',
+          steps: [
+            'From the project folder run: node dev-server.mjs',
+            'Open the app from that server (e.g. http://127.0.0.1:5500/ or http://localhost:5500/) — demo loads /mock-api on the same origin, not a different host.',
+            'Do not open index.html as a file (file://). To use the live hub instead, turn off demo in Settings and reload.'
+          ],
+          technical:
+            (msgDemo ? 'Message: ' + msgDemo + '. ' : '') +
+            (st === 404
+              ? 'HTTP 404 — this origin has no /mock-api route (common if the static dev server is not running).'
+              : ''),
+          code: 'DEMO_MOCK_API',
+          detail: ''
+        };
+      }
+    }
     if (st === 503 || st === 502) {
       return {
         severity: 'error',
@@ -6884,18 +6894,17 @@
       if (st === 404) {
         return {
           severity: 'error',
-          title: 'API not found at this URL',
+          title: 'Wrong data address',
           summary:
-            'The server responded, but the Fuel Fault routes were not found at the API base you are using.',
+            'Something answered at that web address, but it is not the Fuel Fault data service this app expects.',
           steps: [
-            'Check the API base in the header (connection pill). It should point at the API root, not a subpath.',
-            'If you use node dev-server.mjs, open http://127.0.0.1:5500/ so /api is proxied correctly.',
-            'To talk to FastAPI on your machine: set window.__FFL_API_BASE__ = "http://127.0.0.1:8000" in the console, then reload.',
-            'Confirm the server exposes routes like GET /counties at that origin.'
+            'In the header, check where the app is pointed. Use the main API site address, not a deep link or extra folder on the end.',
+            'If you are working locally, open the dashboard from your usual local server link, not by double-clicking the HTML file.',
+            'When your own API is running, reload this page after it has started.'
           ],
-          technical:
-            'Expected hub paths include /counties, /county/{name}, /history. Open /docs on the same origin to verify.',
+          technical: '',
           code: 'HTTP_404',
+          suppressNoticeCode: true,
           detail: ''
         };
       }
@@ -7022,7 +7031,7 @@
       escapeHtml(title) +
       '</p>' +
       bodyHtml +
-      (code
+      (code && !opts.suppressNoticeCode
         ? '<p class="app-notice-code">' + escapeHtml(code) + '</p>'
         : '') +
       actions +
@@ -7116,17 +7125,20 @@
     var pill = document.getElementById('pill-connection');
     if (!pill) return;
     var txt = pill.querySelector('.pill-live-text');
+    var demo = typeof fflDemoApiActive !== 'undefined' && fflDemoApiActive;
     pill.classList.remove('connected', 'degraded', 'offline');
     if (!loadFinishedOnce) {
-      if (txt) txt.textContent = 'Connecting…';
-      pill.title = 'Loading county data from the API';
+      if (txt) txt.textContent = demo ? 'Demo…' : 'Connecting…';
+      pill.title = demo ? 'Loading sample county data' : 'Loading county data from the API';
       if (appPage === 'ai') refreshAiPageStatus();
       return;
     }
     if (lastLoadOkCount <= 0) {
       pill.classList.add('offline');
-      if (txt) txt.textContent = 'Offline';
-      pill.title = 'No county data loaded — check API or network';
+      if (txt) txt.textContent = demo ? 'Demo' : 'Offline';
+      pill.title = demo
+        ? 'Sample data did not load — try Retry load'
+        : 'No county data loaded — check API or network';
       if (appPage === 'ai') refreshAiPageStatus();
       return;
     }
@@ -7142,8 +7154,8 @@
       return;
     }
     pill.classList.add('connected');
-    if (txt) txt.textContent = 'Connected';
-    pill.title = 'All counties loaded from the API';
+    if (txt) txt.textContent = demo ? 'Demo' : 'Online';
+    pill.title = demo ? 'Sample county data loaded (demo mode)' : 'All counties loaded from the API';
     if (appPage === 'ai') refreshAiPageStatus();
   }
 
@@ -7203,330 +7215,6 @@
     updateThresholdLabels();
   }
 
-  function populateJudgeScriptOl() {
-    const ol = document.getElementById('method-judge-ol');
-    if (!ol || !metaCache || !Array.isArray(metaCache.demo_script_for_judges)) return;
-    ol.innerHTML = '';
-    for (let i = 0; i < metaCache.demo_script_for_judges.length; i++) {
-      const li = document.createElement('li');
-      li.textContent = metaCache.demo_script_for_judges[i];
-      ol.appendChild(li);
-    }
-  }
-
-  /** @type {object|null} */
-  let submissionPackCache = null;
-
-  function setHtml(id, html) {
-    const el = document.getElementById(id);
-    if (el) {
-      el.innerHTML = html;
-      __fflIconsRefresh();
-    }
-  }
-
-  function formatNationalHuman(s) {
-    if (!s || typeof s !== 'object') return '<p>No data.</p>';
-    const pe = num(s.headline_price_eur_l);
-    const peStr = Number.isFinite(pe) ? pe.toFixed(2) : '—';
-    let h =
-      '<dl class="method-kv">' +
-      '<dt>Scenario €/L</dt><dd>€' +
-      peStr +
-      '</dd>' +
-      '<dt>Threshold</dt><dd>' +
-      s.poverty_threshold_pct +
-      '% fuel-income proxy</dd>' +
-      '<dt>Counties over line</dt><dd><strong>' +
-      s.counties_over_threshold +
-      '</strong> / ' +
-      s.total_counties +
-      '</dd>' +
-      '<dt>Critical tier</dt><dd>' +
-      s.critical_tier_counties +
-      ' counties</dd>' +
-      '<dt>Mean fuel share</dt><dd>' +
-      s.mean_fuel_share_pct +
-      '%</dd>' +
-      '<dt>Vulnerable HH (model)</dt><dd>' +
-      (s.vulnerable_households_modelled != null
-        ? Number(s.vulnerable_households_modelled).toLocaleString()
-        : '—') +
-      '</dd></dl>';
-    if (s.highest_fuel_share) {
-      h +=
-        '<p><strong>Steepest proxy:</strong> ' +
-        escapeHtml(s.highest_fuel_share.county) +
-        ' at ' +
-        s.highest_fuel_share.poverty_pct +
-        '%.</p>';
-    }
-    if (s.lowest_fuel_share) {
-      h +=
-        '<p><strong>Lowest proxy:</strong> ' +
-        escapeHtml(s.lowest_fuel_share.county) +
-        ' at ' +
-        s.lowest_fuel_share.poverty_pct +
-        '%.</p>';
-    }
-    return h;
-  }
-
-  function formatValidationHuman(v) {
-    if (!v || !Array.isArray(v.checks)) return '<p>No data.</p>';
-    let h = '<ul>';
-    for (let i = 0; i < v.checks.length; i++) {
-      const c = v.checks[i];
-      const ok = c.passes ? 'Pass' : 'Review';
-      const col = c.passes ? 'var(--low)' : 'var(--high)';
-      h +=
-        '<li><span style="color:' +
-        col +
-        ';font-weight:600">' +
-        ok +
-        '</span> — ' +
-        escapeHtml(c.description || c.id) +
-        ' <span style="color:var(--ink3);font-family:var(--mono);font-size:0.75rem">r=' +
-        (c.r != null ? c.r : '—') +
-        ', n=' +
-        (c.n != null ? c.n : '—') +
-        '</span></li>';
-    }
-    h += '</ul>';
-    if (v.note) h += '<p style="margin-top:0.5rem;font-size:0.8rem">' + escapeHtml(v.note) + '</p>';
-    return h;
-  }
-
-  function formatDistributionHuman(d) {
-    if (!d || !d.deciles) return '<p>No data.</p>';
-    const dec = d.deciles;
-    const keys = Object.keys(dec).sort();
-    let rows = '';
-    for (let i = 0; i < keys.length; i++) {
-      rows +=
-        '<tr><td style="padding:0.2rem 0.5rem 0.2rem 0;font-family:var(--mono);font-size:0.72rem">' +
-        keys[i] +
-        '</td><td style="padding:0.2rem 0">' +
-        dec[keys[i]] +
-        '%</td></tr>';
-    }
-    return (
-      '<p>Mean <strong>' +
-      d.mean +
-      '%</strong> · std <strong>' +
-      d.std +
-      '%</strong> · range <strong>' +
-      d.min +
-      '–' +
-      d.max +
-      '%</strong></p>' +
-      '<table style="font-size:0.84rem;border-collapse:collapse">' +
-      rows +
-      '</table>'
-    );
-  }
-
-  function formatBreachHuman(b) {
-    if (!b || !Array.isArray(b.counties)) return '<p>No data.</p>';
-    const list = b.counties;
-    const finite = list.filter(function (x) {
-      return x.breach_price_eur_l != null;
-    });
-    let h =
-      '<p>At reference €' +
-      (b.reference_price_eur_l != null ? Number(b.reference_price_eur_l).toFixed(2) : '?') +
-      '/L, <strong>' +
-      (b.counties_already_over_at_reference != null ? b.counties_already_over_at_reference : '—') +
-      '</strong> counties are already over the ' +
-      b.poverty_threshold_pct +
-      '% line.</p>';
-    if (finite.length > 1) {
-      const prices = finite.map(function (x) {
-        return x.breach_price_eur_l;
-      });
-      h +=
-        '<p>Breach €/L spans <strong>€' +
-        Math.min.apply(null, prices).toFixed(2) +
-        '–€' +
-        Math.max.apply(null, prices).toFixed(2) +
-        '</strong> across counties (first crossing of threshold).</p>';
-    }
-    h += '<p style="font-size:0.8rem;color:var(--ink3)">Most resilient (highest breach) first in raw JSON.</p>';
-    return h;
-  }
-
-  function formatRegionalHuman(r) {
-    if (!r || !Array.isArray(r.regions)) return '<p>No data.</p>';
-    let h = '<ul>';
-    for (let i = 0; i < r.regions.length; i++) {
-      const reg = r.regions[i];
-      h +=
-        '<li><strong>' +
-        escapeHtml(reg.province) +
-        '</strong> — mean index ' +
-        reg.mean_vulnerability +
-        ', mean fuel share ' +
-        reg.mean_fuel_share_pct +
-        '%, ' +
-        reg.counties_over_threshold +
-        '/' +
-        reg.counties +
-        ' counties over line, ' +
-        reg.critical_counties +
-        ' Critical.</li>';
-    }
-    h += '</ul>';
-    return h;
-  }
-
-  function formatClaimsHuman(j) {
-    if (!j || !Array.isArray(j.claims)) return '<p>No data.</p>';
-    let h = '<ul>';
-    for (let i = 0; i < j.claims.length; i++) {
-      const c = j.claims[i];
-      const ok = c.holds;
-      h +=
-        '<li><span style="color:' +
-        (ok ? 'var(--low)' : 'var(--critical)') +
-        ';font-weight:600">' +
-        (ok ? 'Holds' : 'Fails') +
-        '</span> — ' +
-        escapeHtml(c.statement || c.id) +
-        '</li>';
-    }
-    h += '</ul>';
-    return h;
-  }
-
-  function formatSensitivityHuman(j) {
-    if (!j || !j.baseline || !Array.isArray(j.variants)) return '<p>No data.</p>';
-    const b = j.baseline;
-    let h =
-      '<p>Baseline at €' +
-      b.price_eur_l +
-      '/L: <strong>' +
-      b.counties_over_threshold +
-      '</strong> counties over threshold.</p><ul>';
-    for (let i = 0; i < j.variants.length; i++) {
-      const v = j.variants[i];
-      h +=
-        '<li>' +
-        escapeHtml(v.label) +
-        ' → <strong>' +
-        v.counties_over_threshold +
-        '</strong> counties (Δ ' +
-        (v.delta_vs_base >= 0 ? '+' : '') +
-        v.delta_vs_base +
-        ')</li>';
-    }
-    h += '</ul>';
-    return h;
-  }
-
-  function formatPolicyHuman(p) {
-    if (!p || !p.targeted_critical) return '<p>No data.</p>';
-    const t = p.targeted_critical;
-    const u = p.universal_all_modelled_vulnerable;
-    return (
-      '<dl class="method-kv">' +
-      '<dt>Grant / home</dt><dd>€' +
-        (p.grant_eur_per_home != null ? Number(p.grant_eur_per_home).toLocaleString() : '—') +
-        '</dd>' +
-      '<dt>Targeted (Critical)</dt><dd>' +
-        t.households.toLocaleString() +
-        ' HH · outlay €' +
-        Number(t.state_grant_outlay_eur || 0).toLocaleString() +
-        '</dd>' +
-      '<dt>Universal (all modelled)</dt><dd>' +
-        u.households.toLocaleString() +
-        ' HH · outlay €' +
-        Number(u.state_grant_outlay_eur || 0).toLocaleString() +
-        '</dd></dl>' +
-      (p.note ? '<p style="margin-top:0.5rem;font-size:0.8rem">' + escapeHtml(p.note) + '</p>' : '')
-    );
-  }
-
-  function formatCurveHuman(c) {
-    if (!c || !Array.isArray(c.points) || c.points.length < 2) return '<p>No data.</p>';
-    const p0 = c.points[0];
-    const p1 = c.points[c.points.length - 1];
-    return (
-      '<p>From <strong>€' +
-      p0.price_eur_l +
-      '</strong> to <strong>€' +
-      p1.price_eur_l +
-      '</strong>/L, counties over the ' +
-      c.poverty_threshold_pct +
-      '% line move from <strong>' +
-      p0.counties_over_threshold +
-      '</strong> to <strong>' +
-      p1.counties_over_threshold +
-      '</strong> (mean share ' +
-      p0.mean_fuel_share_pct +
-      '% → ' +
-      p1.mean_fuel_share_pct +
-      '%).</p>'
-    );
-  }
-
-  function formatRankingHuman(r) {
-    if (!r || !Array.isArray(r.variants)) return '<p>No data.</p>';
-    const k = r.top_k || 10;
-    let h =
-      '<p>Baseline top <strong>' +
-      k +
-      '</strong>: ' +
-      (r.baseline_top_counties || [])
-        .slice(0, 5)
-        .map(function (x) {
-          return escapeHtml(x);
-        })
-        .join(', ') +
-      (r.baseline_top_counties && r.baseline_top_counties.length > 5 ? '…' : '') +
-      '</p><ul>';
-    for (let i = 0; i < r.variants.length; i++) {
-      const v = r.variants[i];
-      h +=
-        '<li>' +
-        escapeHtml(v.label) +
-        ' — overlap with baseline top-' +
-        k +
-        ': <strong>' +
-        v.overlap_with_baseline_top_k +
-        '/' +
-        k +
-        '</strong></li>';
-    }
-    h += '</ul>';
-    if (r.note) h += '<p style="font-size:0.78rem;color:var(--ink3)">' + escapeHtml(r.note) + '</p>';
-    return h;
-  }
-
-  function formatMetaLineageHuman() {
-    if (!metaCache) return '<p>Load the API to see lineage.</p>';
-    const dl = metaCache.data_lineage || {};
-    return (
-      '<dl class="method-kv">' +
-      '<dt>API</dt><dd>v' +
-      escapeHtml(String(metaCache.api_version || '?')) +
-      ' · <code>' +
-      escapeHtml(String(metaCache.git_rev || '?')) +
-      '</code></dd>' +
-      '<dt>SEAI</dt><dd>' +
-      escapeHtml(String(dl.seai || '—')) +
-      '</dd>' +
-      '<dt>CSO</dt><dd>' +
-      escapeHtml(String(dl.cso_deprivation || '—')) +
-      '</dd>' +
-      '<dt>Counties</dt><dd>' +
-      (metaCache.counties != null ? metaCache.counties : '—') +
-      '</dd></dl>' +
-      '<p style="margin-top:0.5rem;font-size:0.82rem">' +
-      escapeHtml(metaCache.limitations || '') +
-      '</p>'
-    );
-  }
-
   async function refreshKeyFindingCard() {
     const body = document.getElementById('key-finding-body');
     if (!body) return;
@@ -7560,132 +7248,6 @@
       __fflPulseInsightBlocks(false);
     }
   }
-
-  async function refreshSubmissionPage() {
-    if (appPage !== 'submit') return;
-    const ta = document.getElementById('submit-devpost-ta');
-    const wc = document.getElementById('submit-word-count');
-    const pre = document.getElementById('submit-pack-json-pre');
-    const videoOl = document.getElementById('submit-video-ol');
-    const zUl = document.getElementById('submit-zerve-ul');
-    const reqUl = document.getElementById('submit-req-ul');
-    const rubDl = document.getElementById('submit-rubric-dl');
-    const oa = document.getElementById('submit-openapi-a');
-    if (oa) oa.href = API + '/docs';
-    const price = getActivePrice();
-    try {
-      const res = await fetch(API + '/insights/submission-pack?price_eur_l=' + encodeURIComponent(price));
-      if (!res.ok) throw new Error('pack');
-      const pack = await res.json();
-      submissionPackCache = pack;
-      if (ta) ta.value = pack.devpost_summary_draft || '';
-      if (wc) {
-        const n = pack.devpost_summary_word_count;
-        wc.textContent =
-          n != null
-            ? 'Word count: ' + n + ' / 300 (trim manually if needed)'
-            : '';
-      }
-      if (pre) pre.textContent = JSON.stringify(pack, null, 2);
-      if (videoOl) {
-        videoOl.innerHTML = '';
-        const steps = pack.zerve_video_checklist || [];
-        for (let i = 0; i < steps.length; i++) {
-          const li = document.createElement('li');
-          li.textContent = steps[i];
-          videoOl.appendChild(li);
-        }
-      }
-      if (zUl) {
-        zUl.innerHTML = '';
-        const wz = pack.why_zerve_not_spreadsheet || [];
-        for (let i = 0; i < wz.length; i++) {
-          const li = document.createElement('li');
-          li.textContent = wz[i];
-          zUl.appendChild(li);
-        }
-      }
-      if (reqUl) {
-        reqUl.innerHTML = '';
-        const req = pack.devpost_required_checklist || [];
-        for (let i = 0; i < req.length; i++) {
-          const li = document.createElement('li');
-          li.textContent = req[i];
-          reqUl.appendChild(li);
-        }
-      }
-      if (rubDl) {
-        rubDl.innerHTML = '';
-        const rp = pack.rubric_talking_points || {};
-        const keys = Object.keys(rp);
-        for (let i = 0; i < keys.length; i++) {
-          const dt = document.createElement('dt');
-          dt.textContent = keys[i].replace(/_/g, ' ');
-          const dd = document.createElement('dd');
-          dd.textContent = rp[keys[i]];
-          rubDl.appendChild(dt);
-          rubDl.appendChild(dd);
-        }
-      }
-    } catch (e) {
-      submissionPackCache = null;
-      if (ta) ta.value = '';
-      if (pre) pre.textContent = String(e && e.message ? e.message : e);
-      showAppNotice({
-        severity: 'error',
-        title: 'Submission pack unavailable',
-        summary:
-          'The app could not load the hackathon submission helper (GET /insights/submission-pack).',
-        steps: [
-          'Confirm the API is running and matches the URL in the header.',
-          'Use http://127.0.0.1:5500/ with node dev-server.mjs if you rely on the /api proxy.',
-          'If you use a local FastAPI app, set window.__FFL_API_BASE__ to its origin, reload, and try again.'
-        ],
-        technical: 'Endpoint: GET /insights/submission-pack?price_eur_l=…',
-        code: 'PACK',
-        detail: ''
-      });
-    }
-  }
-
-  window.__fflReloadSubmissionPack = function () {
-    refreshSubmissionPage();
-  };
-
-  window.__fflCopySubmitField = async function (which) {
-    const pack = submissionPackCache;
-    let text = '';
-    if (which === 'devpost' && pack && pack.devpost_summary_draft) text = pack.devpost_summary_draft;
-    else if (which === 'social' && pack && pack.social_post_draft_x) text = pack.social_post_draft_x;
-    else if (which === 'headline' && pack && pack.headline_insight) text = pack.headline_insight;
-    if (!text) {
-      showAppNotice({
-        severity: 'warn',
-        title: 'Nothing to copy',
-        detail: 'Load the submission pack from the API first (Refresh pack), then copy again.',
-        code: null
-      });
-      return;
-    }
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(text);
-        showAppNotice({
-          severity: 'info',
-          title: 'Copied',
-          detail: 'Paste into Devpost or your notes.',
-          code: null
-        });
-      }
-    } catch (e) {
-      showAppNotice({
-        severity: 'warn',
-        title: 'Copy failed',
-        detail: String(e && e.message ? e.message : e),
-        code: null
-      });
-    }
-  };
 
   async function refreshThesisBanner() {
     const el = document.getElementById('thesis-banner-text');
@@ -7733,14 +7295,14 @@
         passed +
         '/' +
         n +
-        '</strong> registered model claims pass (see Method &amp; lab). ' +
+        '</strong> registered model claims pass. ' +
         snapLine +
         ' <span style="opacity:0.88">Illustrative model — synthetic income bands, not survey microdata.</span>';
       __fflIconsRefresh();
     } catch (e) {
       el.innerHTML =
         'Model compares county-level SEAI energy profiles with CSO deprivation and a liquid-fuel proxy. ' +
-        'Open <strong>Method &amp; lab</strong> when the API exposes <code>/meta</code> and <code>/model/claims</code> for full lineage.';
+        'Connect the app to an API that exposes <code>/meta</code> and <code>/model/claims</code> for full lineage.';
       __fflIconsRefresh();
     } finally {
       __fflPulseInsightBlocks(false);
@@ -7805,371 +7367,6 @@
     }
   };
 
-  async function refreshMethodPage() {
-    if (appPage !== 'method') return;
-    const preMeta = document.getElementById('method-meta-pre');
-    const preNat = document.getElementById('method-national-pre');
-    const preVal = document.getElementById('method-validation-pre');
-    const preDist = document.getElementById('method-distribution-pre');
-    const preBr = document.getElementById('method-breach-pre');
-    const preReg = document.getElementById('method-regional-pre');
-    const preNar = document.getElementById('method-narrative-pre');
-    const preCurve = document.getElementById('method-scenario-curve-pre');
-    const preRank = document.getElementById('method-ranking-pre');
-    const oaLink = document.getElementById('method-openapi-link');
-    const preC = document.getElementById('method-claims-pre');
-    const preS = document.getElementById('method-sensitivity-pre');
-    const preP = document.getElementById('method-policy-pre');
-    const lin = document.getElementById('method-lineage-p');
-    populateJudgeScriptOl();
-    if (oaLink) oaLink.href = API + '/docs';
-    if (preMeta) {
-      if (metaCache) preMeta.textContent = JSON.stringify(metaCache, null, 2);
-      else preMeta.textContent = '(no /meta yet)';
-    }
-    setHtml('method-lineage-human', formatMetaLineageHuman());
-    if (lin && metaCache && metaCache.data_lineage) {
-      lin.textContent =
-        'SEAI: ' +
-        metaCache.data_lineage.seai +
-        ' · CSO deprivation: ' +
-        metaCache.data_lineage.cso_deprivation +
-        '. ' +
-        (metaCache.limitations || '');
-    }
-    if (metaCache && metaCache.params) {
-      const p = metaCache.params;
-      const l1 = document.getElementById('lab-litres');
-      const l2 = document.getElementById('lab-threshold');
-      const w1 = document.getElementById('lab-w-fuel');
-      const w2 = document.getElementById('lab-w-social');
-      const hdd = document.getElementById('lab-hdd');
-      if (l1 && p.litres_per_hh_pa != null) l1.value = String(p.litres_per_hh_pa);
-      if (l2 && p.poverty_threshold_pct != null) l2.value = String(p.poverty_threshold_pct);
-      if (w1 && p.weights && p.weights.fuel_dependency_score != null) {
-        w1.value = String(p.weights.fuel_dependency_score);
-      }
-      if (w2 && p.weights && p.weights.social_deprivation_score != null) {
-        w2.value = String(p.weights.social_deprivation_score);
-      }
-      if (hdd && p.use_hdd_adjustment != null) hdd.checked = !!p.use_hdd_adjustment;
-    }
-    const price = getActivePrice();
-    if (preNat) {
-      try {
-        const r = await fetch(API + '/national/snapshot?price_eur_l=' + encodeURIComponent(price));
-        if (r.ok) {
-          const j = await r.json();
-          preNat.textContent = JSON.stringify(j, null, 2);
-          setHtml('method-national-human', formatNationalHuman(j));
-        } else {
-          preNat.textContent = 'HTTP ' + r.status;
-          setHtml(
-            'method-national-human',
-            fflInlineAlert('error', 'National snapshot', 'The API returned an error or empty body.')
-          );
-        }
-      } catch (e) {
-        preNat.textContent = String(e);
-        setHtml(
-          'method-national-human',
-          fflInlineAlert(
-            'error',
-            'National snapshot',
-            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
-          )
-        );
-      }
-    }
-    if (preVal) {
-      try {
-        const r = await fetch(API + '/model/validation?price_eur_l=' + encodeURIComponent(price));
-        if (r.ok) {
-          const j = await r.json();
-          preVal.textContent = JSON.stringify(j, null, 2);
-          setHtml('method-validation-human', formatValidationHuman(j));
-        } else {
-          preVal.textContent = 'HTTP ' + r.status;
-          setHtml(
-            'method-validation-human',
-            fflInlineAlert('error', 'Model validation', 'The API returned an error or empty body.')
-          );
-        }
-      } catch (e) {
-        preVal.textContent = String(e);
-        setHtml(
-          'method-validation-human',
-          fflInlineAlert(
-            'error',
-            'Model validation',
-            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
-          )
-        );
-      }
-    }
-    if (preDist) {
-      try {
-        const r = await fetch(API + '/model/distribution?price_eur_l=' + encodeURIComponent(price));
-        if (r.ok) {
-          const j = await r.json();
-          preDist.textContent = JSON.stringify(j, null, 2);
-          setHtml('method-distribution-human', formatDistributionHuman(j));
-        } else {
-          preDist.textContent = 'HTTP ' + r.status;
-          setHtml(
-            'method-distribution-human',
-            fflInlineAlert('error', 'Score distribution', 'The API returned an error or empty body.')
-          );
-        }
-      } catch (e) {
-        preDist.textContent = String(e);
-        setHtml(
-          'method-distribution-human',
-          fflInlineAlert(
-            'error',
-            'Score distribution',
-            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
-          )
-        );
-      }
-    }
-    if (preBr) {
-      try {
-        const r = await fetch(
-          API + '/model/breach-prices?reference_price_eur_l=' + encodeURIComponent(price)
-        );
-        if (r.ok) {
-          const j = await r.json();
-          preBr.textContent = JSON.stringify(j, null, 2);
-          setHtml('method-breach-human', formatBreachHuman(j));
-        } else {
-          preBr.textContent = 'HTTP ' + r.status;
-          setHtml(
-            'method-breach-human',
-            fflInlineAlert('error', 'Breach prices', 'The API returned an error or empty body.')
-          );
-        }
-      } catch (e) {
-        preBr.textContent = String(e);
-        setHtml(
-          'method-breach-human',
-          fflInlineAlert(
-            'error',
-            'Breach prices',
-            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
-          )
-        );
-      }
-    }
-    if (preReg) {
-      try {
-        const r = await fetch(API + '/insights/regional?fuel_price=' + encodeURIComponent(price));
-        if (r.ok) {
-          const j = await r.json();
-          preReg.textContent = JSON.stringify(j, null, 2);
-          setHtml('method-regional-human', formatRegionalHuman(j));
-        } else {
-          preReg.textContent = 'HTTP ' + r.status;
-          setHtml(
-            'method-regional-human',
-            fflInlineAlert('error', 'Regional insights', 'The API returned an error or empty body.')
-          );
-        }
-      } catch (e) {
-        preReg.textContent = String(e);
-        setHtml(
-          'method-regional-human',
-          fflInlineAlert(
-            'error',
-            'Regional insights',
-            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
-          )
-        );
-      }
-    }
-    if (preNar) {
-      try {
-        const r = await fetch(API + '/insights/narrative?price_eur_l=' + encodeURIComponent(price));
-        if (r.ok) {
-          const j = await r.json();
-          const bullets = j.bullets || [];
-          const pitch = j.elevator_pitch || '';
-          preNar.textContent =
-            bullets.map(function (b, i) {
-              return i + 1 + '. ' + b;
-            }).join('\n') + (pitch ? '\n\nElevator: ' + pitch : '');
-          let nh = '<ol style="margin:0.35rem 0 0 1.1rem">';
-          for (let i = 0; i < bullets.length; i++) {
-            nh += '<li>' + escapeHtml(bullets[i]) + '</li>';
-          }
-          nh += '</ol>';
-          setHtml('method-narrative-human', nh);
-          const elEv = document.getElementById('method-narrative-elevator');
-          if (elEv) elEv.textContent = pitch || '';
-        } else {
-          preNar.textContent = 'HTTP ' + r.status;
-          setHtml(
-            'method-narrative-human',
-            fflInlineAlert('error', 'Narrative pack', 'The API returned an error or empty body.')
-          );
-          const elEv = document.getElementById('method-narrative-elevator');
-          if (elEv) elEv.textContent = '';
-        }
-      } catch (e) {
-        preNar.textContent = String(e);
-        setHtml(
-          'method-narrative-human',
-          fflInlineAlert(
-            'error',
-            'Narrative pack',
-            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
-          )
-        );
-        const elEv2 = document.getElementById('method-narrative-elevator');
-        if (elEv2) elEv2.textContent = '';
-      }
-    }
-    if (preCurve) {
-      try {
-        const lo = Math.max(0.5, price - 0.85);
-        const hi = Math.min(8, price + 0.85);
-        const r = await fetch(
-          API +
-            '/model/scenario-curve?price_min=' +
-            encodeURIComponent(lo) +
-            '&price_max=' +
-            encodeURIComponent(hi) +
-            '&steps=24'
-        );
-        if (r.ok) {
-          const j = await r.json();
-          preCurve.textContent = JSON.stringify(j, null, 2);
-          setHtml('method-curve-human', formatCurveHuman(j));
-        } else {
-          preCurve.textContent = 'HTTP ' + r.status;
-          setHtml(
-            'method-curve-human',
-            fflInlineAlert('error', 'Scenario curve', 'The API returned an error or empty body.')
-          );
-        }
-      } catch (e) {
-        preCurve.textContent = String(e);
-        setHtml(
-          'method-curve-human',
-          fflInlineAlert(
-            'error',
-            'Scenario curve',
-            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
-          )
-        );
-      }
-    }
-    if (preRank) {
-      try {
-        const r = await fetch(API + '/model/ranking-stability?top_k=10');
-        if (r.ok) {
-          const j = await r.json();
-          preRank.textContent = JSON.stringify(j, null, 2);
-          setHtml('method-ranking-human', formatRankingHuman(j));
-        } else {
-          preRank.textContent = 'HTTP ' + r.status;
-          setHtml(
-            'method-ranking-human',
-            fflInlineAlert('error', 'Ranking stability', 'The API returned an error or empty body.')
-          );
-        }
-      } catch (e) {
-        preRank.textContent = String(e);
-        setHtml(
-          'method-ranking-human',
-          fflInlineAlert(
-            'error',
-            'Ranking stability',
-            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
-          )
-        );
-      }
-    }
-    if (preC) {
-      try {
-        const r = await fetch(API + '/model/claims?price_eur_l=' + encodeURIComponent(price));
-        if (r.ok) {
-          const j = await r.json();
-          preC.textContent = JSON.stringify(j, null, 2);
-          setHtml('method-claims-human', formatClaimsHuman(j));
-        } else {
-          preC.textContent = 'HTTP ' + r.status;
-          setHtml(
-            'method-claims-human',
-            fflInlineAlert('error', 'Registered claims', 'The API returned an error or empty body.')
-          );
-        }
-      } catch (e) {
-        preC.textContent = String(e);
-        setHtml(
-          'method-claims-human',
-          fflInlineAlert(
-            'error',
-            'Registered claims',
-            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
-          )
-        );
-      }
-    }
-    if (preS) {
-      try {
-        const r = await fetch(API + '/model/sensitivity');
-        if (r.ok) {
-          const j = await r.json();
-          preS.textContent = JSON.stringify(j, null, 2);
-          setHtml('method-sensitivity-human', formatSensitivityHuman(j));
-        } else {
-          preS.textContent = 'HTTP ' + r.status;
-          setHtml(
-            'method-sensitivity-human',
-            fflInlineAlert('error', 'Sensitivity analysis', 'The API returned an error or empty body.')
-          );
-        }
-      } catch (e) {
-        preS.textContent = String(e);
-        setHtml(
-          'method-sensitivity-human',
-          fflInlineAlert(
-            'error',
-            'Sensitivity analysis',
-            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
-          )
-        );
-      }
-    }
-    if (preP) {
-      try {
-        const r = await fetch(API + '/model/policy');
-        if (r.ok) {
-          const j = await r.json();
-          preP.textContent = JSON.stringify(j, null, 2);
-          setHtml('method-policy-human', formatPolicyHuman(j));
-        } else {
-          preP.textContent = 'HTTP ' + r.status;
-          setHtml(
-            'method-policy-human',
-            fflInlineAlert('error', 'Policy hooks', 'The API returned an error or empty body.')
-          );
-        }
-      } catch (e) {
-        preP.textContent = String(e);
-        setHtml(
-          'method-policy-human',
-          fflInlineAlert(
-            'error',
-            'Policy hooks',
-            'Network error — confirm the FastAPI hub is running and reachable from this browser.'
-          )
-        );
-      }
-    }
-  }
-
   window.__fflOpenNationalBriefing = function () {
     const price = getActivePrice();
     const url =
@@ -8211,69 +7408,6 @@
         detail: String(e && e.message ? e.message : e),
         code: null
       });
-    }
-  };
-
-  window.__fflApplyModelLab = async function () {
-    const st = document.getElementById('lab-status');
-    const litres = parseFloat((document.getElementById('lab-litres') || {}).value);
-    const thr = parseFloat((document.getElementById('lab-threshold') || {}).value);
-    const wf = parseFloat((document.getElementById('lab-w-fuel') || {}).value);
-    const ws = parseFloat((document.getElementById('lab-w-social') || {}).value);
-    const hddEl = document.getElementById('lab-hdd');
-    const useHdd = hddEl ? hddEl.checked : true;
-    if (wf + ws >= 0.98) {
-      if (st) st.textContent = 'Fuel + social weights must leave room for building & energy.';
-      return;
-    }
-    const rem = 1 - wf - ws;
-    const defB = 0.25 / (0.25 + 0.15);
-    const defE = 0.15 / (0.25 + 0.15);
-    const wb = Math.round(rem * defB * 100) / 100;
-    const we = Math.round((rem - wb) * 100) / 100;
-    const weights = {
-      fuel_dependency_score: wf,
-      social_deprivation_score: ws,
-      building_inefficiency_score: wb,
-      energy_intensity_score: we
-    };
-    const sum =
-      weights.fuel_dependency_score +
-      weights.social_deprivation_score +
-      weights.building_inefficiency_score +
-      weights.energy_intensity_score;
-    if (Math.abs(sum - 1) > 0.02) {
-      if (st) st.textContent = 'Weights did not normalize; check inputs.';
-      return;
-    }
-    if (st) st.textContent = 'Applying…';
-    try {
-      const res = await fetch(API + '/model/params', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          litres_per_hh_pa: litres,
-          poverty_threshold_pct: thr,
-          weights: weights,
-          use_hdd_adjustment: useHdd
-        })
-      });
-      const j = await res.json().catch(function () {
-        return {};
-      });
-      if (!res.ok) {
-        if (st) st.textContent = (j.detail && String(j.detail)) || 'HTTP ' + res.status;
-        return;
-      }
-      metaCache = j.meta || metaCache;
-      applyMetaToUi(metaCache);
-      if (st) st.textContent = 'OK — reloading counties…';
-      await runLoad(false);
-      await refreshThesisBanner();
-      await refreshMethodPage();
-      if (st) st.textContent = 'Done.';
-    } catch (e) {
-      if (st) st.textContent = 'Lab needs POST /model/params on the API.';
     }
   };
 
@@ -9773,9 +8907,11 @@
     var el = document.getElementById('ai-page-status');
     if (!el) return;
     var price = getActivePrice();
-    var apiLabel = useLocalProxy
-      ? 'Local /api → ' + UPSTREAM_ZERVE_HOST
-      : API_PUBLIC.replace(/^https?:\/\//, '');
+    var apiLabel = fflDemoApiActive
+      ? 'Demo data'
+      : useLocalProxy
+        ? 'Local /api → ' + UPSTREAM_ZERVE_HOST
+        : API_PUBLIC.replace(/^https?:\/\//, '');
     var dataLabel = '…';
     if (loadFinishedOnce) {
       if (lastLoadOkCount <= 0) dataLabel = 'No county rows loaded';
@@ -9968,6 +9104,12 @@
   initMatricesNav();
   try {
     var savedPage = (localStorage.getItem('ffl_page') || '').trim();
+    if (savedPage === 'method' || savedPage === 'submit') {
+      savedPage = 'dashboard';
+      try {
+        localStorage.setItem('ffl_page', 'dashboard');
+      } catch (eSp) {}
+    }
     if (savedPage && PAGE_TITLES[savedPage]) window.__fflSetPage(savedPage);
     else __fflSyncPageAria();
   } catch (eBoot) {
@@ -9980,8 +9122,7 @@
     await fetchCountiesList();
     metaCache = await fetchApiMeta();
     applyMetaToUi(metaCache);
-    populateJudgeScriptOl();
-    runLoad(true);
+    await runLoad(true);
   })();
 })();
 </script>

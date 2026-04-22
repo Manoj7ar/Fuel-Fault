@@ -11,6 +11,7 @@ import https from 'https';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { handleMockApi } from './mock-api-handler.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
@@ -62,11 +63,42 @@ const server = http.createServer((req, res) => {
   }
 
   if (req.method === 'OPTIONS') {
+    const mockPath = url.pathname === '/mock-api' || url.pathname.startsWith('/mock-api/');
     res.writeHead(204, cors({
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Methods': mockPath ? 'GET, POST, OPTIONS' : 'GET, OPTIONS',
       'Access-Control-Allow-Headers': '*',
     }));
     res.end();
+    return;
+  }
+
+  const isMockApi = url.pathname === '/mock-api' || url.pathname.startsWith('/mock-api/');
+  if (isMockApi) {
+    if (req.method !== 'GET' && req.method !== 'POST') {
+      res.writeHead(405, cors({ 'Content-Type': 'text/plain' }));
+      res.end('Method not allowed');
+      return;
+    }
+    if (req.method === 'POST') {
+      const chunks = [];
+      req.on('data', (c) => chunks.push(c));
+      req.on('end', () => {
+        try {
+          const bodyStr = Buffer.concat(chunks).toString('utf8');
+          handleMockApi(req, res, url, bodyStr);
+        } catch (e) {
+          res.writeHead(500, cors({ 'Content-Type': 'application/json; charset=utf-8' }));
+          res.end(JSON.stringify({ detail: String(e && e.message ? e.message : e) }));
+        }
+      });
+      return;
+    }
+    try {
+      handleMockApi(req, res, url, '');
+    } catch (e) {
+      res.writeHead(500, cors({ 'Content-Type': 'application/json; charset=utf-8' }));
+      res.end(JSON.stringify({ detail: String(e && e.message ? e.message : e) }));
+    }
     return;
   }
 
@@ -154,5 +186,6 @@ server.listen(PORT, LISTEN_HOST, () => {
   const hint = LISTEN_HOST === '0.0.0.0' ? '127.0.0.1' : LISTEN_HOST;
   console.log(`Fuel Fault Lines → http://${hint}:${PORT}/`);
   console.log(`API proxy     → http://${hint}:${PORT}/api/... → https://${UPSTREAM_HOST}/...`);
+  console.log(`Mock demo API → http://${hint}:${PORT}/mock-api/... (Settings → offline demo in the UI)`);
   console.log(`Local FastAPI → add ?api=http://${hint}:8000 or localStorage ffl_api_base (see README)`);
 });

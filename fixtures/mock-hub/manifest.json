@@ -1,0 +1,4 @@
+{
+  "description": "Offline demo API data is generated in mock-api-handler.mjs from CANONICAL_COUNTIES (no large JSON blobs).",
+  "version": 1
+}
