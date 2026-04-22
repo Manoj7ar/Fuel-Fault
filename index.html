@@ -2245,6 +2245,303 @@
     .compare-row:last-of-type { margin-bottom: 0.65rem; }
     .compare-row label { font-family: var(--mono); font-size: 0.58rem; color: var(--ink3); display: block; margin-bottom: 0.25rem; }
     .single-slider-wrap.hidden { display: none; }
+
+    /* —— Scenarios page (interactive studio) —— */
+    #page-scenarios .scenarios-page-inner {
+      gap: 1.25rem;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .scenarios-hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--rule);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 253, 250, 0.88) 42%, rgba(224, 231, 255, 0.55) 100%);
+      box-shadow: var(--shadow-card);
+    }
+    .scenarios-hero__grid {
+      display: grid;
+      grid-template-columns: 1fr minmax(7rem, 9.5rem);
+      gap: 1rem 1.5rem;
+      align-items: center;
+      padding: 1.25rem 1.35rem 1.35rem;
+      position: relative;
+      z-index: 1;
+    }
+    @media (max-width: 640px) {
+      .scenarios-hero__grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .scenarios-hero__eyebrow {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent-deep);
+      margin: 0 0 0.35rem;
+    }
+    .scenarios-hero h1 {
+      font-family: var(--display);
+      font-size: clamp(1.45rem, 3.2vw, 1.85rem);
+      font-weight: 700;
+      color: var(--ink);
+      margin: 0 0 0.45rem;
+      line-height: 1.15;
+    }
+    .scenarios-hero__tagline {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.55;
+      color: var(--ink2);
+      max-width: 36rem;
+    }
+    .scenarios-hero__pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.85rem;
+    }
+    .scenarios-hero__fake-chip {
+      font-family: var(--mono);
+      font-size: 0.52rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.28rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      color: var(--ink3);
+    }
+    .scenarios-hero__orb {
+      position: relative;
+      width: min(9rem, 100%);
+      aspect-ratio: 1;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.95), rgba(204, 251, 241, 0.35) 45%, rgba(165, 243, 252, 0.25) 100%);
+      border: 1px solid rgba(13, 148, 136, 0.2);
+      box-shadow: 0 12px 40px rgba(13, 148, 136, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .scenarios-orb-ring {
+      position: absolute;
+      inset: 10%;
+      border-radius: 50%;
+      border: 2px dashed rgba(13, 148, 136, 0.28);
+      animation: ffl-scenarios-orbit 14s linear infinite;
+    }
+    @keyframes ffl-scenarios-orbit {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scenarios-orb-ring {
+        animation: none;
+      }
+    }
+    .scenarios-orb-label {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--accent-deep);
+      position: relative;
+      z-index: 1;
+    }
+    .scenarios-live-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.65rem;
+    }
+    @media (max-width: 900px) {
+      .scenarios-live-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 480px) {
+      .scenarios-live-strip {
+        grid-template-columns: 1fr;
+      }
+    }
+    .scenario-stat-card {
+      position: relative;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--rule-light);
+      background: var(--surface);
+      padding: 0.75rem 0.85rem 0.8rem 2.35rem;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85) inset;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .scenario-stat-card:hover {
+      border-color: rgba(13, 148, 136, 0.22);
+      box-shadow: 0 6px 22px rgba(15, 23, 42, 0.06);
+    }
+    .scenario-stat-card--accent {
+      background: linear-gradient(165deg, rgba(254, 243, 199, 0.35), rgba(255, 255, 255, 0.98));
+      border-color: rgba(251, 191, 36, 0.35);
+    }
+    .scenario-stat-card__ico {
+      position: absolute;
+      left: 0.65rem;
+      top: 0.72rem;
+      width: 1.35rem;
+      height: 1.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-deep);
+      opacity: 0.88;
+    }
+    .scenario-stat-card__ico .lucide {
+      width: 1.1rem;
+      height: 1.1rem;
+      stroke-width: 2px;
+    }
+    .scenario-stat-card__label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.52rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--ink3);
+      margin-bottom: 0.2rem;
+    }
+    .scenario-stat-card__value {
+      display: block;
+      font-family: var(--display);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.15;
+    }
+    .scenario-stat-card__hint {
+      display: block;
+      font-size: 0.68rem;
+      color: var(--ink3);
+      margin-top: 0.15rem;
+      line-height: 1.35;
+    }
+    .scenarios-studio {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(12rem, 15rem);
+      gap: 1rem 1.25rem;
+      align-items: start;
+    }
+    @media (max-width: 820px) {
+      .scenarios-studio {
+        grid-template-columns: 1fr;
+      }
+    }
+    .scenarios-studio__panel {
+      max-width: none !important;
+      width: 100%;
+    }
+    .scenarios-studio__head {
+      margin-bottom: 0.85rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--rule-light);
+    }
+    .scenarios-studio__title {
+      font-family: var(--display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 0 0 0.25rem;
+      color: var(--ink);
+    }
+    .scenarios-studio__sub {
+      margin: 0;
+      font-size: 0.78rem;
+      color: var(--ink3);
+      line-height: 1.45;
+    }
+    .scenario-presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-bottom: 0.85rem;
+    }
+    #page-scenarios.scenarios-compare-on .scenario-presets--b {
+      display: flex;
+    }
+    .scenario-presets--b {
+      display: none;
+    }
+    .scenario-preset-chip {
+      font-family: var(--sans);
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 0.38rem 0.65rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      background: rgba(255, 255, 255, 0.75);
+      color: var(--ink2);
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
+    }
+    .scenario-preset-chip:hover {
+      color: var(--accent-deep);
+      border-color: rgba(13, 148, 136, 0.35);
+      background: rgba(240, 253, 250, 0.85);
+    }
+    .scenario-preset-chip:active {
+      transform: scale(0.97);
+    }
+    .scenario-presets__label {
+      width: 100%;
+      font-family: var(--mono);
+      font-size: 0.52rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink3);
+      margin-bottom: 0.15rem;
+    }
+    .scenarios-studio__controls {
+      margin-top: 0.25rem;
+    }
+    #page-scenarios .single-slider-wrap {
+      padding: 0.65rem 0.75rem;
+      border-radius: var(--radius-md);
+      background: rgba(248, 250, 252, 0.65);
+      border: 1px solid var(--rule-light);
+    }
+    #page-scenarios #price-slider {
+      width: 100%;
+    }
+    .scenarios-tip-card {
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(124, 58, 237, 0.18);
+      background: linear-gradient(165deg, rgba(245, 243, 255, 0.65), rgba(255, 255, 255, 0.95));
+      padding: 0.85rem 1rem;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: var(--ink2);
+    }
+    .scenarios-tip-card strong {
+      font-size: 0.68rem;
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #6d28d9;
+    }
+    .scenarios-tip-card__link {
+      margin: 0.5rem 0 0;
+    }
+    .scenarios-tip-card__link a {
+      font-weight: 600;
+      color: var(--accent-deep);
+      text-decoration: none;
+    }
+    .scenarios-tip-card__link a:hover {
+      text-decoration: underline;
+    }
+    .scenarios-foot-note {
+      margin-top: 0.25rem;
+    }
     .scenario-summary {
       display: block;
       font-size: 0.8rem;
@@ -3350,13 +3647,191 @@
       display: flex;
       flex-direction: column;
     }
-    #page-compare .matrices-page-wrap {
-      flex: 1 1 auto;
-      min-height: min(72vh, 720px);
+    #page-compare .compare-page-inner {
+      gap: 1.1rem;
     }
-    #page-compare .matrices-shell {
+    #page-compare .compare-workspace {
       flex: 1 1 auto;
-      min-height: min(64vh, 640px);
+      min-height: min(52vh, 560px);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+    }
+    #page-compare .compare-page-head {
+      margin-bottom: 0;
+    }
+    #page-compare .compare-workspace-head {
+      border-bottom: 1px solid var(--rule-light);
+      background: var(--surface-muted);
+    }
+    #page-compare .compare-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.65rem 1rem;
+      padding: 0.75rem 1rem;
+    }
+    #page-compare .compare-toolbar-views {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.45rem 0.65rem;
+      min-width: 0;
+    }
+    #page-compare .compare-toolbar-label {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--ink3);
+      flex-shrink: 0;
+    }
+    #page-compare .compare-pills {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 0.18rem;
+      padding: 0.22rem;
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid rgba(226, 232, 240, 0.95);
+    }
+    #page-compare .compare-pills .matrices-nav-item {
+      width: auto;
+      display: inline-block;
+      margin-bottom: 0;
+      padding: 0.4rem 0.78rem;
+      border-radius: calc(var(--radius-pill) - 4px);
+      font-family: var(--sans);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--ink3);
+      background: transparent;
+      border: 1px solid transparent;
+    }
+    #page-compare .compare-pills .matrices-nav-item:hover {
+      color: var(--accent-deep);
+      background: rgba(255, 255, 255, 0.65);
+    }
+    #page-compare .compare-pills .matrices-nav-item.active {
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--ink);
+      border-color: rgba(226, 232, 240, 0.95);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    }
+    #page-compare .compare-toolbar-mid {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    #page-compare .compare-toolbar .matrices-view-tabs {
+      margin-right: 0;
+      border-bottom: none;
+      gap: 0.15rem;
+    }
+    #page-compare .compare-toolbar .matrices-view-tab {
+      padding: 0.38rem 0.75rem;
+      border-radius: var(--radius-pill);
+      margin-bottom: 0;
+      border-bottom: none;
+      font-size: 0.72rem;
+    }
+    #page-compare .compare-toolbar .matrices-view-tab.active {
+      background: rgba(13, 148, 136, 0.12);
+      color: var(--accent-deep);
+      border: 1px solid rgba(13, 148, 136, 0.28);
+    }
+    #page-compare .compare-chart-caption {
+      padding: 0.35rem 1rem 0.65rem;
+    }
+    #page-compare .compare-chart-caption .matrices-graph-title {
+      margin: 0;
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    #page-compare .matrices-graph-block {
+      flex: 1 1 0%;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      padding: 0.5rem 1rem 0.85rem;
+      border-bottom: 1px solid var(--rule-light);
+    }
+    #page-compare .matrices-chart-outer {
+      flex: 1 1 0%;
+      min-height: clamp(220px, 36vh, 520px);
+      position: relative;
+    }
+    #page-compare .matrices-table-block {
+      max-height: min(34vh, 280px);
+      min-height: 120px;
+    }
+    #page-compare .compare-footer-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 0.75rem 1.25rem;
+      padding: 0.75rem 1rem 0.95rem;
+      background: var(--surface);
+      border-top: 1px solid var(--rule-light);
+    }
+    #page-compare .compare-footer-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.28rem;
+      min-width: 8.5rem;
+    }
+    #page-compare .compare-footer-field--palette {
+      flex: 1 1 12rem;
+      min-width: 0;
+    }
+    #page-compare .compare-footer-field label,
+    #page-compare .compare-footer-label {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink3);
+    }
+    #page-compare .compare-footer-field select {
+      padding: 0.42rem 0.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--rule);
+      background: var(--surface-solid);
+      font-size: 0.78rem;
+      color: var(--ink);
+    }
+    #page-compare .compare-footer-field .matrices-palette {
+      padding: 0;
+    }
+    @media (max-width: 680px) {
+      #page-compare .compare-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      #page-compare .compare-toolbar-mid {
+        margin-left: 0;
+      }
+      #page-compare .compare-toolbar .matrices-view-tabs {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      #page-compare .compare-footer-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      #page-compare .compare-footer-field,
+      #page-compare .compare-footer-field--palette {
+        width: 100%;
+        max-width: none;
+      }
     }
     .matrices-shell {
       flex: 1;
@@ -4380,160 +4855,214 @@
     </div>
 
     <div id="page-scenarios" class="page-view" role="region" aria-label="Scenarios">
-      <div class="page-inner">
+      <div class="page-inner scenarios-page-inner">
         <div class="scenario-summary" id="scenario-summary"></div>
         <div class="crisis-alert" id="crisis-alert">
           <strong id="crisis-count">0</strong> <span id="crisis-line-label">counties above the 10% income share line</span>.
           Households in those counties: <strong id="crisis-households">0</strong>.
         </div>
-        <header class="dash-top" style="margin-bottom:0">
-          <div class="dash-brand">
-            <h1>Price scenarios</h1>
-            <p class="dash-tagline">Model the same counties at one price or compare two futures side by side.</p>
+
+        <section class="scenarios-hero" aria-labelledby="scenarios-hero-title">
+          <div class="scenarios-hero__grid">
+            <div class="scenarios-hero__copy">
+              <p class="scenarios-hero__eyebrow">Interactive lab</p>
+              <h1 id="scenarios-hero-title">Price scenarios</h1>
+              <p class="scenarios-hero__tagline">Sweep retail diesel €/L and watch the model respond in real time. Compare A/B to see which counties cross the fuel-income line.</p>
+              <div class="scenarios-hero__pills" aria-hidden="true">
+                <span class="scenarios-hero__fake-chip">26 counties</span>
+                <span class="scenarios-hero__fake-chip">Same model as Dashboard</span>
+              </div>
+            </div>
+            <div class="scenarios-hero__orb" aria-hidden="true">
+              <div class="scenarios-orb-ring"></div>
+              <span class="scenarios-orb-label">€/L</span>
+            </div>
           </div>
-        </header>
-        <div class="page-panel page-panel--tight" style="max-width:44rem">
-        <div class="dash-controls" style="max-width:none;border:none;padding:0;background:transparent;box-shadow:none">
-          <div class="assumption" style="flex:1;min-width:0">
-            <div class="price-mode-bar">
-              <div class="price-mode-segment" role="group" aria-label="Scenario mode">
-                <button type="button" class="btn-mode active" id="btn-single-mode" onclick="window.__fflSetCompareMode(false)">Single price</button>
-                <button type="button" class="btn-mode" id="btn-compare-mode" onclick="window.__fflSetCompareMode(true)">Compare A / B</button>
-              </div>
-            </div>
-            <div class="single-slider-wrap" id="single-price-ui">
-              <div class="assumption-top">
-                <label for="price-slider">Retail diesel, €/L</label>
-                <div class="price-readout"><span id="price-val">€2.14</span> <small>/L</small></div>
-              </div>
-              <input type="range" id="price-slider"
-                     min="1.50" max="4.00" step="0.01" value="2.14"
-                     aria-label="Fuel price per litre"
-                     oninput="onSliderInput(this.value)">
-              <div class="ticks">
-                <span>1.50</span><span>2.00</span><span>2.50</span><span>3.00</span><span>4.00</span>
-              </div>
-            </div>
-            <div class="compare-sliders" id="compare-price-ui">
-              <div class="compare-row">
-                <label for="price-slider-a">Scenario A — €/L</label>
-                <div class="assumption-top" style="margin-bottom:0.35rem">
-                  <span></span>
-                  <div class="price-readout" style="font-size:1.35rem"><span id="price-val-a">€2.14</span> <small>/L</small></div>
-                </div>
-                <input type="range" id="price-slider-a" min="1.50" max="4.00" step="0.01" value="2.14"
-                       aria-label="Scenario A price" oninput="window.__fflOnCompareA(this.value)">
-                <div class="ticks"><span>1.50</span><span>4.00</span></div>
-              </div>
-              <div class="compare-row">
-                <label for="price-slider-b">Scenario B — €/L</label>
-                <div class="assumption-top" style="margin-bottom:0.35rem">
-                  <span></span>
-                  <div class="price-readout" style="font-size:1.35rem"><span id="price-val-b">€3.00</span> <small>/L</small></div>
-                </div>
-                <input type="range" id="price-slider-b" min="1.50" max="4.00" step="0.01" value="3.00"
-                       aria-label="Scenario B price" oninput="window.__fflOnCompareB(this.value)">
-                <div class="ticks"><span>1.50</span><span>4.00</span></div>
-              </div>
-              <button type="button" class="btn-compare-run" onclick="window.__fflRunScenarioCompare()">Compare</button>
-            </div>
+        </section>
+
+        <div class="scenarios-live-strip" id="scenarios-live-strip" aria-live="polite">
+          <div class="scenario-stat-card">
+            <span class="scenario-stat-card__ico" aria-hidden="true"><i data-lucide="gauge"></i></span>
+            <span class="scenario-stat-card__label" id="sc-live-price-label">Scenario price</span>
+            <strong class="scenario-stat-card__value" id="sc-live-price">€2.14</strong>
+            <span class="scenario-stat-card__hint" id="sc-live-mode-hint">Single price · slider preview</span>
+          </div>
+          <div class="scenario-stat-card scenario-stat-card--accent">
+            <span class="scenario-stat-card__ico" aria-hidden="true"><i data-lucide="alert-circle"></i></span>
+            <span class="scenario-stat-card__label">Over <span id="sc-live-th-label">10</span>% line</span>
+            <strong class="scenario-stat-card__value" id="sc-live-over">—</strong>
+            <span class="scenario-stat-card__hint" id="sc-live-over-hint">counties (instant estimate)</span>
+          </div>
+          <div class="scenario-stat-card">
+            <span class="scenario-stat-card__ico" aria-hidden="true"><i data-lucide="percent"></i></span>
+            <span class="scenario-stat-card__label" id="sc-live-mean-label">Mean fuel share</span>
+            <strong class="scenario-stat-card__value" id="sc-live-mean">—</strong>
+            <span class="scenario-stat-card__hint" id="sc-live-mean-hint">all counties at slider</span>
+          </div>
+          <div class="scenario-stat-card">
+            <span class="scenario-stat-card__ico" aria-hidden="true"><i data-lucide="home"></i></span>
+            <span class="scenario-stat-card__label" id="sc-live-vuln-label">Est. vulnerable HH</span>
+            <strong class="scenario-stat-card__value" id="sc-live-vuln">—</strong>
+            <span class="scenario-stat-card__hint" id="sc-live-vuln-hint">in those counties</span>
           </div>
         </div>
-        <p class="table-label" style="margin-top:0.5rem"><strong>County register</strong> — open full list from Counties</p>
-        <footer class="site-footer--compact">Adjust sliders · use Compare for A/B · county grid on Counties page</footer>
+
+        <section class="scenarios-studio">
+          <div class="scenarios-studio__panel page-panel page-panel--tight">
+            <div class="scenarios-studio__head">
+              <h2 class="scenarios-studio__title">Adjust your scenario</h2>
+              <p class="scenarios-studio__sub">Tap a preset to jump the slider, or drag for a smooth sweep. Full county reload still runs after a short pause while you settle on a price.</p>
+            </div>
+            <div class="scenario-presets" role="group" aria-label="Quick prices for scenario A or single mode">
+              <span class="scenario-presets__label">Quick prices</span>
+              <button type="button" class="scenario-preset-chip" onclick="window.__fflScenarioPreset('a','1.65')">€1.65</button>
+              <button type="button" class="scenario-preset-chip" onclick="window.__fflScenarioPreset('a','1.90')">€1.90</button>
+              <button type="button" class="scenario-preset-chip" onclick="window.__fflScenarioPreset('a','2.14')">€2.14</button>
+              <button type="button" class="scenario-preset-chip" onclick="window.__fflScenarioPreset('a','2.50')">€2.50</button>
+              <button type="button" class="scenario-preset-chip" onclick="window.__fflScenarioPreset('a','3.00')">€3.00</button>
+              <button type="button" class="scenario-preset-chip" onclick="window.__fflScenarioPreset('a','3.50')">€3.50</button>
+            </div>
+            <div class="scenario-presets scenario-presets--b" role="group" aria-label="Quick prices for scenario B">
+              <span class="scenario-presets__label">Scenario B quick prices</span>
+              <button type="button" class="scenario-preset-chip" onclick="window.__fflScenarioPreset('b','2.14')">€2.14</button>
+              <button type="button" class="scenario-preset-chip" onclick="window.__fflScenarioPreset('b','2.75')">€2.75</button>
+              <button type="button" class="scenario-preset-chip" onclick="window.__fflScenarioPreset('b','3.00')">€3.00</button>
+              <button type="button" class="scenario-preset-chip" onclick="window.__fflScenarioPreset('b','3.40')">€3.40</button>
+              <button type="button" class="scenario-preset-chip" onclick="window.__fflScenarioPreset('b','3.85')">€3.85</button>
+            </div>
+            <div class="dash-controls scenarios-studio__controls" style="max-width:none;border:none;padding:0;background:transparent;box-shadow:none">
+              <div class="assumption" style="flex:1;min-width:0">
+                <div class="price-mode-bar">
+                  <div class="price-mode-segment" role="group" aria-label="Scenario mode">
+                    <button type="button" class="btn-mode active" id="btn-single-mode" onclick="window.__fflSetCompareMode(false)">Single price</button>
+                    <button type="button" class="btn-mode" id="btn-compare-mode" onclick="window.__fflSetCompareMode(true)">Compare A / B</button>
+                  </div>
+                </div>
+                <div class="single-slider-wrap" id="single-price-ui">
+                  <div class="assumption-top">
+                    <label for="price-slider">Retail diesel, €/L</label>
+                    <div class="price-readout"><span id="price-val">€2.14</span> <small>/L</small></div>
+                  </div>
+                  <input type="range" id="price-slider"
+                         min="1.50" max="4.00" step="0.01" value="2.14"
+                         aria-label="Fuel price per litre"
+                         oninput="onSliderInput(this.value)">
+                  <div class="ticks">
+                    <span>1.50</span><span>2.00</span><span>2.50</span><span>3.00</span><span>4.00</span>
+                  </div>
+                </div>
+                <div class="compare-sliders" id="compare-price-ui">
+                  <div class="compare-row">
+                    <label for="price-slider-a">Scenario A — €/L</label>
+                    <div class="assumption-top" style="margin-bottom:0.35rem">
+                      <span></span>
+                      <div class="price-readout" style="font-size:1.35rem"><span id="price-val-a">€2.14</span> <small>/L</small></div>
+                    </div>
+                    <input type="range" id="price-slider-a" min="1.50" max="4.00" step="0.01" value="2.14"
+                           aria-label="Scenario A price" oninput="window.__fflOnCompareA(this.value)">
+                    <div class="ticks"><span>1.50</span><span>4.00</span></div>
+                  </div>
+                  <div class="compare-row">
+                    <label for="price-slider-b">Scenario B — €/L</label>
+                    <div class="assumption-top" style="margin-bottom:0.35rem">
+                      <span></span>
+                      <div class="price-readout" style="font-size:1.35rem"><span id="price-val-b">€3.00</span> <small>/L</small></div>
+                    </div>
+                    <input type="range" id="price-slider-b" min="1.50" max="4.00" step="0.01" value="3.00"
+                           aria-label="Scenario B price" oninput="window.__fflOnCompareB(this.value)">
+                    <div class="ticks"><span>1.50</span><span>4.00</span></div>
+                  </div>
+                  <button type="button" class="btn-compare-run" onclick="window.__fflRunScenarioCompare()">Run comparison</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="scenarios-studio__aside" aria-label="Tips">
+            <div class="scenarios-tip-card">
+              <strong>Workflow</strong>
+              <p>Single mode drives the whole app from one €/L. Compare mode loads both prices when you run the comparison, then Counties shows A/B columns.</p>
+              <p class="scenarios-tip-card__link"><a href="#" onclick="window.__fflSetPage('counties');return false;">Open Counties register →</a></p>
+              <p class="scenarios-tip-card__link" style="margin-top:0.35rem"><a href="#" onclick="window.__fflSetPage('dashboard');return false;">Dashboard scenario curve →</a></p>
+            </div>
+          </aside>
+        </section>
+
+        <p class="table-label scenarios-foot-note"><strong>County register</strong> — full sortable grid on the Counties page.</p>
+        <footer class="site-footer--compact">Presets jump instantly · sliders debounce the API reload · A/B uses the same model as the rest of the app</footer>
       </div>
-    </div>
     </div>
 
     <div id="page-compare" class="page-view" role="region" aria-label="Compare charts">
-      <div class="page-inner matrices-page-wrap">
-    <div class="matrices-shell">
-      <nav class="matrices-nav" aria-label="Datasets">
-        <div class="matrices-nav-top">
-          <span>MATRICES</span>
-          <span class="matrices-nav-top-ico" aria-hidden="true">
-            <i data-lucide="menu"></i>
-          </span>
-        </div>
-        <input type="search" class="matrices-nav-search" id="matrices-dataset-search" placeholder="Search datasets…" autocomplete="off"
-               oninput="window.__fflFilterMatricesNav(this.value)">
-        <div class="matrices-nav-section">Views</div>
-        <div class="matrices-nav-list" id="matrices-nav-list">
-          <button type="button" class="matrices-nav-item active" data-view="tier-stress">Tier stress over time</button>
-          <button type="button" class="matrices-nav-item" data-view="price-path">Price path &amp; stress</button>
-        </div>
-        <button type="button" class="matrices-nav-upload">Upload dataset</button>
-      </nav>
+      <div class="page-inner compare-page-inner">
+        <header class="dash-top compare-page-head">
+          <div class="dash-brand">
+            <h1>Compare counties</h1>
+            <p class="dash-tagline">Tier stress over time or along the diesel price path — same €/L as <strong>Scenarios</strong>.</p>
+          </div>
+        </header>
 
-      <div class="matrices-main">
-        <div class="matrices-toolbar">
-          <div class="matrices-view-tabs" role="tablist">
-            <button type="button" class="matrices-view-tab active" id="mx-tab-graph" onclick="window.__fflMatricesViewMode('graph')">Graph</button>
-            <button type="button" class="matrices-view-tab" id="mx-tab-table" onclick="window.__fflMatricesViewMode('table')">Table</button>
+        <section class="compare-workspace" aria-labelledby="matrices-graph-title">
+          <div class="compare-workspace-head">
+            <div class="compare-toolbar">
+              <div class="compare-toolbar-views">
+                <span class="compare-toolbar-label" id="compare-dataset-label">Dataset</span>
+                <div class="compare-pills" id="matrices-nav-list" role="group" aria-labelledby="compare-dataset-label">
+                  <button type="button" class="matrices-nav-item active" data-view="tier-stress">Tier stress over time</button>
+                  <button type="button" class="matrices-nav-item" data-view="price-path">Price path &amp; stress</button>
+                </div>
+              </div>
+              <div class="compare-toolbar-mid">
+                <div class="matrices-view-tabs" role="tablist" aria-label="Chart or table">
+                  <button type="button" class="matrices-view-tab active" id="mx-tab-graph" onclick="window.__fflMatricesViewMode('graph')">Graph</button>
+                  <button type="button" class="matrices-view-tab" id="mx-tab-table" onclick="window.__fflMatricesViewMode('table')">Table</button>
+                </div>
+              </div>
+              <button type="button" class="ffl-btn ffl-btn--secondary ffl-btn--sm" onclick="window.__fflRefreshMatricesChart()">Refresh data</button>
+            </div>
+            <div class="compare-chart-caption">
+              <h2 class="matrices-graph-title" id="matrices-graph-title">Tier stress over time</h2>
+            </div>
           </div>
-          <div class="matrices-toolbar-actions">
-            <button type="button" class="matrices-tb-btn">Collapse</button>
-            <button type="button" class="matrices-tb-btn">Group</button>
-            <button type="button" class="matrices-tb-btn primary">Graph options</button>
-          </div>
-        </div>
 
-        <div class="matrices-graph-block" id="matrices-graph-block">
-          <div class="matrices-graph-head">
-            <h2 class="matrices-graph-title" id="matrices-graph-title">Tier stress over time</h2>
-            <button type="button" class="matrices-tb-btn primary" onclick="window.__fflRefreshMatricesChart()">Refresh</button>
+          <div class="matrices-graph-block" id="matrices-graph-block">
+            <div class="matrices-chart-outer">
+              <canvas id="chart-matrices-stack" aria-label="Stacked comparison chart"></canvas>
+              <div class="matrices-chart-tooltip" id="matrices-chart-tooltip" aria-hidden="true"></div>
+            </div>
           </div>
-          <div class="matrices-chart-outer">
-            <canvas id="chart-matrices-stack" aria-label="Stacked comparison chart"></canvas>
-            <div class="matrices-chart-tooltip" id="matrices-chart-tooltip" aria-hidden="true"></div>
-          </div>
-        </div>
 
-        <div class="matrices-table-block" id="matrices-table-block">
-          <div class="matrices-table-scroll">
-            <table class="matrices-table" id="matrices-data-table">
-              <thead id="matrices-table-head"></thead>
-              <tbody id="matrices-table-body"></tbody>
-            </table>
+          <div class="matrices-table-block" id="matrices-table-block">
+            <div class="matrices-table-scroll">
+              <table class="matrices-table" id="matrices-data-table">
+                <thead id="matrices-table-head"></thead>
+                <tbody id="matrices-table-body"></tbody>
+              </table>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <aside class="matrices-inspector" aria-label="Graph options">
-        <h3>Type</h3>
-        <div class="matrices-field">
-          <label for="mx-chart-type">Chart</label>
-          <select id="mx-chart-type" onchange="window.__fflMatricesChartType(this.value)">
-            <option value="line" selected>Stacked area (line)</option>
-            <option value="bar">Stacked bars</option>
-          </select>
-        </div>
-        <h3>Axes</h3>
-        <div class="matrices-field">
-          <label for="mx-axis-x">X-axis</label>
-          <select id="mx-axis-x" disabled>
-            <option>Date (timeline)</option>
-          </select>
-        </div>
-        <div class="matrices-field">
-          <label for="mx-axis-y">Y-axis</label>
-          <select id="mx-axis-y" disabled>
-            <option>County count</option>
-          </select>
-        </div>
-        <h3>Display</h3>
-        <div class="matrices-field">
-          <label for="mx-sort">Sort series</label>
-          <select id="mx-sort" onchange="window.__fflMatricesSort(this.value)">
-            <option value="tier">Tier order</option>
-            <option value="value">By value at cursor</option>
-          </select>
-        </div>
-        <h3>Colors</h3>
-        <div class="matrices-palette" id="matrices-palette"></div>
-      </aside>
-    </div>
-    <footer class="site-footer--compact">Stacked comparison · SEAI · CSO · AA · Zerve</footer>
+          <div class="compare-footer-controls" aria-label="Chart appearance">
+            <div class="compare-footer-field">
+              <label for="mx-chart-type">Chart style</label>
+              <select id="mx-chart-type" onchange="window.__fflMatricesChartType(this.value)">
+                <option value="line" selected>Stacked area</option>
+                <option value="bar">Stacked bars</option>
+              </select>
+            </div>
+            <div class="compare-footer-field">
+              <label for="mx-sort">Sort series</label>
+              <select id="mx-sort" onchange="window.__fflMatricesSort(this.value)">
+                <option value="tier">Tier order</option>
+                <option value="value">By value at cursor</option>
+              </select>
+            </div>
+            <div class="compare-footer-field compare-footer-field--palette">
+              <span class="compare-footer-label" id="compare-palette-label">Colour</span>
+              <div class="matrices-palette" id="matrices-palette" role="group" aria-labelledby="compare-palette-label"></div>
+            </div>
+          </div>
+        </section>
+
+        <footer class="site-footer--compact">Same model as Dashboard · adjust €/L on Scenarios</footer>
       </div>
     </div>
 
@@ -5636,6 +6165,38 @@
     };
   }
 
+  /** Dated €/L series for Compare when /history is missing, fails, or returns no points (offline, proxy, or hub mismatch). */
+  function __fflBuiltinHistorySeries() {
+    return {
+      historical: [
+        { date: '2024-05-01', price: 1.87 },
+        { date: '2024-06-01', price: 1.83 },
+        { date: '2024-07-01', price: 1.8 },
+        { date: '2024-08-01', price: 1.77 },
+        { date: '2024-09-01', price: 1.74 },
+        { date: '2024-10-01', price: 1.72 },
+        { date: '2024-11-01', price: 1.7 },
+        { date: '2024-12-01', price: 1.71 },
+        { date: '2025-01-01', price: 1.73 },
+        { date: '2025-02-01', price: 1.74 },
+        { date: '2025-03-01', price: 1.76 },
+        { date: '2025-04-01', price: 1.78 }
+      ],
+      projected: [
+        { date: '2025-05-01', price: 1.79 },
+        { date: '2025-06-01', price: 1.81 },
+        { date: '2025-07-01', price: 1.84 },
+        { date: '2025-08-01', price: 1.86 },
+        { date: '2025-09-01', price: 1.88 },
+        { date: '2025-10-01', price: 1.9 }
+      ],
+      events: [{ date: '2022-02-24', label: 'Russia invades Ukraine' }],
+      threshold: 2.14,
+      july: null,
+      oct: null
+    };
+  }
+
   function parseHistoryDate(s) {
     const d = new Date(s);
     return Number.isFinite(d.getTime()) ? d : null;
@@ -5882,12 +6443,26 @@
         ((!data.historical || !data.historical.length) &&
           (!data.projected || !data.projected.length))
       ) {
-        data = { historical: [], projected: [], events: [], threshold: 2.14 };
+        data = __fflBuiltinHistorySeries();
       }
       historyCache = data;
     }
-    renderStressAreaChart(historyCache);
-    refreshMatricesIfCompare();
+    try {
+      renderStressAreaChart(historyCache);
+    } catch (eStress) {
+      console.warn('Dashboard stress chart:', eStress);
+    }
+    /* Compare uses maintainAspectRatio:false; if we build the chart in the same turn as
+       switching to #page-compare, layout can still be 0×0. Wait for paint before sizing.
+       Must run even if the stress chart throws, or Compare stays blank. */
+    await new Promise(function (resolve) {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          refreshMatricesIfCompare();
+          resolve();
+        });
+      });
+    });
   }
 
   const MATRICES_TIERS = ['Critical', 'High', 'Medium', 'Low'];
@@ -6161,10 +6736,6 @@
     const canvas = document.getElementById('chart-matrices-stack');
     if (!canvas || typeof Chart === 'undefined') return;
 
-    if (!historyCache) {
-      historyCache = { historical: [], projected: [], events: [], threshold: 2.14 };
-    }
-
     let labels = matricesHistoryLabelList();
     if (!labels.length) return;
     const maps = matricesPriceMaps();
@@ -6187,7 +6758,7 @@
           fill: matricesChartType === 'line',
           stack: 'stress',
           tension: 0.35,
-          borderWidth: matricesChartType === 'line' ? 0 : 0,
+          borderWidth: matricesChartType === 'line' ? 1 : 0,
           borderColor: col,
           backgroundColor:
             matricesChartType === 'line' ? hexToRgba(col, 0.45) : hexToRgba(col, 0.75),
@@ -6239,7 +6810,10 @@
     hideMatricesTooltip();
 
     const ann = buildMatricesAnnotations();
-    const plugins = { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } };
+    const plugins = {
+      legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } },
+      filler: { drawTime: 'beforeDatasetsDraw' }
+    };
     if (window['chartjs-plugin-annotation']) {
       plugins.annotation = { annotations: ann };
     }
@@ -6375,6 +6949,11 @@
           .then(doCompareCharts)
           .catch(function (eH) {
             console.warn('ensureHistoryStressRendered:', eH);
+            try {
+              if (!historyCache || !matricesHistoryLabelList().length) {
+                historyCache = __fflBuiltinHistorySeries();
+              }
+            } catch (eFix) {}
             doCompareCharts();
           });
       }
@@ -6386,6 +6965,16 @@
       }
       if (appPage === 'settings') {
         __fflRefreshSettingsPage();
+      }
+      if (appPage === 'scenarios') {
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            refreshScenariosLivePanel();
+            try {
+              __fflIconsRefresh();
+            } catch (eSc) {}
+          });
+        });
       }
       try {
         localStorage.setItem('ffl_page', appPage);
@@ -6623,7 +7212,7 @@
       .toLowerCase();
     list.querySelectorAll('.matrices-nav-item').forEach(function (btn) {
       var t = (btn.textContent || '').toLowerCase();
-      btn.style.display = !needle || t.indexOf(needle) !== -1 ? 'block' : 'none';
+      btn.style.display = !needle || t.indexOf(needle) !== -1 ? '' : 'none';
     });
   };
 
@@ -6675,7 +7264,11 @@
   }
 
   function setSliderVisual(val) {
-    document.getElementById('price-slider').style.setProperty('--pct', sliderPct(val) + '%');
+    const pct = sliderPct(val) + '%';
+    const el = document.getElementById('price-slider');
+    if (el) el.style.setProperty('--pct', pct);
+    const wrap = document.getElementById('single-price-ui');
+    if (wrap) wrap.style.setProperty('--pct', pct);
   }
 
   function setSliderVisualA(val) {
@@ -7182,6 +7775,148 @@
   function inEnergyPoverty(d) {
     return povertyPct(d) > povertyThresholdPct - 1e-9;
   }
+
+  /** Client-side fuel % of income at an arbitrary €/L (matches tier-stress proxy). */
+  function povertyPctAtPriceLive(d, priceEuro) {
+    const p = num(priceEuro);
+    if (!Number.isFinite(p) || p <= 0 || !d) return NaN;
+    const inc = num(d.estimated_annual_income);
+    if (!Number.isFinite(inc) || inc <= 0) return NaN;
+    let litres = num(d.model_litres_proxy_pa);
+    if (!Number.isFinite(litres) || litres <= 0) {
+      const dep = num(d.fuel_dependency_score);
+      litres = LITRES_PER_HH_PA * (0.5 + (Number.isFinite(dep) ? dep / 100 : 0));
+    }
+    return (litres * p) / inc * 100;
+  }
+
+  function refreshScenariosLivePanel() {
+    var root = document.getElementById('scenarios-live-strip');
+    if (!root) return;
+    var thSpan = document.getElementById('sc-live-th-label');
+    if (thSpan) thSpan.textContent = String(povertyThresholdPct);
+    var pl = document.getElementById('sc-live-price');
+    var ph = document.getElementById('sc-live-price-label');
+    var mh = document.getElementById('sc-live-mode-hint');
+    var ov = document.getElementById('sc-live-over');
+    var ovh = document.getElementById('sc-live-over-hint');
+    var mn = document.getElementById('sc-live-mean');
+    var mnl = document.getElementById('sc-live-mean-label');
+    var mnh = document.getElementById('sc-live-mean-hint');
+    var vu = document.getElementById('sc-live-vuln');
+    var vul = document.getElementById('sc-live-vuln-label');
+    var vuh = document.getElementById('sc-live-vuln-hint');
+    var thr = povertyThresholdPct;
+
+    if (compareMode && scenarioCompared && scenarioByCounty) {
+      if (ph) ph.textContent = 'Scenario prices';
+      if (pl) pl.textContent = '€' + priceA.toFixed(2) + ' · €' + priceB.toFixed(2);
+      if (mh) mh.textContent = 'Comparison loaded';
+      var oa = 0;
+      var ob = 0;
+      var sumA = 0;
+      var sumB = 0;
+      var na = 0;
+      var nb = 0;
+      var newly = 0;
+      for (var i = 0; i < COUNTIES.length; i++) {
+        var cn = COUNTIES[i];
+        var s = scenarioByCounty[cn];
+        if (!s) continue;
+        if (s.in_poverty_a) oa++;
+        if (s.in_poverty_b) ob++;
+        if (s.newly_at_risk) newly++;
+        var pa = num(s.poverty_pct_a);
+        var pb = num(s.poverty_pct_b);
+        if (Number.isFinite(pa)) {
+          sumA += pa;
+          na++;
+        }
+        if (Number.isFinite(pb)) {
+          sumB += pb;
+          nb++;
+        }
+      }
+      if (ov) ov.textContent = 'A ' + oa + ' · B ' + ob;
+      if (ovh) ovh.textContent = 'counties over ' + thr + '% line';
+      if (mnl) mnl.textContent = 'Mean proxy % (A / B)';
+      if (mn)
+        mn.textContent =
+          (na ? (sumA / na).toFixed(1) : '—') + ' / ' + (nb ? (sumB / nb).toFixed(1) : '—') + '%';
+      if (mnh) mnh.textContent = 'from comparison results';
+      if (vul) vul.textContent = 'Newly past line (A→B)';
+      if (vu) vu.textContent = String(newly);
+      if (vuh) vuh.textContent = 'counties newly over at B';
+      try {
+        __fflIconsRefresh();
+      } catch (eIc) {}
+      return;
+    }
+
+    var price = compareMode ? priceA : currentPrice;
+    if (ph) ph.textContent = compareMode ? 'Scenario A (preview)' : 'Scenario price';
+    if (pl) pl.textContent = '€' + price.toFixed(2);
+    if (mh)
+      mh.textContent = compareMode ? 'Move B, then run comparison' : 'Single price · slider preview';
+    if (mnl) mnl.textContent = 'Mean fuel share';
+    if (mnh) mnh.textContent = compareMode ? 'at €/L for A (instant estimate)' : 'all counties at slider (instant estimate)';
+    if (ovh) ovh.textContent = 'counties over ' + thr + '% line (instant estimate)';
+    if (vul) vul.textContent = 'Est. vulnerable HH';
+    if (vuh) vuh.textContent = 'in those counties (model field)';
+
+    var over = 0;
+    var sumP = 0;
+    var n = 0;
+    var vuln = 0;
+    for (var j = 0; j < COUNTIES.length; j++) {
+      var c = COUNTIES[j];
+      var d = countyData[c];
+      if (!d) continue;
+      var pct = povertyPctAtPriceLive(d, price);
+      if (!Number.isFinite(pct)) continue;
+      n++;
+      sumP += pct;
+      if (pct > thr - 1e-9) {
+        over++;
+        vuln += Number(d.est_vulnerable_households) || 0;
+      }
+    }
+    if (ov) ov.textContent = COUNTIES.length ? String(over) : '—';
+    if (mn) mn.textContent = n ? (sumP / n).toFixed(1) + '%' : '—';
+    if (vu) vu.textContent = COUNTIES.length ? vuln.toLocaleString() : '—';
+    try {
+      __fflIconsRefresh();
+    } catch (eI2) {}
+  }
+
+  window.__fflScenarioPreset = function (which, valStr) {
+    var v = parseFloat(valStr);
+    if (!Number.isFinite(v)) return;
+    v = Math.max(1.5, Math.min(4.0, v));
+    var dec = v.toFixed(2);
+    if (!compareMode) {
+      var el = document.getElementById('price-slider');
+      if (!el) return;
+      el.value = dec;
+      window.onSliderInput(dec);
+      refreshScenariosLivePanel();
+      return;
+    }
+    if (which === 'b') {
+      var sb = document.getElementById('price-slider-b');
+      if (sb) {
+        sb.value = dec;
+        window.__fflOnCompareB(dec);
+      }
+    } else {
+      var sa = document.getElementById('price-slider-a');
+      if (sa) {
+        sa.value = dec;
+        window.__fflOnCompareA(dec);
+      }
+    }
+    refreshScenariosLivePanel();
+  };
 
   function updateThresholdLabels() {
     const th = povertyThresholdPct;
@@ -8184,6 +8919,7 @@
     } else if (alert) {
       alert.classList.remove('show');
     }
+    refreshScenariosLivePanel();
   }
 
   function renderGrid() {
@@ -8602,7 +9338,8 @@
             refreshMatricesIfCompare();
           })
           .catch(function () {
-            /* history optional */
+            /* history optional — still try Compare in case builtin series populated cache */
+            refreshMatricesIfCompare();
           });
       }
       if (selectedCounty && countyData[selectedCounty]) {
@@ -8651,6 +9388,8 @@
     if (bcm) bcm.classList.toggle('active', compareMode);
     if (spu) spu.classList.toggle('hidden', compareMode);
     if (cpu) cpu.classList.toggle('show', compareMode);
+    var pSc = document.getElementById('page-scenarios');
+    if (pSc) pSc.classList.toggle('scenarios-compare-on', compareMode);
 
     if (compareMode) {
       var sa = document.getElementById('price-slider-a');
@@ -8667,6 +9406,7 @@
     }
     updateCompareHeads();
     renderGrid();
+    refreshScenariosLivePanel();
     runLoad(false);
   };
 
@@ -8687,6 +9427,7 @@
     }
     updateCompareHeads();
     renderGrid();
+    refreshScenariosLivePanel();
     clearTimeout(sliderDebounce);
     sliderDebounce = setTimeout(function () {
       runLoad(false);
@@ -8709,6 +9450,7 @@
     }
     updateCompareHeads();
     renderGrid();
+    refreshScenariosLivePanel();
   };
 
   window.__fflRunScenarioCompare = async function () {
@@ -8744,6 +9486,7 @@
     updateScenarioSummary(priceA, priceB, by);
     updateCompareHeads();
     renderGrid();
+    refreshScenariosLivePanel();
   };
 
   window.__fflOpenCountyDrawer = function () {
@@ -9056,6 +9799,7 @@
     if (st) st.textContent = '€' + currentPrice.toFixed(2);
 
     clearTimeout(sliderDebounce);
+    refreshScenariosLivePanel();
     sliderDebounce = setTimeout(function () {
       runLoad(false);
     }, 400);
@@ -9105,7 +9849,7 @@
   initMatricesNav();
   try {
     var savedPage = (localStorage.getItem('ffl_page') || '').trim();
-    if (savedPage === 'method' || savedPage === 'submit') {
+    if (savedPage === 'method' || savedPage === 'submit' || savedPage === 'hackathon') {
       savedPage = 'dashboard';
       try {
         localStorage.setItem('ffl_page', 'dashboard');
