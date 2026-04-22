@@ -1,46 +1,70 @@
 # Fuel Fault Lines
 
-**Irish county energy vulnerability — one liquid-fuel scenario at a time.** A judge-ready **dashboard + OpenAPI hub** that turns public energy and deprivation signals into an explorable, exportable model. Built for **[ZerveHack](https://zervehack.devpost.com/)** — *Stop thinking about it. Build it.* — the Zerve AI hackathon with **$10,000 in prizes** (deadline **Apr 29, 2026 @ 2:00pm EDT** per [Devpost](https://zervehack.devpost.com/)).
+**Irish county energy stress, made explorable.** Fuel Fault Lines is a decision-support surface for **liquid-fuel vulnerability** across **twenty-six counties**: one transparent model, many **€/L price scenarios**, and outputs you can **inspect, compare, and export**—without treating policy trade-offs as a single headline number.
 
 ---
 
-## Hackathon submission at a glance
+## What this project is
 
-| Devpost requirement | Where it lives in this repo |
-|---------------------|-----------------------------|
-| **Public Zerve project** | Deploy `api/` as **FastAPI** on Zerve; notebook block names align with optional `zerve.variable(...)` injection (see [Zerve deployment](#zerve-notebook--fastapi-how-the-hub-connects)). |
-| **Project summary (≤300 words)** | Use **`GET /insights/submission-pack`** — the **Demo & submit** page loads a draft summary, shot list, social copy, and rubric hooks. |
-| **Demo video (≤3 min)** | Walk through: Dashboard → Scenarios (€/L) → Counties deep-dive → Method & lab (`/meta`, validation) → Demo & submit pack → optional **AI · Gemini** copilot grounded in live API data. |
-| **Share (LinkedIn / X)** | Tag **@Zerve AI** / **@Zerve_AI** per hackathon rules; link your deployed `*.hub.zerve.cloud` + this repo. |
-| **Bonus: deployed API** | Primary story: **Zerve-hosted FastAPI** + **zero-build** static UI (`index.html`). |
+Fuel Fault Lines combines:
 
-**Deployed demo hub (default for local UI proxy):** `https://26db1629-947d4286.hub.zerve.cloud`  
-**Zerve FastAPI guide:** [Notebook → FastAPI on Zerve](https://docs.zerve.ai/guide/notebook-view/deployment/fast-api)
+- **Public-style signals** — SEAI-oriented energy profiles, CSO deprivation structure, and a retail **diesel / heating-oil** price lever (€ per litre), merged into a **single in-memory cohort** (no database).
+- **A vulnerability index and tiering** — So you can see *who sits where* in the distribution, not only national averages.
+- **Scenario behaviour** — Move the price (or compare **A vs B**), watch **counties over a modelled fuel-share-of-income line**, **scenario curves**, and **national snapshots** update together.
+- **An OpenAPI hub** — The same numbers power the **browser app** and any **script, notebook, or integration** that speaks HTTP.
+
+The frontend is a **single static file** (`index.html`): charts, multi-page navigation, county register, optional **Gemini** copilot (your key, in the browser only). The backend is **FastAPI** (`api/`): one canonical **pandas** `DataFrame` drives every route, rebuilt or injected at startup depending on how you deploy.
 
 ---
 
-## One-liner pitch (video cold open)
+## Why it exists
 
-> **Fuel Fault Lines** maps **26 Irish counties** through a **retail diesel / heating-oil proxy (€/L)** and a transparent **vulnerability index** — with **charts**, **A/B scenarios**, **markdown exports**, a **submission-pack** endpoint for Devpost copy, and an optional **Gemini** copilot that **reads live hub data** before answering — all backed by a **Zerve-deployable FastAPI** service and **no database** (in-memory model).
+Ireland still has a **meaningful liquid-fuel heated stock** and a geography of **income and building condition** that does not line up evenly. Policy and advocacy conversations often jump between **retail price shocks**, ** retrofit costs**, and **social protection**—without a **shared, repeatable object** that lets people ask: *at this €/L, where does the modelled burden cross a line we can defend, and which counties move first?*
 
----
+Fuel Fault Lines was built to:
 
-## Why ZerveHack judges should care
+1. **Make assumptions visible** — Thresholds, proxies, and data lineage are surfaced in **`/meta`**, exports, and the app’s connection to the live model—not buried in a one-off spreadsheet.
+2. **Support “what if” without hero charts** — **Scenarios** and **Compare** are first-class: the point is to stress-test a *story* (“€2.14 vs €2.60”) rather than decorate a single forecast.
+3. **Bridge analysts and communicators** — **Markdown exports** (`/export/briefing`, `/export/county/...`) and narrative endpoints (`/insights/*`) turn the same core table into **briefing fragments** a human can edit—useful for internal notes, TD letters, or team alignment (always subject to the documented limitations below).
 
-The [ZerveHack judging criteria](https://zervehack.devpost.com/) emphasize depth, end-to-end workflow, clarity, and ambition. This project maps to them deliberately:
-
-| Criterion | Weight | How Fuel Fault Lines responds |
-|-----------|--------|-------------------------------|
-| **Analytical depth** | 35% | County-level **fuel share of income** proxy, **tiering**, **national snapshot**, **scenario curves**, **breach prices**, **ranking stability**, **sensitivity** — not a single chart and done. See **Method & lab** in the UI and **`/model/*`** routes. |
-| **End-to-end workflow** | 30% | **Notebook-shaped logic** in `api/pipeline.py` → **production FastAPI** in `api/main.py` → **real browser product** in `index.html`. Optional **`USE_ZERVE_VARIABLE`** wires the **live Zerve notebook DataFrame** into the same API. |
-| **Storytelling & clarity** | 20% | Multi-page UI, **exports** (`/export/briefing`, `/export/county/...`), **submission-pack** for hackathon narrative, **meta/lineage** for trust. |
-| **Creativity & ambition** | 15% | **Climate & energy** relevance (Ireland, liquid fuels, vulnerability), **policy hooks** (TD templates where data allows), **Gemini copilot** with **per-message refresh** of snapshot + headline + county digest. |
+It is **not** a replacement for official fuel-poverty statistics. It is a **structured sandbox** for **exploration and alignment** when liquid-fuel prices move and counties do not react the same way.
 
 ---
 
-## Architecture (system overview)
+## How people use it day to day
 
-At runtime there are **three cooperating layers**: the **browser UI**, the **model API** (local or Zerve), and **Google Gemini** (optional, browser-only — keys never hit our FastAPI).
+These are the workflows the UI and API are shaped around—whether you open the app once a week or wire the hub into your own tooling.
+
+### Morning or “price moved” check
+
+1. Open **Dashboard** — National chips, **scenario curve**, and **key finding** text reflect the **active €/L** (driven from **Scenarios**).
+2. Nudge the **Scenarios** slider after a wholesale or forecourt move — The app refetches county rows for that price so **tiers**, **register stress colours**, and **charts** stay coherent with the same definition of “fuel share of income” everywhere.
+
+### Comparing two futures (A vs B)
+
+On **Scenarios**, switch to **compare mode**, set **A** and **B**, run the comparison — The **Counties** register and compare views highlight **who crosses the line** between the two prices. That is the everyday question: *not only “how bad is it now?” but “how many places tip if we add €0.20?”*
+
+### Drilling into one county
+
+From **Counties**, open a county — **Deep metrics**, modal detail, and (when the hub supports them) **export** links give you a **portable slice** for a constituency or supplier discussion without re-implementing the pipeline.
+
+### Earning trust before you cite numbers
+
+Use **Compare** for **matrix-style views** (charts + table) over **model diagnostics** where exposed—validation, sensitivity, ranking stability—so “impressive headline” does not outrun **internal consistency**. When something fails (502, partial load), the **connection pill** and notices tell you whether you are looking at **live hub data** or **Settings → demo mode** sample data.
+
+### Optional analyst chat (**AI · Gemini**)
+
+If you add a key from [Google AI Studio](https://aistudio.google.com/apikey), each message is sent with a **fresh bundle of live context** (national snapshot, headline, meta, county digest from what the UI already loaded). The model is instructed **not to invent** county statistics when the hub is down—so the chat stays **subordinate to the API**, not the other way around.
+
+### Integrators and report writers
+
+Anything the UI does, you can call from **curl**, **Python**, or a **notebook**: **`GET /docs`** on your running hub lists routes. **`GET /insights/submission-pack`** returns a **structured JSON scaffold** (summary draft, checklists, social-length copy, rubric-style bullets)—handy as **raw material** for comms or documentation, not as an authoritative statistic.
+
+---
+
+## Architecture
+
+At runtime there are **three cooperating layers**: the **browser UI**, the **model API** (local or hosted), and **Google Gemini** (optional, browser-only—keys never hit FastAPI).
 
 ```mermaid
 flowchart TB
@@ -51,7 +75,7 @@ flowchart TB
   subgraph local [Local dev optional]
     PROXY[dev-server.mjs :5500]
   end
-  subgraph zerve [Zerve cloud or localhost]
+  subgraph cloud [Hosted or localhost]
     API[FastAPI hub]
     MEM[(In-memory DataFrame)]
   end
@@ -62,14 +86,16 @@ flowchart TB
   UI -->|user Gemini key| GEM
 ```
 
-- **Normal local demo:** `node dev-server.mjs` → UI at `http://127.0.0.1:5500`, API calls go to **`/api`** → proxied to **`https://26db1629-947d4286.hub.zerve.cloud`** (override with env `UPSTREAM_HOST`).
-- **Full stack local:** run `uvicorn` on port 8000, then either open **`http://127.0.0.1:5500/?api=http://127.0.0.1:8000`**, or run `localStorage.setItem('ffl_api_base','http://127.0.0.1:8000')` and reload, or set `window.__FFL_API_BASE__` before the app script (see [Quick start](#quick-start-judges--teammates)).
+- **Typical local use:** `node dev-server.mjs` → UI at **http://127.0.0.1:5500**, `fetch` hits **`/api/*`**, which the dev server **proxies over HTTPS** to your configured upstream hub (see `UPSTREAM_HOST` in `dev-server.mjs` and defaults in `index.html`).
+- **Full stack on your laptop:** run **uvicorn** on port **8000**, then point the UI with **`?api=http://127.0.0.1:8000`**, **`localStorage` `ffl_api_base`**, or `window.__FFL_API_BASE__` before loads (see Quick start).
+
+**Do not open `index.html` via `file://`** — the app expects a real origin for `fetch`, CORS, and optional proxy behaviour.
 
 ---
 
-## Zerve notebook → FastAPI (how the hub connects)
+## Notebook-shaped core → FastAPI hub
 
-The FastAPI app is designed for Zerve’s **notebook → deploy** story. Core idea: **one canonical DataFrame** (`warmer_homes_df` shape) powers every route.
+The service is structured so **one canonical DataFrame** (internally the `warmer_homes_df` shape) powers **every** JSON and markdown response. That keeps **dashboard**, **exports**, and **validation** aligned.
 
 ```mermaid
 flowchart LR
@@ -89,27 +115,25 @@ flowchart LR
     PL --> STATE
   end
   subgraph routes [HTTP routes]
-    R1[/county /national /insights ...]
+    R1["REST: /county, /national, /insights, …"]
     STATE --> R1
   end
   DF -.->|same names via env| ZV
 ```
 
-**Environment variables** (on the Zerve deployment):
-
 | Variable | Purpose |
 |----------|---------|
-| `USE_ZERVE_VARIABLE=1` | Load the model DataFrame via **`zerve.variable(...)`** instead of rebuilding only from `pipeline.py`. |
+| `USE_ZERVE_VARIABLE=1` | Load the model DataFrame via **`zerve.variable(...)`** from a deployed Zerve notebook instead of rebuilding only from `pipeline.py`. |
 | `ZERVE_DATA_BLOCK` | Notebook block title (default `warmer_homes_roi`). |
 | `ZERVE_DATA_VAR` | Variable name (default `warmer_homes_df`). |
 
-**Code anchors:** `api/main.py` (`_load_warmer_homes_df`, `lifespan`) and `api/pipeline.py` (ingest, scores, insights, exports).
+**Code anchors:** `api/main.py` (`lifespan`, `_load_warmer_homes_df`) and `api/pipeline.py` (ingest, scores, insights, exports). For Zerve’s **notebook → FastAPI** deployment story, see the [Zerve FastAPI guide](https://docs.zerve.ai/guide/notebook-view/deployment/fast-api).
 
 ---
 
-## Request flow (example: dashboard load)
+## Request flow (example: loading counties)
 
-What happens when a judge opens the app and the UI fetches counties for the current €/L scenario:
+What happens when the UI loads **all counties** for a given **€/L** (e.g. dashboard after a slider change):
 
 ```mermaid
 sequenceDiagram
@@ -123,10 +147,10 @@ sequenceDiagram
   M-->>H: JSON counties + aggregates
   H-->>P: 200 application/json
   P-->>U: 200 JSON
-  Note over U: Charts + register hydrate
+  Note over U: Charts and county register hydrate
 ```
 
-The **AI · Gemini** page adds a parallel path: before each reply, the UI **GETs** `/national/snapshot`, `/insights/headline`, `/meta`, and merges an in-memory **county digest** into the **Gemini system instruction** — so the **knowledge layer** stays tied to the **data layer**.
+The **AI · Gemini** path is separate: before each reply, the UI **GETs** snapshot/headline/meta (as available) and attaches a **county digest** from data already in memory—so answers stay **grounded in the same model state** you are looking at.
 
 ---
 
@@ -134,45 +158,44 @@ The **AI · Gemini** page adds a parallel path: before each reply, the UI **GETs
 
 ```text
 Fuel-Fault/
-├── README.md              # This file — submission narrative + architecture
-├── AGENTS.md              # Notes for AI coding agents (ports, proxy, endpoints)
-├── index.html             # Full frontend: UI, charts, routing, Lucide icons, AI copilot
-├── assets/                # Generated brand mark (PNG) + favicon-32.png
-├── dev-server.mjs         # Static host + /api HTTPS proxy (optional 502 retry)
+├── README.md              # Project overview (this file)
+├── AGENTS.md              # Concise notes for tooling / AI agents (ports, proxy)
+├── index.html             # Full frontend: UI, charts, routing, optional Gemini
+├── assets/                # Brand mark + favicon
+├── dev-server.mjs         # Static host + /api HTTPS proxy (Node built-ins only)
 └── api/
     ├── main.py            # FastAPI: routes, CORS, lifespan, optional Zerve variable
-    ├── pipeline.py        # Data ingest, model, insights, exports (“notebook brain”)
+    ├── pipeline.py        # Data ingest, model, insights, exports
     ├── requirements.txt
     └── .gitignore
 ```
 
-**Mental model:** `pipeline.py` = *what we compute* · `main.py` = *how the world calls it* · `index.html` = *how humans explore it* · `dev-server.mjs` = *how you demo without CORS pain*.
+**Mental model:** `pipeline.py` = *what we compute* · `main.py` = *how the world calls it* · `index.html` = *how humans explore it* · `dev-server.mjs` = *local demo without CORS friction*.
 
 ---
 
-## Features (demo script checklist)
+## Product surface (what ships in the UI)
 
-- **Dashboard** — At-a-glance stats, scenario curve, tier bars, stress over time, bubble + donut views; updates with fuel price.
-- **Scenarios** — Single **€/L** slider or **compare A vs B**; batch `/counties?fuel_price=…` where the hub supports it.
-- **Compare** — Matrix-style charts + table.
-- **Counties** — Full register, modal **deep-dive**, exports when available.
-- **Method & lab** — Lineage, validation, sensitivity, claims, curves — **trust layer** for judges.
-- **Demo & submit** — **`GET /insights/submission-pack`** (Devpost draft, shot list, social, rubric hooks).
-- **AI · Gemini** — Browser-side [Google AI Studio](https://aistudio.google.com/apikey) key; **live hub context** injected each message (snapshot, headline, meta, county digest). Key is **not** sent to FastAPI.
+| Area | Role in everyday use |
+|------|----------------------|
+| **Dashboard** | National at-a-glance, **scenario curve**, tier and stress visuals; updates with the active price. |
+| **Scenarios** | Single **€/L** slider or **compare A vs B**; drives refetch and live strip numbers. |
+| **Compare** | Matrix-style charts + table for **multi-metric** comparison. |
+| **Counties** | Sortable register, **modal deep-dive**, export entry points when the hub exposes them. |
+| **Settings** | **Demo mode** vs live API base; reload to apply. |
+| **AI · Gemini** | Optional Q&A with **live hub context** per message; key stays in the browser. |
 
 ---
 
-## Quick start (judges & teammates)
+## Quick start
 
-### 1) Frontend + cloud hub (fastest path)
+### Frontend + remote hub
 
 ```bash
 node dev-server.mjs
 ```
 
-Open **http://127.0.0.1:5500/** — by default **`/api/*`** proxies to **`https://26db1629-947d4286.hub.zerve.cloud`** (same default as `API_PUBLIC` in `index.html`).
-
-Point at **your** hub:
+Open **http://127.0.0.1:5500/**. Override upstream:
 
 ```bash
 UPSTREAM_HOST=your-project.hub.zerve.cloud node dev-server.mjs
@@ -180,9 +203,7 @@ UPSTREAM_HOST=your-project.hub.zerve.cloud node dev-server.mjs
 
 Optional: **`PORT`**, **`HOST`** (see `dev-server.mjs`).
 
-**Do not open `index.html` via `file://`** — the UI expects a real origin for `fetch` and proxy behaviour.
-
-### 2) Local FastAPI (full stack)
+### Local FastAPI
 
 ```bash
 cd api
@@ -194,44 +215,34 @@ First boot may **fetch external datasets**; failures fall back to **bundled data
 
 **Point the UI at local API** (pick one):
 
-- **URL (one-shot):** open `http://127.0.0.1:5500/?api=http://127.0.0.1:8000` (the `<head>` bootstrap sets `window.__FFL_API_BASE__` before the app runs).
-- **Persist:** in the console run `localStorage.setItem('ffl_api_base', 'http://127.0.0.1:8000')` then reload.
-- **Manual:** set `window.__FFL_API_BASE__ = 'http://127.0.0.1:8000'` in the console and reload (must run before fetches; prefer the options above).
+- **URL:** `http://127.0.0.1:5500/?api=http://127.0.0.1:8000`
+- **Persist:** `localStorage.setItem('ffl_api_base', 'http://127.0.0.1:8000')` then reload.
 
 ---
 
 ## API surface (summary)
 
-Interactive docs: **`GET /docs`** on your hub host.
+Interactive contracts: **`GET /docs`** on the running hub.
 
-| Area | Example routes |
-|------|----------------|
+| Area | Examples |
+|------|----------|
 | **Health & meta** | `/health`, `/meta` |
 | **County data** | `/counties`, `/county/{county}`, `/deep-dive/{county}`, `/compare/counties` |
 | **Scenarios** | `/scenario`, `/history`, `/model/scenario-curve` |
 | **Model rigour** | `/model/validation`, `/model/claims`, `/model/sensitivity`, `/model/ranking-stability`, `/model/distribution`, `/model/breach-prices`, `/model/policy` |
-| **Insights** | `/national/snapshot`, `/insights/narrative`, `/insights/headline`, `/insights/regional`, **`/insights/submission-pack`** |
+| **Insights** | `/national/snapshot`, `/insights/narrative`, `/insights/headline`, `/insights/regional`, `/insights/submission-pack` |
 | **Exports** | `/export/county/{county}`, `/export/briefing` |
-| **Tuning** | `POST /model/params` (see OpenAPI; behaviour interacts with Zerve variable mode) |
+| **Tuning** | `POST /model/params` (see OpenAPI; interacts with Zerve variable mode when enabled) |
 
-Exact payloads: **`/docs`** on the running hub.
-
-**Batch load note:** the UI’s primary path expects **`GET /counties?fuel_price=…`** with a **batch payload** (`counties[]` + aggregates). The in-repo `api/main.py` may expose a **name-list** `GET /counties` for bootstrapping — for full dashboard parity with a cloud hub, deploy the **batch-capable** hub you intend to demo.
+**Batch note:** the dashboard’s happy path expects a **batch-style** `GET /counties?fuel_price=…` response (county rows plus aggregates). If you run a minimal fork, confirm parity with **`/docs`** on your deployment.
 
 ---
 
-## AI copilot (Gemini + live data)
+## Data & limitations (read before citing)
 
-- **Data (Zerve / FastAPI):** Each send refreshes **national snapshot**, **headline insight**, **meta** (or cache), and a **county digest** from data already loaded in the UI.
-- **Knowledge (Gemini):** [Generative Language API](https://ai.google.dev/) from the **browser** only; key stored in **`localStorage`** (`ffl_gemini_key`). Default model id in `index.html`: **`gemini-2.5-flash`** (change if your key requires another model).
-
----
-
-## Data & limitations (read before citing numbers)
-
-- **Sources:** SEAI-style profiles (with gov.ie / ArcGIS fallbacks), **CSO** deprivation cube, **AA Ireland**-style liquid fuel snapshot — surfaced in-app and in **`/meta`**.
-- **No database** — **in-memory** per process.
-- **Synthetic income bands** and **proxies** stand in where survey microdata is not wired. Outputs are **scenario illustrations** for policy exploration, **not** official fuel-poverty statistics. **`/meta`**, exports, and the Method page document lineage and caveats.
+- **Sources:** SEAI-style profiles (with gov.ie / ArcGIS fallbacks), **CSO** deprivation inputs, **AA Ireland**-style liquid-fuel reference — surfaced in **`/meta`** and in-app copy where available.
+- **No database** — **in-memory** per process; restart clears state except what you persist externally.
+- **Proxies and synthetic bands** stand in where full survey microdata is not wired. Treat outputs as **scenario illustrations for policy exploration**, not official fuel-poverty statistics. **`/meta`**, exports, and in-app notices document lineage and caveats.
 
 ---
 
@@ -240,10 +251,10 @@ Exact payloads: **`/docs`** on the running hub.
 | Fact | Detail |
 |------|--------|
 | **No `package.json`** | `dev-server.mjs` uses **Node built-ins only**. |
-| **No frontend build** | Ship **`index.html`** as-is on any static host. |
-| **Icons** | [Lucide](https://lucide.dev) via pinned CDN in `index.html`. |
-| **Tests** | Manual + `/docs` + live UI. |
-| **Agent hints** | **`AGENTS.md`** |
+| **No frontend build** | Ship **`index.html`** on any static host. |
+| **Icons** | [Lucide](https://lucide.dev) via CDN reference in `index.html`. |
+| **Automated tests** | Not configured; validate via **`/docs`** and manual UI passes. |
+| **Agent-oriented notes** | **`AGENTS.md`** |
 
 ---
 
@@ -251,10 +262,9 @@ Exact payloads: **`/docs`** on the running hub.
 
 | Resource | URL |
 |----------|-----|
-| **ZerveHack (Devpost)** | https://zervehack.devpost.com/ |
 | **Zerve — FastAPI deployment** | https://docs.zerve.ai/guide/notebook-view/deployment/fast-api |
-| **Google AI Studio (Gemini)** | https://aistudio.google.com/apikey |
+| **Google AI Studio (Gemini keys)** | https://aistudio.google.com/apikey |
 
 ---
 
-**Fuel Fault Lines** — *fault lines aren’t only geology; they’re who gets cold when the price moves.*
+**Fuel Fault Lines** — *fault lines are not only geological; they are who gets squeezed when the price moves.*
