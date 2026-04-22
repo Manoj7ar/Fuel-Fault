@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fuel Fault Lines — Ireland</title>
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/brand-mark.png" sizes="192x192">
   <script>
     (function () {
       /* ?api= / ?api_base= always wins over demo bundle and localStorage ffl_api_base. */
@@ -379,11 +380,12 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
     }
-    .sidebar-logo__mark {
-      width: 26px;
-      height: 26px;
+    .sidebar-logo__img {
+      width: 28px;
+      height: 28px;
       display: block;
-      color: #f1f5f9;
+      object-fit: cover;
+      border-radius: 10px;
       flex-shrink: 0;
     }
     .sidebar-toggle .lucide {
@@ -4157,15 +4159,14 @@
     <div class="sidebar-brand">
       <div class="sidebar-brand-main">
         <div class="sidebar-logo" aria-hidden="true">
-          <svg class="sidebar-logo__mark" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-            <!-- Strata / baseline layers -->
-            <path d="M6 13h12M6 20h17M6 27h11" stroke="currentColor" stroke-opacity="0.28" stroke-width="2" stroke-linecap="round"/>
-            <!-- Fault trace -->
-            <path d="M26 7l-6 12 8 6-9 12" stroke="currentColor" stroke-width="2.35" stroke-linecap="round" stroke-linejoin="round"/>
-            <!-- Stress locus -->
-            <circle cx="24.5" cy="19" r="2.75" fill="currentColor" fill-opacity="0.88"/>
-            <circle cx="24.5" cy="19" r="5" stroke="currentColor" stroke-opacity="0.2" stroke-width="1.25" fill="none"/>
-          </svg>
+          <img
+            class="sidebar-logo__img"
+            src="/assets/brand-mark.png"
+            width="28"
+            height="28"
+            alt=""
+            decoding="async"
+          />
         </div>
         <div class="sidebar-headlines">
           <span class="sidebar-title-text">Fuel fault lines<small>Energy vulnerability</small></span>

@@ -137,7 +137,7 @@ Fuel-Fault/
 ├── README.md              # This file — submission narrative + architecture
 ├── AGENTS.md              # Notes for AI coding agents (ports, proxy, endpoints)
 ├── index.html             # Full frontend: UI, charts, routing, Lucide icons, AI copilot
-├── favicon.svg            # Brand mark (zap / energy)
+├── assets/                # Generated brand mark (PNG) + favicon-32.png
 ├── dev-server.mjs         # Static host + /api HTTPS proxy (optional 502 retry)
 └── api/
     ├── main.py            # FastAPI: routes, CORS, lifespan, optional Zerve variable
