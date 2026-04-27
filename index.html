@@ -4647,6 +4647,33 @@
       --glass-shadow: 0 1px 0 rgba(255, 255, 255, 0.72) inset, 0 18px 48px rgba(15, 23, 42, 0.08);
       --control-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 8px 22px rgba(15, 23, 42, 0.08);
     }
+    :root[data-theme="midnight"] {
+      --paper: #0b1220;
+      --paper2: #0f1a2e;
+      --surface: rgba(11, 18, 32, 0.9);
+      --surface-muted: #111b31;
+      --ink: #e5edf8;
+      --ink2: #c2d0e3;
+      --ink3: #8fa0b8;
+      --glass-bg: rgba(15, 23, 42, 0.78);
+      --glass-bg-strong: rgba(15, 23, 42, 0.9);
+      --glass-border: rgba(71, 85, 105, 0.72);
+      --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.08) inset, 0 20px 46px rgba(2, 6, 23, 0.45);
+    }
+    :root[data-theme="contrast"] {
+      --paper: #f8fafc;
+      --paper2: #e2e8f0;
+      --surface: #ffffff;
+      --surface-muted: #f1f5f9;
+      --ink: #020617;
+      --ink2: #0f172a;
+      --ink3: #334155;
+      --accent: #0b766e;
+      --accent-deep: #115e59;
+      --glass-bg: rgba(255, 255, 255, 0.96);
+      --glass-bg-strong: rgba(255, 255, 255, 0.99);
+      --glass-border: rgba(148, 163, 184, 0.68);
+    }
 
     body {
       background-color: var(--paper);
@@ -4756,6 +4783,13 @@
       height: 5px;
       background: var(--accent);
       box-shadow: 0 0 12px rgba(20, 184, 166, 0.55);
+    }
+    .sidebar-nav-section .lucide {
+      width: 0.78rem;
+      height: 0.78rem;
+      margin-right: 0.34rem;
+      vertical-align: -0.11rem;
+      opacity: 0.9;
     }
     .nav-item {
       position: relative;
@@ -4961,6 +4995,13 @@
       border-color: rgba(15, 159, 146, 0.24);
       box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
     }
+    .stat-chip-label .lucide {
+      width: 0.82rem;
+      height: 0.82rem;
+      margin-right: 0.24rem;
+      vertical-align: -0.1rem;
+      opacity: 0.82;
+    }
     .thesis-banner {
       background: linear-gradient(118deg, rgba(15, 159, 146, 0.14) 0%, rgba(255, 255, 255, 0.86) 50%, rgba(245, 158, 11, 0.09) 100%);
     }
@@ -5055,6 +5096,48 @@
     .sidebar-foot strong {
       color: #f8fafc;
       font-size: 0.68rem;
+    }
+    .settings-theme-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.62rem;
+      margin-top: 0.85rem;
+    }
+    .settings-theme-btn {
+      text-align: left;
+      border: 1px solid rgba(214, 224, 234, 0.95);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.56));
+      color: var(--ink);
+      padding: 0.65rem 0.7rem;
+      cursor: pointer;
+      transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.18s ease;
+    }
+    .settings-theme-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(15, 159, 146, 0.34);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.09);
+    }
+    .settings-theme-btn.active {
+      border-color: rgba(15, 159, 146, 0.5);
+      box-shadow: 0 0 0 3px rgba(15, 159, 146, 0.12);
+    }
+    .settings-theme-btn strong {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+    }
+    .settings-theme-btn .lucide {
+      width: 0.9rem;
+      height: 0.9rem;
+    }
+    .settings-theme-btn small {
+      display: block;
+      margin-top: 0.35rem;
+      color: var(--ink3);
+      line-height: 1.35;
+      font-size: 0.73rem;
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -5171,7 +5254,7 @@
       </div>
     </div>
     <nav class="sidebar-nav" aria-label="Pages">
-      <div class="sidebar-nav-section">Explore</div>
+      <div class="sidebar-nav-section"><i data-lucide="compass"></i>Explore</div>
       <button type="button" class="nav-item active" data-page="dashboard" onclick="window.__fflSetPage('dashboard')">
         <span class="nav-ico" aria-hidden="true"><i data-lucide="layout-dashboard"></i></span><span class="nav-item-label">Dashboard</span>
       </button>
@@ -5179,18 +5262,18 @@
         <span class="nav-ico" aria-hidden="true"><i data-lucide="sliders-horizontal"></i></span><span class="nav-item-label">Scenarios</span>
       </button>
       <button type="button" class="nav-item" data-page="compare" onclick="window.__fflSetPage('compare')">
-        <span class="nav-ico" aria-hidden="true"><i data-lucide="bar-chart-3"></i></span><span class="nav-item-label">Compare</span>
+        <span class="nav-ico" aria-hidden="true"><i data-lucide="git-compare-arrows"></i></span><span class="nav-item-label">Compare</span>
       </button>
       <button type="button" class="nav-item" data-page="counties" onclick="window.__fflSetPage('counties')">
-        <span class="nav-ico" aria-hidden="true"><i data-lucide="map-pin"></i></span><span class="nav-item-label">Counties</span>
+        <span class="nav-ico" aria-hidden="true"><i data-lucide="map"></i></span><span class="nav-item-label">Counties</span>
       </button>
-      <div class="sidebar-nav-section">Workspace</div>
+      <div class="sidebar-nav-section"><i data-lucide="briefcase"></i>Workspace</div>
       <button type="button" class="nav-item" data-page="ai" onclick="window.__fflSetPage('ai')">
-        <span class="nav-ico" aria-hidden="true"><i data-lucide="sparkles"></i></span><span class="nav-item-label">AI · Gemini</span>
+        <span class="nav-ico" aria-hidden="true"><i data-lucide="bot"></i></span><span class="nav-item-label">AI · Gemini</span>
       </button>
-      <div class="sidebar-nav-section">App</div>
+      <div class="sidebar-nav-section"><i data-lucide="wrench"></i>App</div>
       <button type="button" class="nav-item" data-page="settings" onclick="window.__fflSetPage('settings')">
-        <span class="nav-ico" aria-hidden="true"><i data-lucide="settings"></i></span><span class="nav-item-label">Settings</span>
+        <span class="nav-ico" aria-hidden="true"><i data-lucide="swatch-book"></i></span><span class="nav-item-label">Settings</span>
       </button>
     </nav>
     <div class="sidebar-toggle-bar">
@@ -5229,15 +5312,15 @@
           <div class="dash-metrics-strip stat-strip stat-strip--anim" id="stat-strip" aria-live="polite">
             <span class="stat-chip">
               <strong id="stat-critical">—</strong>
-              <span class="stat-chip-label">Critical tier</span>
+              <span class="stat-chip-label"><i data-lucide="triangle-alert" aria-hidden="true"></i>Critical tier</span>
             </span>
             <span class="stat-chip">
               <strong id="stat-poverty">—</strong>
-              <span class="stat-chip-label"><span id="stat-poverty-label">&gt;10%</span> line</span>
+              <span class="stat-chip-label"><i data-lucide="trending-up" aria-hidden="true"></i><span id="stat-poverty-label">&gt;10%</span> line</span>
             </span>
             <span class="stat-chip">
               <strong id="stat-vuln-hh">—</strong>
-              <span class="stat-chip-label">Vulnerable HH</span>
+              <span class="stat-chip-label"><i data-lucide="house-plus" aria-hidden="true"></i>Vulnerable HH</span>
             </span>
             <span class="stat-chip">
               <strong id="stat-overspend">—</strong>
@@ -5710,6 +5793,26 @@
             <div class="method-lab-actions" style="margin-top:1rem">
               <button type="button" class="ffl-btn ffl-btn--primary" onclick="window.__fflApplyDemoModeFromSettings()">Save and reload</button>
               <button type="button" class="ffl-btn ffl-btn--secondary" onclick="window.__fflClearDemoModeAndReload()">Turn off demo and reload</button>
+            </div>
+          </section>
+          <section class="method-section" aria-labelledby="settings-theme-h">
+            <h2 id="settings-theme-h">Interface theme</h2>
+            <p style="font-size:0.88rem;color:var(--ink2);line-height:1.55">
+              Pick a visual mode that matches your environment. This only changes UI colors and keeps model logic unchanged.
+            </p>
+            <div class="settings-theme-grid" role="group" aria-label="Theme selection">
+              <button type="button" class="settings-theme-btn active" data-theme-option="default" onclick="window.__fflSetTheme('default')">
+                <strong><i data-lucide="sun-medium" aria-hidden="true"></i>Default</strong>
+                <small>Balanced light glass theme for everyday analysis.</small>
+              </button>
+              <button type="button" class="settings-theme-btn" data-theme-option="midnight" onclick="window.__fflSetTheme('midnight')">
+                <strong><i data-lucide="moon-star" aria-hidden="true"></i>Midnight</strong>
+                <small>Darker surfaces for low-light rooms and projection screens.</small>
+              </button>
+              <button type="button" class="settings-theme-btn" data-theme-option="contrast" onclick="window.__fflSetTheme('contrast')">
+                <strong><i data-lucide="scan-eye" aria-hidden="true"></i>High contrast</strong>
+                <small>Crisper boundaries and stronger text contrast for readability.</small>
+              </button>
             </div>
           </section>
           <section class="method-section" aria-labelledby="settings-api-h">
@@ -7628,10 +7731,44 @@
         }
         sum.innerHTML = line;
       }
+      __fflRefreshThemeButtons();
     } catch (eRs) {
       console.warn('refresh settings:', eRs);
     }
   }
+
+  function __fflGetStoredTheme() {
+    try {
+      var th = localStorage.getItem('ffl_theme');
+      if (th === 'midnight' || th === 'contrast') return th;
+      return 'default';
+    } catch (eThemeGet) {
+      return 'default';
+    }
+  }
+
+  function __fflApplyTheme(themeName) {
+    var root = document.documentElement;
+    if (!root) return;
+    if (themeName === 'midnight' || themeName === 'contrast') root.setAttribute('data-theme', themeName);
+    else root.removeAttribute('data-theme');
+  }
+
+  function __fflRefreshThemeButtons() {
+    var active = __fflGetStoredTheme();
+    document.querySelectorAll('.settings-theme-btn[data-theme-option]').forEach(function (btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-theme-option') === active);
+    });
+  }
+
+  window.__fflSetTheme = function (themeName) {
+    var t = (themeName === 'midnight' || themeName === 'contrast') ? themeName : 'default';
+    try {
+      localStorage.setItem('ffl_theme', t);
+    } catch (eThemeSet) {}
+    __fflApplyTheme(t);
+    __fflRefreshThemeButtons();
+  };
 
   window.__fflApplyDemoModeFromSettings = function () {
     var cb = document.getElementById('settings-demo-checkbox');
@@ -7661,6 +7798,8 @@
       window.location.reload();
     }
   };
+
+  __fflApplyTheme(__fflGetStoredTheme());
 
   window.__fflToggleSidebar = function () {
     var sb = document.getElementById('app-sidebar');
