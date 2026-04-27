@@ -8,7 +8,7 @@ Fuel Fault Lines is a two-service application for visualizing Irish county-level
 
 - **FastAPI backend** (`api/`) — Python data pipeline + REST API (port 8000)
 - **Frontend** (`index.html`) — Single-file vanilla HTML/JS dashboard served by `dev-server.mjs` (port 5500)
-- **AI chat** — Optional **Google Gemini** assistant on the **AI · Gemini** page: browser-side calls to `generativelanguage.googleapis.com` with a user-supplied key (not sent to FastAPI).
+- **AI chat** — Optional **AI · Gemini** page: **only** Google Gemini generates replies (`generativelanguage.googleapis.com`, user key in browser, not sent to FastAPI). The app’s **Fuel Fault Lines REST API** is used **only** to fetch read-only numbers for the system prompt context — no other LLM or “Zero”/hosted chat service is involved in responses.
 - **Submission pack (API)** — `GET /insights/submission-pack` returns JSON scaffolding (summary draft, checklists, social-length copy) for integrators or comms workflows.
 
 No database — all data is computed in-memory from public APIs (SEAI, CSO) with hardcoded fallbacks.

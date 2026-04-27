@@ -671,9 +671,6 @@
       background: var(--rule);
       flex-shrink: 0;
     }
-    .main-topbar .pill-live {
-      margin-top: 0;
-    }
     .app-notice-wrap {
       flex-shrink: 0;
       padding: 0 1.25rem;
@@ -3118,56 +3115,6 @@
       gap: 0.4rem;
       justify-content: flex-end;
     }
-    .pill-live {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.32rem 0.72rem;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.52);
-      border: 1px solid rgba(226, 232, 240, 0.95);
-      backdrop-filter: blur(14px) saturate(1.35);
-      -webkit-backdrop-filter: blur(14px) saturate(1.35);
-      color: var(--ink2);
-      font-family: var(--sans);
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-      box-shadow: 0 1px 0 var(--glass-highlight) inset, 0 2px 10px rgba(15, 23, 42, 0.04);
-    }
-    .pill-live-ico {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      color: #94a3b8;
-      transition: color 0.22s ease, filter 0.22s ease;
-    }
-    .pill-live-ico .lucide {
-      width: 14px;
-      height: 14px;
-      stroke-width: 2.25px;
-    }
-    .pill-live.connected .pill-live-ico {
-      color: #10b981;
-      filter: drop-shadow(0 0 5px rgba(16, 185, 129, 0.35));
-    }
-    .pill-live.degraded .pill-live-ico {
-      color: #f59e0b;
-      filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.3));
-    }
-    .pill-live.offline .pill-live-ico {
-      color: #ef4444;
-      filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.25));
-    }
-    .pill-live .pill-live-text {
-      font-family: var(--mono);
-      font-size: 0.58rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--ink2);
-    }
     .dash-date, .dash-api {
       font-family: var(--mono);
       font-size: 0.58rem;
@@ -3604,6 +3551,141 @@
       padding: 0;
       font-family: var(--sans);
       text-decoration: underline;
+    }
+
+    /* Featured chart drilldown — full “slice” view (tier / risk mix / stress), not a footnote */
+    .dash-chart-drilldown--featured {
+      margin-top: 0.85rem;
+      padding: 0;
+      border: none;
+      background: transparent;
+      font-size: inherit;
+      line-height: inherit;
+      color: inherit;
+    }
+    .ffl-drill-featured {
+      position: relative;
+      border-radius: var(--radius-lg);
+      padding: 1.2rem 1.25rem 1.35rem;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.96) 48%, rgba(224, 242, 254, 0.35) 100%);
+      border: 1px solid rgba(13, 148, 136, 0.28);
+      box-shadow:
+        0 14px 42px rgba(15, 23, 42, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+    .ffl-drill-close {
+      position: absolute;
+      top: 0.55rem;
+      right: 0.55rem;
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--rule);
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--ink2);
+      font-size: 1.15rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+    .ffl-drill-close:hover {
+      background: var(--surface-muted);
+      color: var(--ink);
+      border-color: #cbd5e1;
+    }
+    .ffl-drill-featured__head {
+      font-family: var(--display);
+      font-size: clamp(1.05rem, 2.4vw, 1.35rem);
+      font-weight: 750;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      padding-right: 2.75rem;
+      line-height: 1.2;
+    }
+    .ffl-drill-featured__sub {
+      margin: 0.45rem 0 0;
+      font-family: var(--sans);
+      font-size: 0.88rem;
+      font-weight: 400;
+      color: var(--ink2);
+      line-height: 1.45;
+      max-width: 42rem;
+    }
+    .ffl-drill-featured__stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1rem 0 0.85rem;
+    }
+    .ffl-drill-stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.45rem 0.85rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      color: var(--ink2);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+    .ffl-drill-stat-pill strong {
+      color: var(--ink);
+      font-weight: 650;
+    }
+    .ffl-drill-featured__counties {
+      margin-top: 0.25rem;
+    }
+    .ffl-drill-counties-h {
+      margin: 0 0 0.55rem;
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      font-weight: 650;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent-deep);
+    }
+    .ffl-county-chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      max-height: min(38vh, 280px);
+      overflow-y: auto;
+      padding: 0.15rem 0.1rem 0.35rem 0;
+      scrollbar-gutter: stable;
+    }
+    .ffl-county-chip {
+      padding: 0.42rem 0.78rem;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      background: rgba(255, 255, 255, 0.95);
+      font-family: var(--sans);
+      font-size: 0.84rem;
+      font-weight: 550;
+      color: var(--ink);
+      cursor: pointer;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+    }
+    .ffl-county-chip:hover {
+      border-color: rgba(13, 148, 136, 0.45);
+      box-shadow: 0 4px 14px rgba(13, 148, 136, 0.12);
+      transform: translateY(-1px);
+    }
+    .ffl-drill-empty {
+      margin: 0;
+      font-size: 0.88rem;
+      color: var(--ink3);
+    }
+    .ffl-drill-featured__foot {
+      margin: 1rem 0 0;
+      font-size: 0.78rem;
+      color: var(--ink3);
+      line-height: 1.45;
+      max-width: 40rem;
     }
 
     .donut-wrap-inner {
@@ -4927,10 +5009,6 @@
     .main-topbar h1 {
       font-weight: 700;
     }
-    .pill-live {
-      border-color: rgba(214, 224, 234, 0.95);
-      box-shadow: var(--control-shadow);
-    }
 
     .page-view {
       padding: clamp(0.85rem, 1.6vw, 1.25rem);
@@ -5230,7 +5308,7 @@
     <div class="spinner" aria-hidden="true"></div>
     <h2>Loading model data</h2>
     <p>Pulling the latest county snapshot for your scenario. One request — usually under a second.</p>
-    <p class="load-sub">If this hangs, check the connection pill in the header or serve via <kbd style="font-size:0.65rem;padding:0.1rem 0.25rem;border-radius:4px;border:1px solid var(--rule)">node dev-server.mjs</kbd></p>
+    <p class="load-sub">If this hangs, check Settings → API / demo mode or serve via <kbd style="font-size:0.65rem;padding:0.1rem 0.25rem;border-radius:4px;border:1px solid var(--rule)">node dev-server.mjs</kbd></p>
   </div>
 </div>
 
@@ -5292,8 +5370,6 @@
     <header class="main-topbar">
       <h1 id="page-title">Dashboard</h1>
       <div class="main-topbar-meta">
-        <span class="pill-live" id="pill-connection" title="API connection status"><span class="pill-live-ico" aria-hidden="true"><i data-lucide="radio"></i></span><span class="pill-live-text">Checking…</span></span>
-        <span class="topbar-divider" aria-hidden="true"></span>
         <span class="dash-date" id="doc-date"></span>
         <span class="dash-api" id="dash-api-endpoint" title="API base"></span>
       </div>
@@ -5389,7 +5465,7 @@
       <div class="dash-chart-wrap">
         <canvas id="chart-tier-bars" aria-label="Mean index by risk tier"></canvas>
       </div>
-      <div class="dash-chart-drilldown dash-chart-drilldown--compact" id="tier-bars-drilldown" role="region" aria-live="polite" hidden></div>
+      <div class="dash-chart-drilldown dash-chart-drilldown--featured" id="tier-bars-drilldown" role="region" aria-live="polite" hidden></div>
     </section>
 
     <section class="dash-card dash-card--tr" aria-labelledby="card-tr-title">
@@ -5414,7 +5490,7 @@
         <canvas id="chart-stress-area" aria-label="Counties in energy poverty over time"></canvas>
       </div>
       <div class="adoption-totals" id="adoption-totals"></div>
-      <div class="dash-chart-drilldown dash-chart-drilldown--compact" id="stress-chart-drilldown" role="region" aria-live="polite" hidden></div>
+      <div class="dash-chart-drilldown dash-chart-drilldown--featured" id="stress-chart-drilldown" role="region" aria-live="polite" hidden></div>
     </section>
 
     <section class="dash-card dash-card--bl" aria-labelledby="card-bl-title">
@@ -5455,11 +5531,11 @@
         <div class="overview-legend" id="overview-legend"></div>
       </div>
       <p class="overview-sub" id="overview-foot">Largest segment: <strong id="overview-largest">—</strong></p>
-      <div class="dash-chart-drilldown dash-chart-drilldown--compact" id="risk-mix-drilldown" role="region" aria-live="polite" hidden></div>
+      <div class="dash-chart-drilldown dash-chart-drilldown--featured" id="risk-mix-drilldown" role="region" aria-live="polite" hidden></div>
     </section>
   </div>
 
-  <footer class="site-footer--compact">Sources: SEAI · CSO · AA Ireland · Zerve model API</footer>
+  <footer class="site-footer--compact">Sources: SEAI · CSO · AA Ireland · Fuel Fault Lines API</footer>
       </div>
     </div>
 
@@ -5707,21 +5783,18 @@
       </div>
     </div>
 
-    <div id="page-ai" class="page-view" role="region" aria-label="AI policy analyst powered by Google Gemini">
+    <div id="page-ai" class="page-view" role="region" aria-label="Chat powered only by Google Gemini; county numbers come from this app’s REST API as read-only context">
       <div class="page-inner" style="max-width:56rem">
         <div class="ai-page">
           <div class="ai-page-head">
-            <h2>Fuel policy copilot</h2>
-            <p class="ai-nav-hint" role="note">
-              <strong>Can’t find this screen?</strong> In the left sidebar, under <strong>Workspace</strong>, click <strong>AI · Gemini</strong> (sparkles icon). The API key field is directly below.
+            <h2>AI · Gemini</h2>
+            <p class="sub" style="margin-bottom:0.65rem">
+              Paste your <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a> key below, then <strong>Save key</strong>. It stays on this device only. <strong>Every reply is generated only by Gemini</strong> — this app fetches numbers from the same Fuel Fault Lines REST API as the dashboard and passes them into Gemini as context; nothing else runs an LLM for this chat.
             </p>
-            <p class="sub">
-              <strong>Google Gemini</strong> answers in natural language. Each reply is grounded in <strong>live numbers</strong> from the same Fuel Fault Lines API as the dashboard (Zerve-hosted hub or your local FastAPI via the dev-server <code>/api</code> proxy). Your Gemini key never touches that hub.
-            </p>
-            <label class="ai-key-label" for="ai-api-key">Gemini API key — paste here, then Save</label>
+            <label class="ai-key-label" for="ai-api-key">Gemini API key</label>
             <div class="ai-page-actions" style="margin-top:0">
               <div class="ai-page-key" style="margin-top:0;flex:1">
-                <input type="text" id="ai-api-key" placeholder="e.g. AIza… (from Google AI Studio)" autocomplete="off" spellcheck="false" autocapitalize="off" aria-label="Google Gemini API key"
+                <input type="text" id="ai-api-key" placeholder="Paste key (e.g. AIza…)" autocomplete="off" spellcheck="false" autocapitalize="off" aria-label="Google Gemini API key"
                        onblur="window.__fflSaveAiKey()">
                 <button type="button" class="ffl-btn ffl-btn--primary" onclick="window.__fflSaveAiKey()">Save key</button>
               </div>
@@ -5732,19 +5805,6 @@
               <span>Scenario: <strong>—</strong></span>
               <span>API: <strong>—</strong></span>
             </div>
-            <p class="ai-key-notice-page">
-              <strong>Gemini only:</strong> create a key at
-              <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>
-              and paste it here — it is stored in <code>localStorage</code> on this device only.
-              <strong>Model API:</strong> no separate key for the Irish vulnerability API; if you see HTTP 502, the Zerve hub or proxy may be busy — the dev-server retries once, or run <code>uvicorn</code> locally and set <code>window.__FFL_API_BASE__ = 'http://127.0.0.1:8000'</code> before load.
-            </p>
-            <details class="ai-key-details">
-              <summary>What each layer does</summary>
-              <div class="ai-key-details-body">
-                <p><strong>Data (Zerve / FastAPI)</strong> — County scores, national snapshot, headline insight, thresholds, and tiers at your scenario €/L. Fetched fresh when you send a chat message (summarised for the model).</p>
-                <p><strong>Knowledge (Gemini)</strong> — Explains policy trade-offs, drafts briefings, and reasons about the numbers. If the data fetch fails, say so clearly instead of inventing figures.</p>
-              </div>
-            </details>
           </div>
           <div class="ai-chips-page" id="ai-chips">
             <button type="button" class="ai-chip-page" data-q="Which counties look worst at the current scenario price, and why?">Worst-hit counties</button>
@@ -5754,12 +5814,8 @@
           </div>
           <div class="ai-thread-page" id="ai-thread">
             <div class="ai-welcome" id="ai-welcome">
-              <p class="ai-welcome-title">Ask about Irish fuel stress and policy</p>
-              <p class="ai-welcome-body">
-                <strong>First:</strong> scroll up to the green <strong>Gemini API key</strong> field, paste your key from
-                <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>,
-                and click <strong>Save key</strong>. Then type below or use a chip. Enter sends; Shift+Enter adds a line.
-              </p>
+              <p class="ai-welcome-title">Ask a question</p>
+              <p class="ai-welcome-body">Use a starter chip or type below. Enter to send, Shift+Enter for a new line.</p>
             </div>
           </div>
           <div class="ai-input-row-page">
@@ -6124,12 +6180,16 @@
   let metaCache = null;
   let povertyThresholdPct = 10;
   const LS_AI_KEY = 'ffl_gemini_key';
+  /**
+   * Model id path segment for: .../v1beta/models/{GEMINI_MODEL}:generateContent
+   * `gemini-1.5-flash` is often removed for new keys — use a current id from ListModels if this fails.
+   */
   const GEMINI_MODEL = 'gemini-2.5-flash';
   /** @type {{role:string, content:string}[]} */
   let aiChatMessages = [];
 
   const AI_SYSTEM_CORE =
-    'You are the Fuel Fault Lines copilot: an expert Irish energy and social policy analyst. You answer via Google Gemini; factual claims about counties, tiers, poverty proxy %, and national counts MUST follow the LIVE MODEL CONTEXT block appended below (from the same REST API as the dashboard — Zerve-deployed FastAPI or local).\n\nIf that block reports fetch errors, HTTP 502, or missing data, say so honestly and give qualitative guidance only. Never invent county-level statistics.\n\nData lineage: SEAI-style energy profiles, CSO deprivation (or synthetic cohort), liquid-fuel price scenario. Limitations: modelled fuel share of income, not survey microdata.\n\nStyle: concise, Irish county names, **bold** for key numbers when helpful, short paragraphs. For memos or briefings, use clear headings in plain text.';
+    'You are the Fuel Fault Lines copilot: an expert Irish energy and social policy analyst. You are Google Gemini — you alone produce the user-visible answers in this chat. Factual claims about counties, tiers, poverty proxy %, and national counts MUST follow the READ-ONLY LIVE MODEL CONTEXT block below (JSON/text fetched from this app’s Fuel Fault Lines REST API — same source as the dashboard, e.g. local FastAPI or any configured API base). That API does not generate chat text; it only supplies data for you to interpret.\n\nIf that context reports fetch errors, HTTP 502, or missing data, say so honestly and give qualitative guidance only. Never invent county-level statistics.\n\nData lineage: SEAI-style energy profiles, CSO deprivation (or synthetic cohort), liquid-fuel price scenario. Limitations: modelled fuel share of income, not survey microdata.\n\nStyle: concise, Irish county names, **bold** for key numbers when helpful, short paragraphs. For memos or briefings, use clear headings in plain text.';
 
   function getActivePrice() {
     return compareMode ? priceA : currentPrice;
@@ -6851,33 +6911,130 @@
     return n;
   }
 
+  /** County names whose modelled fuel-income share exceeds the dashboard threshold at €/L `priceEuro`. */
+  function countiesOverThresholdAtPrice(priceEuro) {
+    const p = num(priceEuro);
+    if (!Number.isFinite(p) || p <= 0) return [];
+    const thr = povertyThresholdPct;
+    const out = [];
+    for (let i = 0; i < COUNTIES.length; i++) {
+      const c = COUNTIES[i];
+      const d = countyData[c];
+      if (!d) continue;
+      const pct = povertyPctAtPriceLive(d, p);
+      if (Number.isFinite(pct) && pct > thr - 1e-9) out.push(c);
+    }
+    out.sort();
+    return out;
+  }
+
+  function fflStressSeriesDateKey(pt) {
+    return pt.date || pt.t || pt.month || pt.label;
+  }
+
+  function fflCountyChipHtml(county) {
+    var name = String(county || '');
+    var safe = name.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    return (
+      '<button type="button" class="ffl-county-chip" onclick="window.__fflSelectCounty(\'' +
+      safe +
+      '\')">' +
+      escapeHtml(name) +
+      '</button>'
+    );
+  }
+
+  /**
+   * Large “featured” drill panel HTML (tier bars, risk mix donut, stress trajectory).
+   * @param {string} countiesHeading — h5 above chip grid; falsy skips the counties block entirely.
+   */
+  function fflFeaturedDrillHtml(title, subtitle, pillsHtml, chipsInnerHtml, footHtml, countiesHeading) {
+    var headSub =
+      subtitle && String(subtitle).trim()
+        ? '<p class="ffl-drill-featured__sub">' + escapeHtml(String(subtitle)) + '</p>'
+        : '';
+    var chipsBlock = '';
+    if (countiesHeading != null && countiesHeading !== '') {
+      chipsBlock =
+        '<div class="ffl-drill-featured__counties">' +
+        '<h5 class="ffl-drill-counties-h">' +
+        escapeHtml(String(countiesHeading)) +
+        '</h5>' +
+        '<div class="ffl-county-chip-grid">' +
+        (chipsInnerHtml || '<p class="ffl-drill-empty">No counties to list.</p>') +
+        '</div></div>';
+    }
+    return (
+      '<div class="ffl-drill-featured">' +
+      '<button type="button" class="ffl-drill-close" aria-label="Close detail">×</button>' +
+      '<div class="ffl-drill-featured__head">' +
+      escapeHtml(String(title || 'Detail')) +
+      headSub +
+      '</div>' +
+      (pillsHtml ? '<div class="ffl-drill-featured__stats">' + pillsHtml + '</div>' : '') +
+      chipsBlock +
+      (footHtml && String(footHtml).trim()
+        ? '<p class="ffl-drill-featured__foot">' + escapeHtml(String(footHtml)) + '</p>'
+        : '') +
+      '</div>'
+    );
+  }
+
+  function fflBindFeaturedDrill(el) {
+    if (!el) return;
+    el.hidden = false;
+    var btn = el.querySelector('.ffl-drill-close');
+    if (btn) {
+      btn.onclick = function () {
+        el.hidden = true;
+        el.innerHTML = '';
+      };
+    }
+  }
+
   function renderStressAreaChart(data) {
     const canvas = document.getElementById('chart-stress-area');
     if (!canvas || typeof Chart === 'undefined') return;
-    const h = data.historical || [];
-    const p = data.projected || [];
-    if (h.length === 0 && p.length === 0) return;
+    let h = data.historical || [];
+    let p = data.projected || [];
+    if (h.length === 0 && p.length === 0) {
+      const fb = __fflBuiltinHistorySeries();
+      h = fb.historical || [];
+      p = fb.projected || [];
+    }
 
     const labelSet = {};
     h.forEach(function (pt) {
-      const ds = pt.date || pt.t;
-      if (ds) labelSet[ds] = true;
+      const ds = fflStressSeriesDateKey(pt);
+      if (ds) labelSet[String(ds)] = true;
     });
     p.forEach(function (pt) {
-      const ds = pt.date || pt.t;
-      if (ds) labelSet[ds] = true;
+      const ds = fflStressSeriesDateKey(pt);
+      if (ds) labelSet[String(ds)] = true;
     });
-    const labels = Object.keys(labelSet).sort();
+    let labels = Object.keys(labelSet).sort();
+    if (labels.length === 0 && (h.length || p.length)) {
+      const seen = {};
+      function collect(arr) {
+        arr.forEach(function (pt) {
+          const ds = fflStressSeriesDateKey(pt);
+          if (ds) seen[String(ds)] = true;
+        });
+      }
+      collect(h);
+      collect(p);
+      labels = Object.keys(seen).sort();
+    }
 
     const hMap = {};
     h.forEach(function (pt) {
-      const ds = pt.date || pt.t;
-      if (ds) hMap[ds] = num(pt.price != null ? pt.price : pt.value);
+      const ds = fflStressSeriesDateKey(pt);
+      if (ds) hMap[String(ds)] = num(pt.price != null ? pt.price : pt.value);
     });
     const pMap = {};
     p.forEach(function (pt) {
-      const ds = pt.date || pt.t;
-      if (ds) pMap[ds] = num(pt.price != null ? pt.price : pt.value);
+      const ds = fflStressSeriesDateKey(pt);
+      if (ds) pMap[String(ds)] = num(pt.price != null ? pt.price : pt.value);
     });
 
     const hArr = [];
@@ -6903,6 +7060,14 @@
     });
     maxY = Math.min(26, Math.max(maxY, 1));
     const yCeil = Math.min(26, maxY + 2);
+
+    if (labels.length === 0) {
+      if (stressAreaChartInstance) {
+        stressAreaChartInstance.destroy();
+        stressAreaChartInstance = null;
+      }
+      return;
+    }
 
     const ann = {};
     (data.events || []).forEach(function (ev, idx) {
@@ -6967,10 +7132,12 @@
             borderColor: '#7c3aed',
             backgroundColor: 'rgba(124, 58, 237, 0.18)',
             tension: 0.4,
-            spanGaps: false,
+            spanGaps: true,
             fill: true,
-            pointRadius: 0,
-            pointHoverRadius: 5,
+            pointRadius: function (ctx) {
+              return ctx.raw != null && !Number.isNaN(ctx.raw) ? 3 : 0;
+            },
+            pointHoverRadius: 6,
             pointHitRadius: 12,
             borderWidth: 2
           },
@@ -6981,10 +7148,12 @@
             borderDash: [6, 4],
             backgroundColor: 'rgba(234, 88, 12, 0.12)',
             tension: 0.4,
-            spanGaps: false,
+            spanGaps: true,
             fill: true,
-            pointRadius: 0,
-            pointHoverRadius: 5,
+            pointRadius: function (ctx) {
+              return ctx.raw != null && !Number.isNaN(ctx.raw) ? 3 : 0;
+            },
+            pointHoverRadius: 6,
             pointHitRadius: 12,
             borderWidth: 2
           }
@@ -8381,40 +8550,6 @@
   };
 
   function updateConnectionPill() {
-    var pill = document.getElementById('pill-connection');
-    if (!pill) return;
-    var txt = pill.querySelector('.pill-live-text');
-    var demo = typeof fflDemoApiActive !== 'undefined' && fflDemoApiActive;
-    pill.classList.remove('connected', 'degraded', 'offline');
-    if (!loadFinishedOnce) {
-      if (txt) txt.textContent = demo ? 'Demo…' : 'Connecting…';
-      pill.title = demo ? 'Loading sample county data' : 'Loading county data from the API';
-      if (appPage === 'ai') refreshAiPageStatus();
-      return;
-    }
-    if (lastLoadOkCount <= 0) {
-      pill.classList.add('offline');
-      if (txt) txt.textContent = demo ? 'Demo' : 'Offline';
-      pill.title = demo
-        ? 'Sample data did not load — try Retry load'
-        : 'No county data loaded — check API or network';
-      if (appPage === 'ai') refreshAiPageStatus();
-      return;
-    }
-    if (lastLoadOkCount < lastLoadTotal) {
-      pill.classList.add('degraded');
-      if (txt) txt.textContent = 'Partial data';
-      pill.title =
-        lastLoadOkCount +
-        ' of ' +
-        lastLoadTotal +
-        ' counties loaded — retry failed rows in the register';
-      if (appPage === 'ai') refreshAiPageStatus();
-      return;
-    }
-    pill.classList.add('connected');
-    if (txt) txt.textContent = demo ? 'Demo' : 'Online';
-    pill.title = demo ? 'Sample county data loaded (demo mode)' : 'All counties loaded from the API';
     if (appPage === 'ai') refreshAiPageStatus();
   }
 
@@ -8893,35 +9028,25 @@
     const names = (lastTierCountyLists[tier] || []).slice();
     const mi = TIER_ORDER.indexOf(tier);
     const mean = lastTierMeans && mi >= 0 ? lastTierMeans[mi] : null;
-    const namesHtml = names.length
-      ? '<p class="curve-names">' +
-        names
-          .map(function (n) {
-            return escapeHtml(String(n));
-          })
-          .join(', ') +
-        '</p>'
-      : '<p class="muted">No counties in this tier.</p>';
-    el.innerHTML =
-      '<button type="button" class="drilldown-dismiss" aria-label="Dismiss">×</button>' +
-      '<h4>' +
-      escapeHtml(tier) +
-      '</h4>' +
-      '<p>Mean index: <strong>' +
+    const pills =
+      '<span class="ffl-drill-stat-pill">Mean index (0–100) <strong>' +
       (mean != null ? mean.toFixed(1) : '—') +
-      '</strong> · n=' +
+      '</strong></span>' +
+      '<span class="ffl-drill-stat-pill">Counties in tier <strong>' +
       names.length +
-      '</p>' +
-      '<p class="muted drilldown-sub">Counties</p>' +
-      namesHtml;
-    el.hidden = false;
-    var btn = el.querySelector('.drilldown-dismiss');
-    if (btn) {
-      btn.onclick = function () {
-        el.hidden = true;
-        el.innerHTML = '';
-      };
-    }
+      '</strong></span>';
+    const chips = names.length
+      ? names.map(fflCountyChipHtml).join('')
+      : '<p class="ffl-drill-empty">No counties are classified in this tier yet.</p>';
+    el.innerHTML = fflFeaturedDrillHtml(
+      tier + ' tier',
+      'Mean vulnerability index for this risk group. Open any county for the full brief.',
+      pills,
+      chips,
+      'Tip: use the close control above when you are done exploring this slice.',
+      'Counties in this tier'
+    );
+    fflBindFeaturedDrill(el);
   }
 
   function showRiskMixDrilldown(tier) {
@@ -8936,38 +9061,28 @@
     }, 0);
     const n = names.length;
     const pct = total > 0 ? ((n / total) * 100).toFixed(1) : '0';
-    const namesHtml = names.length
-      ? '<p class="curve-names">' +
-        names
-          .map(function (x) {
-            return escapeHtml(String(x));
-          })
-          .join(', ') +
-        '</p>'
-      : '<p class="muted">No counties in this tier.</p>';
-    el.innerHTML =
-      '<button type="button" class="drilldown-dismiss" aria-label="Dismiss">×</button>' +
-      '<h4>' +
-      escapeHtml(tier) +
-      ' · ' +
-      n +
-      ' counties</h4>' +
-      '<p>Share of all tiered counties: <strong>' +
+    const pills =
+      '<span class="ffl-drill-stat-pill">Weighted share <strong>' +
       pct +
-      '%</strong></p>' +
-      '<p>Mean vulnerability index: <strong>' +
+      '%</strong> of tiered counties</span>' +
+      '<span class="ffl-drill-stat-pill">Counties <strong>' +
+      n +
+      '</strong></span>' +
+      '<span class="ffl-drill-stat-pill">Mean index <strong>' +
       (mean != null ? mean.toFixed(1) : '—') +
-      '</strong></p>' +
-      '<p class="muted drilldown-sub">County names</p>' +
-      namesHtml;
-    el.hidden = false;
-    var btn = el.querySelector('.drilldown-dismiss');
-    if (btn) {
-      btn.onclick = function () {
-        el.hidden = true;
-        el.innerHTML = '';
-      };
-    }
+      '</strong></span>';
+    const chips = names.length
+      ? names.map(fflCountyChipHtml).join('')
+      : '<p class="ffl-drill-empty">No counties in this mix slice yet.</p>';
+    el.innerHTML = fflFeaturedDrillHtml(
+      tier + ' · risk mix',
+      'The donut is weighted by how many counties sit in each tier. This panel shows who is inside the slice you picked.',
+      pills,
+      chips,
+      'Weighted share is county count in this tier divided by all counties that have a tier on the map.',
+      'Counties in this mix slice'
+    );
+    fflBindFeaturedDrill(el);
   }
 
   function showStressChartDrilldown(idx, labels, hMap, pMap) {
@@ -8980,31 +9095,40 @@
     const proj = pv != null && !Number.isNaN(pv);
     const fp = hist ? hv : proj ? pv : null;
     const n = fp != null && Number.isFinite(fp) ? povertyCountAtPrice(fp) : null;
-    el.innerHTML =
-      '<button type="button" class="drilldown-dismiss" aria-label="Dismiss">×</button>' +
-      '<h4>' +
-      escapeHtml(lb || 'Point') +
-      '</h4>' +
-      '<p>Series: <strong>' +
-      (hist ? 'Historical' : proj ? 'Projected' : '—') +
-      '</strong></p>' +
-      '<p>Implied fuel price: <strong>' +
-      (fp != null && Number.isFinite(fp) ? '€' + fp.toFixed(2) + '/L' : '—') +
-      '</strong></p>' +
-      '<p>Counties over ' +
-      povertyThresholdPct +
-      '% at this price: <strong>' +
-      (n != null ? n : '—') +
-      '</strong></p>' +
-      '<p class="muted">Uses the same fuel-income proxy as the main dashboard.</p>';
-    el.hidden = false;
-    var btn = el.querySelector('.drilldown-dismiss');
-    if (btn) {
-      btn.onclick = function () {
-        el.hidden = true;
-        el.innerHTML = '';
-      };
+    const countyList =
+      fp != null && Number.isFinite(fp) ? countiesOverThresholdAtPrice(fp) : [];
+    var stressCountyHeading = '';
+    var stressChipsInner = null;
+    if (fp != null && Number.isFinite(fp)) {
+      stressCountyHeading = 'Counties over ' + povertyThresholdPct + '% at this €/L';
+      stressChipsInner = countyList.length
+        ? countyList.map(fflCountyChipHtml).join('')
+        : '<p class="ffl-drill-empty">No counties exceed the threshold at this implied price.</p>';
     }
+    const pills =
+      '<span class="ffl-drill-stat-pill">Date <strong>' +
+      escapeHtml(String(lb || '—')) +
+      '</strong></span>' +
+      '<span class="ffl-drill-stat-pill">Series <strong>' +
+      (hist ? 'Historical' : proj ? 'Projected' : '—') +
+      '</strong></span>' +
+      '<span class="ffl-drill-stat-pill">Implied €/L <strong>' +
+      (fp != null && Number.isFinite(fp) ? '€' + fp.toFixed(2) : '—') +
+      '</strong></span>' +
+      '<span class="ffl-drill-stat-pill">Over ' +
+      povertyThresholdPct +
+      '% line <strong>' +
+      (n != null ? n : '—') +
+      '</strong></span>';
+    el.innerHTML = fflFeaturedDrillHtml(
+      'Stress trajectory · this month',
+      'Counties whose modelled fuel spend as a share of income clears the dashboard threshold at the implied price on this point.',
+      pills,
+      stressChipsInner,
+      'Uses the same fuel-income proxy as the main dashboard. Click a county chip to open its full brief.',
+      stressCountyHeading
+    );
+    fflBindFeaturedDrill(el);
   }
 
   async function renderScenarioCurveChart() {
@@ -9237,6 +9361,7 @@
       if (tierBarChartInstance) {
         tierBarChartInstance.data.datasets[0].data = tierMeans.slice();
         tierBarChartInstance.data.datasets[0].backgroundColor = faded;
+        tierBarChartInstance.data.datasets[0].minBarLength = 6;
         tierBarChartInstance.update('active');
       } else {
         tierBarChartInstance = new Chart(barCanvas.getContext('2d'), {
@@ -9250,7 +9375,8 @@
                 backgroundColor: faded,
                 borderWidth: 0,
                 borderRadius: 14,
-                maxBarThickness: 36
+                maxBarThickness: 36,
+                minBarLength: 6
               }
             ]
           },
@@ -9982,7 +10108,7 @@
             steps: [
               'Scroll to the county register and look for rows marked failed or empty.',
               'Click a failed county to retry just that request.',
-              'If everything fails, use Retry load after checking the API (see connection pill).'
+              'If everything fails, use Retry load after checking the API in Settings.'
             ],
             code: null,
             detail: ''
@@ -10242,7 +10368,8 @@
     }
   }
 
-  async function buildAiHubContext() {
+  /** Read-only JSON for Gemini system prompt — Fuel Fault Lines REST API only; no LLM calls here. */
+  async function buildAiModelContextForGemini() {
     var price = getActivePrice();
     var base = API;
     var errors = [];
@@ -10301,7 +10428,7 @@
       lines.push(
         'WARNINGS: ' +
           errors.join('; ') +
-          '. The hub may be down (502) or unreachable — tell the user and avoid fabricating numbers.'
+          '. The model REST API may be down (502) or unreachable — tell the user and avoid fabricating numbers.'
       );
     }
 
@@ -10319,8 +10446,8 @@
     var apiLabel = fflDemoApiActive
       ? 'Demo data'
       : useLocalProxy
-        ? 'Local /api → ' + UPSTREAM_ZERVE_HOST
-        : API_PUBLIC.replace(/^https?:\/\//, '');
+        ? 'Local · /api (proxied)'
+        : 'Hosted REST API';
     var dataLabel = '…';
     if (loadFinishedOnce) {
       if (lastLoadOkCount <= 0) dataLabel = 'No county rows loaded';
@@ -10355,8 +10482,8 @@
     w.className = 'ai-welcome';
     w.id = 'ai-welcome';
     w.innerHTML =
-      '<p class="ai-welcome-title">Ask about Irish fuel stress and policy</p>' +
-      '<p class="ai-welcome-body"><strong>First:</strong> scroll up, paste your Gemini API key, click <strong>Save key</strong>. Then chat here. Enter sends; Shift+Enter adds a line.</p>';
+      '<p class="ai-welcome-title">Ask a question</p>' +
+      '<p class="ai-welcome-body">Use a starter chip or type below. Enter to send, Shift+Enter for a new line.</p>';
     th.appendChild(w);
     __fflIconsRefresh();
   };
@@ -10384,14 +10511,14 @@
     if (input) input.value = '';
     if (sendBtn) sendBtn.disabled = true;
 
-    var typing = appendAiMsg('bot typing', 'Fetching live model data & calling Gemini…');
-    var hubCtx = await buildAiHubContext();
+    var typing = appendAiMsg('bot typing', 'Loading read-only scenario data for Gemini…');
+    var modelCtx = await buildAiModelContextForGemini();
     if (typing) typing.remove();
 
     var systemText =
       AI_SYSTEM_CORE +
-      '\n\n--- LIVE MODEL CONTEXT (Fuel Fault Lines API; refresh each message) ---\n' +
-      hubCtx.text;
+      '\n\n--- READ-ONLY LIVE MODEL CONTEXT (for Gemini only; refreshed each send; not an LLM response) ---\n' +
+      modelCtx.text;
 
     var nextMsgs = aiChatMessages.concat([{ role: 'user', content: text }]);
     var url =
@@ -10417,10 +10544,29 @@
         var errTxt =
           errObj.message || errObj.status || res.statusText || 'Request failed';
         appendAiMsg('bot', String(errTxt), false);
-        if (/not found|NOT_FOUND|model|invalid/i.test(String(errTxt))) {
+        var errStr = String(errTxt);
+        if (/quota|billing|free_tier|exceeded your current|rate limit|rate-limit|generate_content_free/i.test(errStr)) {
           appendAiMsg(
             'bot',
-            'If the model was rejected, set GEMINI_MODEL in the page script to a model your key supports (e.g. gemini-2.0-flash).',
+            '**Quota (Google):** https://ai.google.dev/gemini-api/docs/rate-limits — enable billing or wait for retry. You can change **GEMINI_MODEL** in this file (e.g. **gemini-2.0-flash-001** if **gemini-2.5-flash** has no quota).',
+            false
+          );
+        } else if (
+          /not found|not supported|listmodels|list models|generatecontent|call listmodels|\b404\b|NOT_FOUND/i.test(
+            errStr
+          )
+        ) {
+          appendAiMsg(
+            'bot',
+            '**Model name:** Older ids like `gemini-1.5-flash` are often unavailable on `v1beta`. Search this file for **GEMINI_MODEL** (default **gemini-2.5-flash**) or try **gemini-2.0-flash-001** / **gemini-2.0-flash**. List what your key supports: open `https://generativelanguage.googleapis.com/v1beta/models?key=YOUR_API_KEY` in a browser (see supportedGenerationMethods for **generateContent**).',
+            false
+          );
+        } else if (
+          /high demand|RESOURCE_EXHAUSTED|overloaded|unavailable|\b429\b|\b503\b|invalid/i.test(errStr)
+        ) {
+          appendAiMsg(
+            'bot',
+            '**Tip:** Retry shortly. If it persists, edit **GEMINI_MODEL** in this file, or call ListModels: `https://generativelanguage.googleapis.com/v1beta/models?key=YOUR_KEY` and pick an id with **generateContent**.',
             false
           );
         }
