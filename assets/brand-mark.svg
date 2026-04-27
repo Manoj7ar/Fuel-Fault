@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-labelledby="title desc">
+  <title id="title">Fuel Fault Lines brand mark</title>
+  <desc id="desc">A dark rounded square with teal contour lines and an amber fuel stress marker.</desc>
+  <defs>
+    <linearGradient id="bg" x1="28" y1="20" x2="168" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#111827"/>
+      <stop offset=".48" stop-color="#071312"/>
+      <stop offset="1" stop-color="#030712"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="46" y1="42" x2="142" y2="158" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5eead4"/>
+      <stop offset=".5" stop-color="#14b8a6"/>
+      <stop offset="1" stop-color="#0f766e"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="110" y1="42" x2="152" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fbbf24"/>
+      <stop offset="1" stop-color="#f97316"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#000000" flood-opacity=".32"/>
+    </filter>
+  </defs>
+  <rect width="192" height="192" rx="42" fill="url(#bg)"/>
+  <path d="M28 138c27-2 35-24 58-24 25 0 31 23 61 17 9-2 15-6 20-11" fill="none" stroke="#164e48" stroke-width="2.5" stroke-linecap="round" opacity=".8"/>
+  <path d="M27 76c22 0 34-19 54-18 25 1 36 30 62 27 11-1 19-7 24-13" fill="none" stroke="#0f766e" stroke-width="2.5" stroke-linecap="round" opacity=".65"/>
+  <g filter="url(#softShadow)">
+    <path d="M48 132V62c0-8 6-14 14-14h42c8 0 14 6 14 14v70c0 8-6 14-14 14H62c-8 0-14-6-14-14Z" fill="#f8fafc"/>
+    <path d="M63 65h39v24H63z" fill="url(#teal)" rx="6"/>
+    <path d="M74 111c0-12 10-24 11-33 1 9 12 21 12 33 0 8-5 16-12 16s-11-8-11-16Z" fill="url(#teal)"/>
+    <path d="M118 66h13c8 0 14 6 14 14v27c0 7 4 11 10 11 5 0 9-4 9-9V78" fill="none" stroke="url(#amber)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M145 78h14" fill="none" stroke="#fed7aa" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <path d="M42 151h108" stroke="url(#teal)" stroke-width="8" stroke-linecap="round"/>
+  <path d="M63 151h32" stroke="#f8fafc" stroke-width="3" stroke-linecap="round" opacity=".9"/>
+</svg>

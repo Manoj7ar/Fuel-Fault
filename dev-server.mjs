@@ -31,7 +31,7 @@ const MIME = {
   '.svg': 'image/svg+xml',
 };
 
-function cors(res, extra = {}) {
+function cors(extra = {}) {
   return {
     'Access-Control-Allow-Origin': '*',
     ...extra,

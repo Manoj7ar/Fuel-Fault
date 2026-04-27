@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fuel Fault Lines — Ireland</title>
-  <link rel="icon" href="/assets/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="icon" href="/assets/brand-mark.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/brand-mark.png" sizes="192x192">
   <script>
     (function () {
@@ -4616,6 +4616,522 @@
       color: var(--ink3);
       margin-top: 0.35rem;
     }
+
+    /* Visual refresh: same Fuel Fault Lines theme, sharper depth and controls */
+    :root {
+      --paper: #eef2f6;
+      --paper2: #dde5ed;
+      --surface: rgba(255, 255, 255, 0.92);
+      --surface-muted: #f5f7fa;
+      --ink: #0b1220;
+      --ink2: #263446;
+      --ink3: #64748b;
+      --accent: #0f9f92;
+      --accent-deep: #0b6f68;
+      --accent-soft: rgba(15, 159, 146, 0.11);
+      --accent-glow: rgba(15, 159, 146, 0.34);
+      --sidebar-bg: #030708;
+      --sidebar-hover: rgba(255, 255, 255, 0.075);
+      --glass-bg: rgba(255, 255, 255, 0.68);
+      --glass-bg-strong: rgba(255, 255, 255, 0.88);
+      --glass-border: rgba(214, 224, 234, 0.9);
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 10px 30px rgba(15, 23, 42, 0.09);
+      --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.78) inset, 0 18px 44px rgba(15, 23, 42, 0.08);
+      --glass-shadow: 0 1px 0 rgba(255, 255, 255, 0.72) inset, 0 18px 48px rgba(15, 23, 42, 0.08);
+      --control-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 8px 22px rgba(15, 23, 42, 0.08);
+    }
+
+    body {
+      background-color: var(--paper);
+      background-image:
+        linear-gradient(rgba(15, 23, 42, 0.032) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.026) 1px, transparent 1px),
+        radial-gradient(ellipse 62% 52% at 92% 0%, rgba(15, 159, 146, 0.16), transparent 58%),
+        radial-gradient(ellipse 58% 48% at 3% 100%, rgba(245, 158, 11, 0.095), transparent 56%),
+        linear-gradient(135deg, #f8fafc 0%, #e9eef5 48%, #f4f7f8 100%);
+      background-size: 42px 42px, 42px 42px, auto, auto, auto;
+    }
+
+    .sidebar-title-text,
+    .nav-item-label,
+    .main-topbar h1,
+    .ai-page-head h2,
+    .masthead-title,
+    .note-panel h2,
+    .retrofit-details summary,
+    .dash-brand h1,
+    .dash-tagline,
+    .stat-chip strong,
+    .dash-card-title,
+    .matrices-graph-title,
+    .submit-page .submit-hero h2 {
+      letter-spacing: 0;
+    }
+
+    .app-shell {
+      --shell-inset: clamp(0.55rem, 1.4vw, 0.9rem);
+    }
+
+    .app-sidebar {
+      isolation: isolate;
+      border-color: rgba(255, 255, 255, 0.12);
+      background:
+        linear-gradient(180deg, rgba(20, 184, 166, 0.1), transparent 22%),
+        radial-gradient(circle at 50% 0%, rgba(20, 184, 166, 0.2), transparent 34%),
+        linear-gradient(180deg, #07100f 0%, #030708 56%, #020405 100%);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.06) inset,
+        0 18px 54px rgba(2, 6, 23, 0.34);
+    }
+    .app-sidebar::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(94, 234, 212, 0.08), transparent 34%),
+        repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 9px);
+      opacity: 0.55;
+    }
+    .app-sidebar::after {
+      content: "";
+      position: absolute;
+      top: 0.9rem;
+      bottom: 0.9rem;
+      left: 0;
+      width: 1px;
+      background: linear-gradient(180deg, transparent, rgba(94, 234, 212, 0.7), transparent);
+      opacity: 0.58;
+    }
+
+    .sidebar-brand {
+      padding: 1rem 0.95rem 0.95rem;
+      border-bottom-color: rgba(255, 255, 255, 0.09);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.01));
+    }
+    .sidebar-logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 15px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
+      border-color: rgba(94, 234, 212, 0.22);
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+        0 14px 30px rgba(0, 0, 0, 0.36),
+        0 0 28px rgba(20, 184, 166, 0.16);
+    }
+    .sidebar-logo__img {
+      width: 34px;
+      height: 34px;
+      border-radius: 11px;
+      object-fit: contain;
+    }
+    .sidebar-title-text {
+      font-size: 0.95rem;
+      text-transform: none;
+    }
+    .sidebar-title-text small {
+      color: #89a4ad;
+      letter-spacing: 0.08em;
+    }
+
+    .sidebar-nav {
+      padding: 0.55rem 0.58rem 0.65rem;
+      gap: 0.22rem;
+    }
+    .sidebar-nav-section {
+      color: #738391;
+      letter-spacing: 0.1em;
+    }
+    .sidebar-nav-section::before {
+      width: 5px;
+      height: 5px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(20, 184, 166, 0.55);
+    }
+    .nav-item {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid transparent;
+      border-radius: 13px;
+      color: #9cadba;
+      transition:
+        transform 0.18s ease,
+        background 0.18s ease,
+        color 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.22s ease,
+        padding 0.35s var(--sidebar-ease),
+        gap 0.35s var(--sidebar-ease);
+    }
+    .nav-item::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      background: linear-gradient(90deg, rgba(20, 184, 166, 0.16), transparent 66%);
+      transition: opacity 0.18s ease;
+    }
+    .nav-item:hover {
+      transform: translateX(2px);
+      border-color: rgba(255, 255, 255, 0.08);
+      background: var(--sidebar-hover);
+    }
+    .nav-item:hover::before,
+    .nav-item.active::before {
+      opacity: 1;
+    }
+    .nav-item.active {
+      background: rgba(255, 255, 255, 0.085);
+      border-color: rgba(94, 234, 212, 0.24);
+      box-shadow:
+        inset 3px 0 0 #5eead4,
+        0 10px 24px rgba(0, 0, 0, 0.16);
+    }
+    .nav-ico {
+      position: relative;
+      z-index: 1;
+      width: 2.18rem;
+      height: 2.18rem;
+      background: rgba(255, 255, 255, 0.055);
+      border-color: rgba(148, 163, 184, 0.12);
+    }
+    .nav-item-label {
+      position: relative;
+      z-index: 1;
+    }
+    .nav-item.active .nav-ico {
+      color: #ccfbf1;
+      background: rgba(20, 184, 166, 0.18);
+      border-color: rgba(94, 234, 212, 0.28);
+      box-shadow: 0 0 18px rgba(20, 184, 166, 0.16);
+    }
+    .app-sidebar.collapsed .nav-item:hover {
+      transform: translateY(-1px);
+    }
+
+    .ffl-btn {
+      position: relative;
+      overflow: hidden;
+      min-height: 2.25rem;
+      border-radius: 10px;
+      letter-spacing: 0;
+      transform: translateZ(0);
+    }
+    .ffl-btn::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.34) 45%, transparent 72%);
+      transform: translateX(-120%);
+      transition: transform 0.42s ease, opacity 0.28s ease;
+    }
+    .ffl-btn:hover:not(:disabled)::after {
+      opacity: 1;
+      transform: translateX(120%);
+    }
+    .ffl-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+    .ffl-btn:active:not(:disabled) {
+      transform: translateY(0) scale(0.98);
+    }
+    .ffl-btn--primary {
+      background: linear-gradient(135deg, #14b8a6 0%, #0f766e 58%, #0b5f59 100%);
+      border-color: rgba(255, 255, 255, 0.34);
+      box-shadow: 0 12px 28px rgba(15, 159, 146, 0.28), var(--control-shadow);
+    }
+    .ffl-btn--primary:hover:not(:disabled) {
+      box-shadow: 0 16px 34px rgba(15, 159, 146, 0.34), var(--control-shadow);
+    }
+    .ffl-btn--secondary,
+    .ffl-btn--ghost,
+    .matrices-tb-btn,
+    .scenario-preset-chip,
+    .ai-chip-page,
+    #page-compare .compare-pills .matrices-nav-item,
+    #page-compare .compare-toolbar .matrices-view-tab {
+      box-shadow: var(--control-shadow);
+      transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease, color 0.16s ease, box-shadow 0.2s ease;
+    }
+    .ffl-btn--secondary:hover:not(:disabled),
+    .ffl-btn--ghost:hover:not(:disabled),
+    .matrices-tb-btn:hover,
+    .scenario-preset-chip:hover,
+    .ai-chip-page:hover,
+    #page-compare .compare-pills .matrices-nav-item:hover,
+    #page-compare .compare-toolbar .matrices-view-tab:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.72) inset, 0 12px 26px rgba(15, 23, 42, 0.1);
+    }
+    .ffl-btn--icon {
+      min-height: 0;
+      border-radius: 11px;
+    }
+    .ffl-btn--sidebar {
+      border-color: rgba(94, 234, 212, 0.22);
+      background: rgba(20, 184, 166, 0.12);
+      color: #ccfbf1;
+    }
+
+    .main-topbar {
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--shell-inset);
+      padding: 0.78rem 1.15rem;
+    }
+    .main-topbar h1 {
+      font-weight: 700;
+    }
+    .pill-live {
+      border-color: rgba(214, 224, 234, 0.95);
+      box-shadow: var(--control-shadow);
+    }
+
+    .page-view {
+      padding: clamp(0.85rem, 1.6vw, 1.25rem);
+      scroll-behavior: smooth;
+    }
+    .page-panel,
+    .dash-card,
+    .ai-page,
+    #page-compare .compare-workspace,
+    .method-page .method-section,
+    .note-panel,
+    .history-chart-shell,
+    .county-drawer-panel,
+    .modal-dialog {
+      border-color: var(--glass-border);
+      box-shadow: var(--shadow-card);
+    }
+    .dash-card,
+    .page-panel,
+    .ai-page,
+    #page-compare .compare-workspace {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.68)),
+        var(--glass-bg);
+    }
+    .dash-card:hover,
+    .page-panel:hover,
+    .ai-page:hover,
+    #page-compare .compare-workspace:hover {
+      border-color: rgba(15, 159, 146, 0.24);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.82) inset, 0 22px 54px rgba(15, 23, 42, 0.1);
+    }
+    .dash-card:hover {
+      transform: translateY(-2px);
+    }
+    .dash-card-icon,
+    .thesis-banner__ico,
+    .key-finding-card .kf-label-ico,
+    .app-notice-ico {
+      background: linear-gradient(145deg, rgba(15, 159, 146, 0.12), rgba(255, 255, 255, 0.78));
+      border-color: rgba(15, 159, 146, 0.18);
+      color: var(--accent-deep);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+    }
+    .dash-pill-tag,
+    .adoption-totals .pill,
+    .donut-center-pill,
+    .live-line {
+      background: linear-gradient(135deg, #0f172a, #102b2a);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+    }
+    .stat-strip {
+      background: rgba(255, 255, 255, 0.58);
+      box-shadow: var(--control-shadow);
+    }
+    .stat-chip {
+      border-color: rgba(214, 224, 234, 0.95);
+      transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.2s ease;
+    }
+    .stat-chip:hover {
+      transform: translateY(-1px);
+      border-color: rgba(15, 159, 146, 0.24);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+    }
+    .thesis-banner {
+      background: linear-gradient(118deg, rgba(15, 159, 146, 0.14) 0%, rgba(255, 255, 255, 0.86) 50%, rgba(245, 158, 11, 0.09) 100%);
+    }
+    .key-finding-card {
+      border-left-color: #14b8a6;
+    }
+    .bubble-chart,
+    .chart-box,
+    .dash-chart-drilldown,
+    .metric-spec,
+    .retrofit-details,
+    .method-pre,
+    details.method-raw,
+    .ai-thread-page,
+    .ai-page-status,
+    .ai-page-key input,
+    .ai-input-row-page textarea,
+    .method-lab-grid input[type="number"],
+    .compare-two-row select,
+    #page-compare .compare-footer-field select {
+      border-color: rgba(214, 224, 234, 0.95);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.72) inset;
+    }
+
+    input,
+    textarea,
+    select {
+      transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: rgba(15, 159, 146, 0.45) !important;
+      box-shadow: 0 0 0 4px rgba(15, 159, 146, 0.11), 0 1px 0 rgba(255, 255, 255, 0.75) inset !important;
+    }
+    input[type=range] {
+      height: 8px;
+      box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.12);
+    }
+    input[type=range]::-webkit-slider-thumb {
+      width: 22px;
+      height: 22px;
+      box-shadow: 0 0 0 5px rgba(15, 159, 146, 0.12), 0 8px 18px var(--accent-glow);
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 0 7px rgba(15, 159, 146, 0.14), 0 10px 24px var(--accent-glow);
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      box-shadow: 0 0 0 5px rgba(15, 159, 146, 0.12), 0 8px 18px var(--accent-glow);
+    }
+
+    .county-row,
+    .overview-legend-row,
+    .metric-spec__row,
+    .matrices-table tbody tr {
+      transition: background 0.16s ease, transform 0.16s ease, box-shadow 0.18s ease;
+    }
+    .county-row:hover:not(.error),
+    .matrices-table tbody tr:hover {
+      background: rgba(15, 159, 146, 0.07);
+    }
+    .county-row:hover:not(.error) {
+      transform: translateX(2px);
+    }
+    .county-row.selected {
+      background: rgba(15, 159, 146, 0.12);
+      box-shadow: inset 3px 0 0 var(--accent);
+    }
+    .cr-bar span {
+      background: linear-gradient(90deg, #5eead4, #0f766e);
+    }
+
+    .sidebar-foot {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      background: linear-gradient(145deg, rgba(20, 184, 166, 0.11), rgba(255, 255, 255, 0.035));
+      border-color: rgba(94, 234, 212, 0.16);
+      color: #93a7b1;
+    }
+    .sidebar-foot__label {
+      color: #5eead4;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.52rem;
+    }
+    .sidebar-foot strong {
+      color: #f8fafc;
+      font-size: 0.68rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ffl-btn,
+      .ffl-btn::after,
+      .nav-item,
+      .nav-item::before,
+      .dash-card,
+      .stat-chip,
+      .county-row,
+      input,
+      textarea,
+      select {
+        transition: none !important;
+        animation: none !important;
+      }
+      .ffl-btn:hover:not(:disabled),
+      .nav-item:hover,
+      .dash-card:hover,
+      .stat-chip:hover,
+      .county-row:hover:not(.error) {
+        transform: none !important;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .app-shell {
+        padding: 0.5rem;
+        gap: 0.5rem;
+      }
+      .app-sidebar {
+        width: var(--sidebar-w-collapsed) !important;
+      }
+      .sidebar-brand {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.95rem 0.55rem 0.85rem;
+      }
+      .sidebar-brand-main {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+      .sidebar-title-text,
+      .sidebar-headlines,
+      .nav-item-label,
+      .sidebar-foot {
+        display: none !important;
+      }
+      .sidebar-nav-section {
+        max-height: 0;
+        opacity: 0;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+      }
+      .nav-item {
+        justify-content: center;
+        padding: 0.58rem 0.42rem;
+        gap: 0;
+      }
+      .sidebar-toggle-bar {
+        justify-content: center;
+        padding: 0.45rem 0.5rem 0.4rem;
+      }
+      .main-topbar {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .main-topbar-meta {
+        width: 100%;
+      }
+      .topbar-divider {
+        display: none;
+      }
+      .dash-card,
+      .page-panel {
+        padding: 1rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -4636,7 +5152,7 @@
         <div class="sidebar-logo" aria-hidden="true">
           <img
             class="sidebar-logo__img"
-            src="/assets/brand-mark.png"
+            src="/assets/brand-mark.svg"
             width="28"
             height="28"
             alt=""
@@ -4676,7 +5192,11 @@
         <i data-lucide="chevron-left"></i>
       </button>
     </div>
-    <div class="sidebar-foot">Ireland · 26 counties · SEAI / CSO / AA</div>
+    <div class="sidebar-foot">
+      <span class="sidebar-foot__label">Model scope</span>
+      <strong>Ireland · 26 counties</strong>
+      <span>SEAI / CSO / AA</span>
+    </div>
   </aside>
 
   <div class="app-main">
